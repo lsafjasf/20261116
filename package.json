@@ -1,0 +1,11 @@
+{
+  "name": "two-crew-submarine-sim",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "双人共舱小型潜艇：状态机、暂停、回放、失败恢复与确定性哈希验证",
+  "scripts": {
+    "test": "node tests/run-all.mjs",
+    "serve": "python3 -m http.server 8732"
+  }
+}

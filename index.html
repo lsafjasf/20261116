@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>双人共舱潜艇模拟</title>
+<link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+<header>
+  <h1>双人共舱小型潜艇 · 样本采集任务</h1>
+  <div class="meta">
+    <label>seed <input id="seed" type="number" value="2026" min="1"></label>
+    <span>计时 <b id="timer">0.0s</b></span>
+    <span>tick <b id="tick">0</b></span>
+    <span>状态机 <b id="phase">READY</b></span>
+    <span>哈希 <code id="hash"></code></span>
+  </div>
+</header>
+
+<main>
+  <section class="stage">
+    <canvas id="scene" width="960" height="600"></canvas>
+    <div class="objective-box">
+      <div>当前目标：<b id="objective"></b></div>
+      <div>运行模式：<b id="modeLabel">手动</b></div>
+    </div>
+  </section>
+
+  <aside class="side">
+    <div class="panel">
+      <h3>任务日志 · 最近状态变化</h3>
+      <ul id="changes" class="changes"></ul>
+      <h4>操作告警</h4>
+      <ul id="warnings" class="warnings"></ul>
+    </div>
+    <div class="panel replay">
+      <h3>回放与验证</h3>
+      <div id="replayResult" class="replay-result">尚未重放</div>
+      <button data-act="replay">按输入记录重放并比对哈希</button>
+    </div>
+  </aside>
+</main>
+
+<section class="consoles">
+  <div class="console station-a">
+    <h3>控制台 A · 推进与灯光</h3>
+    <div class="keys">
+      <button data-act="thrust-fwd">前进 <kbd>W</kbd></button>
+      <button data-act="thrust-rev">倒车 <kbd>S</kbd></button>
+      <button data-act="light">灯光切换 <kbd>Q</kbd></button>
+      <button data-act="engine">引擎开关 <kbd>E</kbd></button>
+      <button data-act="sample" class="primary">采集样本 <kbd>Space</kbd></button>
+    </div>
+    <p class="hint">泛光灯耗电高，会压低推进功率；低电量时推力进一步衰减。</p>
+  </div>
+
+  <div class="console station-b">
+    <h3>控制台 B · 浮力与气阀</h3>
+    <div class="keys">
+      <button data-act="flood">注水压载 <kbd>↑</kbd></button>
+      <button data-act="vent">排水 <kbd>↓</kbd></button>
+      <button data-act="neutral">回中 <kbd>N</kbd></button>
+      <button data-act="blow" class="danger">应急排气 <kbd>B</kbd></button>
+      <button data-act="recover" class="warn">失败恢复 <kbd>R</kbd></button>
+    </div>
+    <p class="hint">急升急降会引起舱温骤变；升速超限进入失控上浮，须立即注水压载。</p>
+  </div>
+</section>
+
+<section class="toolbar">
+  <button id="pauseBtn" data-act="pause">暂停 (P)</button>
+  <button id="restartBtn" data-act="restart">重新开始</button>
+  <span class="sep"></span>
+  <button data-act="mode-safe">自动：成功路线</button>
+  <button data-act="mode-mistake">自动：操作失误</button>
+  <button data-act="mode-extreme">自动：参数极限</button>
+  <button data-act="mode-manual">回到手动</button>
+</section>
+
+<script type="module" src="src/app.js"></script>
+</body>
+</html>
