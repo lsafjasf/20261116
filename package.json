@@ -1,0 +1,25 @@
+{
+  "name": "uid618",
+  "version": "1.0.0",
+  "description": "键盘可操作绘图工具（鼠标/键盘等价输入）",
+  "main": "server.mjs",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node tests/run-all.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lsafjasf/20261116.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/lsafjasf/20261116/issues"
+  },
+  "homepage": "https://github.com/lsafjasf/20261116#readme",
+  "devDependencies": {
+    "playwright": "^1.65.1"
+  }
+}
