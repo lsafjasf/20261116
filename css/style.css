@@ -1,0 +1,67 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", "PingFang SC", monospace, sans-serif;
+  background: #0b0e18;
+  color: #d7def0;
+}
+header { padding: 14px 20px 6px; }
+h1 { font-size: 20px; margin: 0 0 8px; }
+.hud { display: flex; gap: 18px; flex-wrap: wrap; font-size: 13px; color: #9fb2d8; }
+.restore { color: #82e696; font-size: 13px; min-height: 18px; }
+main { padding: 0 20px 30px; }
+.stage-wrap { position: relative; }
+canvas {
+  width: 100%;
+  max-width: 800px;
+  border: 1px solid #2a3350;
+  border-radius: 8px;
+  background: #141826;
+}
+.banner {
+  position: absolute;
+  top: 12px;
+  width: 100%;
+  max-width: 800px;
+  text-align: center;
+  color: #ffd24a;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+.panels { display: flex; gap: 16px; margin: 14px 0; flex-wrap: wrap; }
+.panel {
+  flex: 1 1 320px;
+  background: #131a2c;
+  border: 1px solid #2a3350;
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+.panel.p1 { border-left: 4px solid #78aaff; }
+.panel.p2 { border-left: 4px solid #82e696; }
+.panel h2 { font-size: 15px; margin: 0 0 6px; }
+.panel p { font-size: 12px; color: #8fa0c4; margin: 0 0 10px; }
+.panel label { display: flex; align-items: center; gap: 8px; margin: 8px 0; font-size: 13px; }
+.panel input[type="range"] { flex: 1; }
+.controls { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+button, .file {
+  background: #1d2740;
+  color: #d7def0;
+  border: 1px solid #33406a;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+button:hover, .file:hover { border-color: #5d78b8; }
+button:disabled { opacity: 0.45; cursor: default; }
+.replay, .conflicts {
+  background: #131a2c;
+  border: 1px solid #2a3350;
+  border-radius: 8px;
+  padding: 10px 16px;
+  margin-top: 14px;
+}
+.replay h2, .conflicts h2 { font-size: 14px; margin: 4px 0; }
+.hint { font-size: 12px; color: #8fa0c4; }
+#conflict-log { margin: 6px 0; padding-left: 18px; font-size: 13px; }
+#conflict-log li { color: #ffd24a; margin: 4px 0; }

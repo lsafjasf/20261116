@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>双人舞台灯光控制台</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header>
+    <h1>双人舞台灯光控制台</h1>
+    <div class="hud">
+      <span id="clock">0:00.0</span>
+      <span id="cue-info">—</span>
+      <span>进度 <progress id="progress" max="10" value="0"></progress></span>
+      <span>状态 <b id="status">running</b></span>
+    </div>
+    <p id="restore-banner" class="restore"></p>
+  </header>
+
+  <main>
+    <section class="stage-wrap">
+      <canvas id="stage" width="800" height="480"></canvas>
+      <p id="banner" class="banner"></p>
+    </section>
+
+    <section class="panels">
+      <div class="panel p1">
+        <h2>玩家 1 · 主光 / 亮度</h2>
+        <p>W/S 亮度 · Shift 闪光(满亮度) · E 主断路器</p>
+        <label>亮度 <input id="p1-bright" type="range" min="0" max="100" disabled />
+          <span id="p1-bright-val">0</span></label>
+        <label>电源 <b id="p1-power">OFF</b></label>
+        <label>耐久 <input id="p1-dur" type="range" min="0" max="100" disabled />
+          <span id="p1-dur-val">100</span></label>
+      </div>
+
+      <div class="panel p2">
+        <h2>玩家 2 · 色片 / 灯架</h2>
+        <p>←/→ 旋转 · ↑ 换色片 · L 安全联锁断电</p>
+        <label>角度 <input id="p2-angle" type="range" min="0" max="140" disabled />
+          <span id="p2-angle-val">0°</span></label>
+        <label>色片 <b id="p2-color">warm</b></label>
+        <label>热量 <input id="p2-heat" type="range" min="0" max="100" disabled />
+          <span id="p2-heat-val">0%</span></label>
+        <label>耐久 <input id="p2-dur" type="range" min="0" max="100" disabled />
+          <span id="p2-dur-val">100</span></label>
+      </div>
+    </section>
+
+    <section class="controls">
+      <button id="demo-success">自动演示：成功演出</button>
+      <button id="demo-fail">自动演示：失败（暗场）</button>
+      <button id="human">双人手动</button>
+      <button id="pause">Pause</button>
+      <button id="step">单步</button>
+      <button id="speed">Speed 1x</button>
+      <button id="replay-live">回放本次</button>
+      <button id="download" disabled>下载录制</button>
+      <label class="file">载入回放文件 <input id="replay-file" type="file" accept="application/json" /></label>
+    </section>
+
+    <section id="replay-panel" class="replay" hidden>
+      <h2>回放（同一时间线重放输入流）</h2>
+      <p>位置 <span id="replay-pos">0/0</span> · <span id="replay-result"></span></p>
+      <p class="hint">暂停 / 单步 / 2x 只改变播放节奏；重算状态哈希在三种模式下必须逐 tick 一致。</p>
+    </section>
+
+    <section class="conflicts">
+      <h2>同通道写入冲突（时刻 + 对象位置 + 两种顺序结果）</h2>
+      <ul id="conflict-log"></ul>
+    </section>
+  </main>
+
+  <script type="module" src="js/web/app.js"></script>
+</body>
+</html>
