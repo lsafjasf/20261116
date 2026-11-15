@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101311">
+  <title>Signal Lab / 10s 音频处理台</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23171c18'/%3E%3Cpath d='M7 20V12M12 24V8M17 22V10M22 19V13M27 17V15' stroke='%23c7f36b' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="ambient" aria-hidden="true"></div>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <div>
+        <p class="eyebrow">DETERMINISTIC AUDIO WORKBENCH</p>
+        <h1>SIGNAL<span>/</span>LAB</h1>
+      </div>
+    </div>
+
+    <div class="top-status" aria-label="运行摘要">
+      <div id="statusPill" class="status-pill" data-state="idle">
+        <span class="status-dot"></span>
+        <span id="statusText">待机</span>
+      </div>
+      <div class="top-stat"><span>活动节点</span><strong id="activeNodeTop">0</strong></div>
+      <div class="top-stat"><span>输出峰值</span><strong id="peakTop">--</strong></div>
+    </div>
+
+    <div class="transport-actions" aria-label="播放与导出">
+      <button id="playBtn" class="btn btn-primary" type="button">
+        <span class="icon" aria-hidden="true">▶</span><span id="playLabel">试听</span>
+      </button>
+      <button id="stopBtn" class="btn btn-icon" type="button" aria-label="停止并释放音频节点" disabled>■</button>
+      <button id="exportBtn" class="btn" type="button">
+        <span class="icon" aria-hidden="true">↓</span> 导出 WAV
+      </button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="card chain-panel" aria-labelledby="chainTitle">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">SIGNAL PATH</p>
+          <h2 id="chainTitle">处理节点</h2>
+        </div>
+        <span id="chainBadge" class="count-badge">5 + 安全</span>
+      </div>
+
+      <div id="chainList" class="chain-list" aria-live="polite"></div>
+
+      <div class="master-control">
+        <div class="control-copy">
+          <label for="masterGain">总线增益</label>
+          <output id="masterGainValue" for="masterGain">+2.5 dB</output>
+        </div>
+        <input id="masterGain" class="range" type="range" min="-12" max="6" step="0.1" value="2.5">
+      </div>
+
+      <div class="source-recipe">
+        <p class="eyebrow">SOURCE RECIPE / 10.000 s</p>
+        <div class="recipe-tags">
+          <span>50 Hz 嗡声</span>
+          <span>爆音 ×2</span>
+          <span>掉线 250 ms</span>
+          <span>源端削波</span>
+        </div>
+        <p class="recipe-note">固定随机种子 · 44.1 kHz · 双声道 · int16 导出</p>
+      </div>
+    </section>
+
+    <section class="stage">
+      <div class="card timeline-card">
+        <div class="section-heading timeline-heading">
+          <div>
+            <p class="eyebrow">ARRANGEMENT / WAVEFORM</p>
+            <h2>十秒信号轨迹</h2>
+          </div>
+          <div class="time-readout"><span id="playTime">00:00.000</span><em>/ 00:10.000</em></div>
+        </div>
+        <div class="waveframe">
+          <canvas id="timelineCanvas" aria-label="处理前后波形、爆音点与掉线区间"></canvas>
+          <div class="wave-legend"><i class="legend-input"></i>输入 <i class="legend-output"></i>输出 <i class="legend-drop"></i>掉线</div>
+        </div>
+        <div class="transport-line">
+          <div class="playhead-track" aria-hidden="true"><span id="playhead"></span></div>
+          <div class="marker-row" id="markerRow"></div>
+        </div>
+      </div>
+
+      <div class="metric-grid" aria-label="关键测量值">
+        <article class="metric-card">
+          <span class="metric-label">输入峰值</span>
+          <strong id="inputPeak">--</strong>
+          <small id="inputPeakNote">源端</small>
+        </article>
+        <article class="metric-card metric-accent">
+          <span class="metric-label">输出峰值</span>
+          <strong id="outputPeak">--</strong>
+          <small id="outputPeakNote">安全天花板</small>
+        </article>
+        <article class="metric-card">
+          <span class="metric-label">立体声相关性</span>
+          <strong id="correlation">--</strong>
+          <small id="panValue">声像 --</small>
+        </article>
+        <article class="metric-card">
+          <span class="metric-label">安全阻断</span>
+          <strong id="clipGuard">--</strong>
+          <small>输出削波样本 0</small>
+        </article>
+      </div>
+
+      <div class="analysis-grid">
+        <article class="card spectrum-card">
+          <div class="card-label">
+            <span><i class="swatch swatch-input"></i>PROCESS / BEFORE</span>
+            <span id="beforeSpectrumPeak">--</span>
+          </div>
+          <canvas id="spectrumBefore" aria-label="处理前频谱"></canvas>
+          <div class="freq-axis"><span>20 Hz</span><span>200</span><span>2k</span><span>20k</span></div>
+        </article>
+        <article class="card spectrum-card">
+          <div class="card-label">
+            <span><i class="swatch swatch-output"></i>PROCESS / AFTER</span>
+            <span id="afterSpectrumPeak">--</span>
+          </div>
+          <canvas id="spectrumAfter" aria-label="处理后频谱"></canvas>
+          <div class="freq-axis"><span>20 Hz</span><span>200</span><span>2k</span><span>20k</span></div>
+        </article>
+      </div>
+    </section>
+
+    <aside class="right-rail">
+      <section class="card runtime-card" aria-labelledby="runtimeTitle">
+        <div class="section-heading compact">
+          <div>
+            <p class="eyebrow">LIVE TELEMETRY</p>
+            <h2 id="runtimeTitle">运行状态</h2>
+          </div>
+          <span id="runtimePulse" class="runtime-pulse" data-state="idle"></span>
+        </div>
+        <dl class="runtime-list">
+          <div><dt>活动节点</dt><dd id="activeNodes">0</dd></div>
+          <div><dt>AudioContext</dt><dd id="contextState">未创建</dd></div>
+          <div><dt>播放调度</dt><dd id="schedulerState">空闲</dd></div>
+          <div><dt>界面监听器</dt><dd id="listenerCount">--</dd></div>
+          <div><dt>节点代数</dt><dd id="graphGeneration">G0</dd></div>
+        </dl>
+        <div id="diagnosis" class="diagnosis">
+          <span class="diagnosis-icon">◎</span>
+          <p><strong>链路待命</strong><small>渲染后即可判断问题位于调度、资源或播放链路。</small></p>
+        </div>
+      </section>
+
+      <section id="safetyCard" class="card safety-card" data-state="pending">
+        <div class="safety-head">
+          <span class="shield" aria-hidden="true">✓</span>
+          <div><p class="eyebrow">NON-BYPASSABLE</p><h2>削波联锁</h2></div>
+        </div>
+        <p id="safetyMessage">等待首轮离线渲染与输出峰值校验。</p>
+        <div class="safety-meter"><span id="safetyFill"></span><i class="ceiling-tick"></i></div>
+        <div class="safety-foot"><span>CEILING −0.50 dBFS</span><strong id="safetyState">CHECKING</strong></div>
+      </section>
+
+      <section class="card snapshot-card" aria-labelledby="snapshotTitle">
+        <div class="section-heading compact">
+          <div>
+            <p class="eyebrow">STATE CONTROL</p>
+            <h2 id="snapshotTitle">参数快照</h2>
+          </div>
+        </div>
+        <div class="button-pair">
+          <button id="saveSnapshotBtn" class="btn btn-small" type="button">保存当前</button>
+          <button id="restoreSnapshotBtn" class="btn btn-small" type="button" disabled>恢复快照</button>
+        </div>
+        <div id="snapshotComparison" class="comparison-list">
+          <p class="empty-copy">尚未保存快照。恢复后将比较节拍点、声像、增益与 WAV 时长。</p>
+        </div>
+      </section>
+
+      <section class="card audit-card" aria-labelledby="auditTitle">
+        <div class="section-heading compact">
+          <div>
+            <p class="eyebrow">REPAIR LEDGER</p>
+            <h2 id="auditTitle">修复记录</h2>
+          </div>
+          <button id="fixRecordBtn" class="link-btn" type="button">修复并记录</button>
+        </div>
+        <ol id="auditLog" class="audit-log">
+          <li data-kind="info"><time>--:--:--</time><span>等待拓扑审计。</span></li>
+        </ol>
+        <button id="selfTestBtn" class="btn btn-wide" type="button">运行生命周期自检</button>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <span>RENDER → VALIDATE → QUANTIZE → EXPORT</span>
+    <span id="wavIdentity">WAV — · -- samples · checksum --</span>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
