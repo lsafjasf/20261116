@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>工厂设备能量流弧线图</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>工厂设备能量流监控</h1>
+    <span class="chip" id="filterChip"></span>
+    <span class="chip" id="versionChip"></span>
+    <span class="chip" id="exportChip"></span>
+    <span class="chip" id="conservedChip"></span>
+  </header>
+
+  <div class="toolbar">
+    <div><label>数据集</label><select id="datasetSelect"></select></div>
+    <div><label>时间窗口</label>
+      <select id="shiftSelect">
+        <option value="all">全天（24h）</option>
+      </select>
+    </div>
+    <div class="range-wrap">
+      <label>输入缩放</label>
+      <input type="range" id="scaleRange" min="0.5" max="1" step="0.01" value="1">
+      <span class="range-val" id="scaleValue">1.00</span>
+    </div>
+    <button class="primary" id="simBtn">运行输入减少仿真 ×0.8</button>
+    <button id="resetBtn">重置</button>
+    <button id="exportBtn">导出工程</button>
+    <button id="importBtn">导入工程</button>
+    <input type="file" id="importInput" accept="application/json">
+  </div>
+
+  <div class="layout">
+    <div class="canvas-card">
+      <div class="card-head">
+        <span>能量流弧线（拖动蓝色弧线调节流量，点击任意弧线查看来源）</span>
+        <span class="muted">Canvas 实时渲染 · 数值单位 kWh</span>
+      </div>
+      <canvas id="flowCanvas"></canvas>
+      <div class="legend">
+        <span><i class="swatch" style="background:#3a7bd5"></i>能量流（按容量利用率着色）</span>
+        <span><i class="swatch" style="background:#2e9e5b"></i>常规损失 &lt;5%</span>
+        <span><i class="swatch" style="background:#e0a32e"></i>预警 5–12%</span>
+        <span><i class="swatch" style="background:#d64545"></i>告警 ≥12%</span>
+        <span><i class="swatch dashed"></i>异常损失（单独显示）</span>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="side-card">
+        <div class="card-head"><span>弧线来源明细（点击画布或清单）</span></div>
+        <div class="card-body" id="detailPop">
+          <span class="muted">尚未选择弧线，点击任意弧线查看来源与构成。</span>
+        </div>
+      </div>
+      <div class="side-card">
+        <div class="card-head"><span>汇总指标</span></div>
+        <div class="card-body kv" id="summary"></div>
+      </div>
+      <div class="side-card">
+        <div class="card-head"><span>节点平衡（随窗口/拖动同步）</span></div>
+        <div class="card-body"><table id="nodeTable"></table></div>
+      </div>
+      <div class="side-card">
+        <div class="card-head"><span>弧线清单（点击查看来源）</span></div>
+        <div class="card-body"><table id="edgeTable"></table></div>
+      </div>
+      <div class="side-card">
+        <div class="card-head"><span>调试面板 · 中间计算状态</span></div>
+        <div class="card-body debug-log" id="debugPanel"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script src="js/core.js"></script>
+  <script src="js/samples.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.getElementById('importBtn').addEventListener('click', function () {
+      document.getElementById('importInput').click();
+    });
+  </script>
+</body>
+</html>

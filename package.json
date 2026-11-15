@@ -1,0 +1,11 @@
+{
+  "name": "factory-energy-flow",
+  "version": "1.4.0",
+  "description": "工厂设备能量输入输出弧线可视化（Canvas + 零依赖逻辑内核）",
+  "private": true,
+  "scripts": {
+    "test": "node tests/run-tests.js && node tests/dom-smoke.js",
+    "build:artifacts": "node scripts/generate-artifacts.js"
+  },
+  "license": "MIT"
+}
