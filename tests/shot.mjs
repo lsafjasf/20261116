@@ -1,0 +1,10 @@
+import { chromium } from 'playwright';
+const browser = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required', '--no-proxy-server'] });
+const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+await page.goto('http://127.0.0.1:8575/index.html');
+await page.waitForFunction(() => window.__app);
+await page.click('#btnStart');
+await page.waitForTimeout(2500);
+await page.screenshot({ path: 'artifacts/screenshot.png' });
+await browser.close();
+console.log('saved');

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>耦合振荡器声场 · Coupled Oscillator Network</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+  <h1>耦合振荡器网络 <small>8 节点 · 稳定 ⇄ 复杂</small></h1>
+</header>
+<main>
+  <section class="panel controls">
+    <h2>参数</h2>
+    <label>耦合强度 K <input id="coupling" type="range" min="0" max="2" step="0.01" value="0.6"><span data-val="coupling"></span></label>
+    <label>相位偏移 φ <input id="phaseOffset" type="range" min="0" max="3.1416" step="0.01" value="0"><span data-val="phaseOffset"></span></label>
+    <label>阻尼 <input id="damping" type="range" min="0" max="1" step="0.01" value="0.35"><span data-val="damping"></span></label>
+    <label>基频 <input id="baseFreq" type="range" min="55" max="220" step="1" value="110"><span data-val="baseFreq"></span></label>
+    <div class="buttons">
+      <button id="btnStart">▶ 启动</button>
+      <button id="btnPause" disabled>⏸ 暂停</button>
+      <button id="btnStop" disabled>⏹ 停止</button>
+      <button id="btnReset">↺ 重置</button>
+    </div>
+    <div class="buttons">
+      <button id="btnDemo">🎬 演示：稳定→复杂→稳定</button>
+      <button id="btnSave">💾 保存参数</button>
+      <button id="btnLoad">📂 恢复快照</button>
+      <button id="btnExport">⬇ 导出 2s WAV</button>
+    </div>
+  </section>
+  <section class="panel status">
+    <h2>运行状态</h2>
+    <dl>
+      <dt>AudioContext</dt><dd id="stCtx">closed</dd>
+      <dt>调度器</dt><dd id="stSched">stopped</dd>
+      <dt>活动音频节点</dt><dd id="stNodes">0</dd>
+      <dt>活动监听器</dt><dd id="stListeners">0</dd>
+      <dt>仿真 tick</dt><dd id="stTick">0</dd>
+      <dt>同步度 r</dt><dd id="stOrder">—</dd>
+      <dt>输出 RMS</dt><dd id="stRms">—</dd>
+      <dt>启动/停止次数</dt><dd id="stCycles">0 / 0</dd>
+    </dl>
+    <div id="diag" class="diag">诊断：—</div>
+  </section>
+  <section class="panel canvas-wrap">
+    <h2>节点网络</h2>
+    <canvas id="netCanvas" width="520" height="360"></canvas>
+  </section>
+  <section class="panel canvas-wrap">
+    <h2>输出波形</h2>
+    <canvas id="waveCanvas" width="520" height="200"></canvas>
+  </section>
+</main>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
