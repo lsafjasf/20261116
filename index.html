@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#071923" />
+    <title>冰隙回声 / ICE ECHO</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <div>
+            <p class="eyebrow">NO VISUAL MAP / AUDIO ONLY</p>
+            <h1>冰隙回声 <span>ICE ECHO</span></h1>
+          </div>
+        </div>
+        <div class="run-meta">
+          <div><span>种子</span><strong id="seedLabel">—</strong></div>
+          <div><span>用时</span><strong id="timeLabel">00:00</strong></div>
+          <div><span>声标</span><strong id="beaconLabel">0 / 3</strong></div>
+          <button id="pauseButton" class="icon-button" type="button" disabled>暂停</button>
+          <button id="soundButton" class="icon-button" type="button" aria-label="切换声音" aria-pressed="true">声音 · 开</button>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="stage-panel" aria-label="冰洞声场">
+          <canvas id="stage" width="960" height="680"></canvas>
+          <div class="stage-vignette" aria-hidden="true"></div>
+          <div class="stage-copy" id="stageCopy" aria-live="polite">
+            <p class="eyebrow">THREE SIGNALS · ONE WAY OUT</p>
+            <h2>闭眼，听见冰层的方向。</h2>
+            <p>三个声标会间歇沉默。前方滤波更亮，身后更闷；回声越长，目标越远。找到全部声标后回到入口。</p>
+            <label class="seed-field">
+              <span>本轮种子</span>
+              <input id="seedInput" type="text" maxlength="28" value="FROST-042" autocomplete="off" spellcheck="false" />
+            </label>
+            <button id="enterButton" class="primary-button" type="button">进入冰洞</button>
+          </div>
+          <div class="canvas-legend" aria-hidden="true">
+            <span><i class="legend-dot"></i> 方向标记</span>
+            <span><b>L</b> 电平表 <b>R</b></span>
+          </div>
+          <div class="touch-controls" aria-label="触屏方向控制">
+            <button data-hold="turnLeft" type="button" aria-label="左转">↶</button>
+            <button data-hold="forward" type="button" aria-label="前进">▲</button>
+            <button data-hold="back" type="button" aria-label="后退">▼</button>
+            <button data-hold="turnRight" type="button" aria-label="右转">↷</button>
+          </div>
+          <aside id="resultPanel" class="result-panel" hidden>
+            <p class="eyebrow" id="resultKicker">RUN COMPLETE</p>
+            <h2 id="resultTitle">返回入口</h2>
+            <p id="resultBody"></p>
+            <div id="resultStats" class="result-stats"></div>
+            <div class="result-actions">
+              <button id="replayButton" class="primary-button" type="button">同种子再来一次</button>
+              <button id="newRunButton" class="ghost-button" type="button">换一个种子</button>
+            </div>
+          </aside>
+        </section>
+
+        <aside class="console-panel">
+          <section class="mission-card">
+            <div class="section-title">
+              <p class="eyebrow">MISSION STATUS</p>
+              <span id="statusPill" class="status-pill idle">待机</span>
+            </div>
+            <p id="missionHint">启动声音，寻找三个冰层声标。</p>
+            <div class="progress-track"><span id="progressFill"></span></div>
+            <div class="mission-grid">
+              <div><span>当前材质</span><strong id="materialLabel">冰晶壁</strong></div>
+              <div><span>危险距离</span><strong id="dangerLabel">安全</strong></div>
+              <div><span>听觉目标</span><strong id="targetLabel">—</strong></div>
+              <div><span>节拍</span><strong id="beatLabel">0</strong></div>
+            </div>
+          </section>
+
+          <section class="diagnostic-card">
+            <div class="section-title">
+              <p class="eyebrow">LIVE TELEMETRY</p>
+              <span class="live-label"><i></i> LIVE</span>
+            </div>
+            <div class="diagnostic-grid">
+              <div><span>调度</span><strong id="diagScheduler">停止</strong></div>
+              <div><span>播放链路</span><strong id="diagPlayback">待机</strong></div>
+              <div><span>活动节点</span><strong id="diagNodes">0</strong></div>
+              <div><span>发声节点</span><strong id="diagVoices">0</strong></div>
+              <div><span>监听器</span><strong id="diagListeners">0</strong></div>
+              <div><span>尾音 / 延迟</span><strong id="diagTails">0</strong></div>
+              <div><span>音频时钟</span><strong id="diagClock">0.00s</strong></div>
+              <div><span>输出峰值</span><strong id="diagPeak">−∞ dB</strong></div>
+            </div>
+            <div class="health-row" aria-label="系统健康状态">
+              <span id="healthScheduler"><i></i>调度</span>
+              <span id="healthResources"><i></i>资源</span>
+              <span id="healthPlayback"><i></i>播放</span>
+            </div>
+            <div class="sparkline-wrap" aria-hidden="true">
+              <canvas id="sparkline" width="420" height="54"></canvas>
+            </div>
+          </section>
+
+          <section class="tool-card">
+            <div class="section-title">
+              <p class="eyebrow">ACOUSTIC TUNING</p>
+              <span class="tiny-note">实时生效</span>
+            </div>
+            <label class="range-row">
+              <span>总增益</span>
+              <input id="masterGain" type="range" min="0" max="120" value="78" />
+              <output id="masterGainValue">78%</output>
+            </label>
+            <label class="range-row">
+              <span>声标增益</span>
+              <input id="pingGain" type="range" min="10" max="100" value="68" />
+              <output id="pingGainValue">68%</output>
+            </label>
+            <label class="range-row">
+              <span>回声距离</span>
+              <input id="echoScale" type="range" min="20" max="180" value="100" />
+              <output id="echoScaleValue">1.00×</output>
+            </label>
+            <label class="range-row">
+              <span>混响湿度</span>
+              <input id="reverbMix" type="range" min="0" max="100" value="42" />
+              <output id="reverbMixValue">42%</output>
+            </label>
+            <label class="range-row">
+              <span>节拍速度</span>
+              <input id="bpm" type="range" min="42" max="96" value="60" />
+              <output id="bpmValue">60 BPM</output>
+            </label>
+            <div class="parameter-actions">
+              <button id="snapshotButton" class="ghost-button" type="button">保存参数快照</button>
+              <button id="restoreButton" class="ghost-button" type="button" disabled>从快照恢复</button>
+            </div>
+            <p id="snapshotStatus" class="tiny-note">快照会记录节拍、声像、增益与 WAV 时长。</p>
+          </section>
+
+          <section class="validation-card">
+            <div class="section-title">
+              <p class="eyebrow">RUNTIME CHECKS</p>
+              <span class="tiny-note">点击逐项验证</span>
+            </div>
+            <div class="validation-actions">
+              <button data-check="seed" type="button">同 seed 重开</button>
+              <button data-check="pause" type="button">暂停 / 恢复</button>
+              <button data-check="wrong" type="button">错误裂隙路径</button>
+              <button data-check="interrupt" type="button">输入中断</button>
+              <button data-check="destroy" type="button">销毁音频节点</button>
+              <button data-check="duplicate" type="button">重复启动</button>
+              <button data-check="snapshot" type="button">快照比对</button>
+              <button data-check="export" type="button">导出 WAV</button>
+            </div>
+            <div id="checkReport" class="check-report" aria-live="polite">
+              <p>尚未运行检查。</p>
+            </div>
+          </section>
+        </aside>
+      </main>
+
+      <footer class="statusbar">
+        <span><i id="audioDot" class="status-dot"></i><b id="audioState">音频待机</b></span>
+        <span>WASD / 方向键 · 转向与移动</span>
+        <span id="footerMessage">Canvas 只显示电平表与方向标记；结算后才揭示真实路径。</span>
+      </footer>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
