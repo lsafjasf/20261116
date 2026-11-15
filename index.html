@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#080b18" />
+    <title>Phase Split · 双轨节拍</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23080b18'/%3E%3Cpath d='M20 12v40M44 12v40' stroke='%2343e7ff' stroke-width='6'/%3E%3Cpath d='M32 20v24' stroke='%23ff55bd' stroke-width='6'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="masthead">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <div>
+            <p class="eyebrow">DUAL TRACK / 60 SEC</p>
+            <h1>PHASE <span>SPLIT</span></h1>
+          </div>
+        </div>
+        <div class="clock-block">
+          <span class="eyebrow">曲目时钟</span>
+          <div class="clock"><span id="clock">00.000</span><small>/ 60.000</small></div>
+        </div>
+      </header>
+
+      <section class="stage" aria-label="双轨节拍游戏">
+        <canvas id="stage" aria-label="双轨节拍与频谱画布"></canvas>
+        <div class="stage-grid" aria-hidden="true"></div>
+        <div class="lane-label lane-label-left">
+          <span>LOW / LEFT</span><strong>F</strong><small>低频 · 左轨</small>
+        </div>
+        <div class="lane-label lane-label-right">
+          <span>HIGH / RIGHT</span><strong>J</strong><small>高频 · 右轨</small>
+        </div>
+
+        <aside class="hud hud-left">
+          <p class="eyebrow">当前目标</p>
+          <h2 id="objective">启动音频，准备演出</h2>
+          <p id="objective-detail" class="objective-detail">校准可减少设备延迟误差。</p>
+          <div class="focus-readout">
+            <span>监听焦点</span>
+            <strong id="focus-label">低频轨</strong>
+            <kbd>SPACE</kbd>
+          </div>
+          <div class="meter">
+            <div class="meter-head"><span>同步完整度</span><strong id="integrity-text">100%</strong></div>
+            <div class="meter-track"><i id="integrity-bar"></i></div>
+          </div>
+        </aside>
+
+        <aside class="hud hud-right">
+          <div class="score-row">
+            <div><span class="eyebrow">分数</span><strong id="score">000000</strong></div>
+            <div class="multiplier"><span class="eyebrow">倍率</span><strong id="multiplier">×1</strong></div>
+          </div>
+          <div class="combo-line"><span>COMBO</span><strong id="combo">0</strong></div>
+          <div class="resource-box">
+            <p class="eyebrow">关键资源</p>
+            <dl>
+              <div><dt>焦点加成</dt><dd id="focus-bonus">待命</dd></div>
+              <div><dt>校准偏移</dt><dd id="offset">0 ms</dd></div>
+              <div><dt>音频资源</dt><dd id="audio-resources">未启动</dd></div>
+              <div><dt>频谱缓存</dt><dd id="spectrum-resources">0 bins</dd></div>
+            </dl>
+          </div>
+          <div class="change-box" aria-live="polite">
+            <p class="eyebrow">最近一次状态变化 <span id="change-time">--:--</span></p>
+            <p id="last-change">等待启动</p>
+            <p id="flash-message" class="flash-message" hidden></p>
+          </div>
+        </aside>
+
+        <div class="spectrum-label spectrum-label-left">LOW SPECTRUM · PANNED L</div>
+        <div class="spectrum-label spectrum-label-right">HIGH SPECTRUM · PANNED R</div>
+
+        <section id="overlay" class="overlay" aria-live="polite">
+          <div class="overlay-card">
+            <p id="overlay-kicker" class="eyebrow">READY / AUDIO LOCK</p>
+            <h2 id="overlay-title">两套节拍，一条时间线</h2>
+            <p id="overlay-copy">低频轨用 F，高频轨用 J。空格切换监听焦点，P 暂停。</p>
+            <div id="calibration-panel" class="calibration-panel" hidden>
+              <div class="calibration-orbit" aria-hidden="true"><span id="calibration-count">0</span><small>/ 5</small></div>
+              <p>跟随点击声敲击 <kbd>K</kbd>。采样达到 5 次后自动应用偏移。</p>
+              <p class="calibration-result">中位偏移 <strong id="calibration-value">0 ms</strong></p>
+            </div>
+            <div id="overlay-actions" class="overlay-actions">
+              <button id="start-button" class="primary" type="button">开始演出</button>
+              <button id="calibrate-button" class="secondary" type="button">校准延迟</button>
+            </div>
+            <p id="record-note" class="record-note">每局结束自动保存 seed、输入记录与最终状态哈希。</p>
+          </div>
+        </section>
+      </section>
+
+      <footer class="controls">
+        <div class="control-group">
+          <button id="pause-button" type="button">暂停 <kbd>P</kbd></button>
+          <button id="focus-button" type="button">切换焦点 <kbd>SPACE</kbd></button>
+          <button id="recover-button" type="button" disabled>失败恢复</button>
+        </div>
+        <div class="control-group">
+          <button id="replay-button" type="button" disabled>回放记录 <kbd>R</kbd></button>
+          <button id="download-button" type="button" disabled>导出记录</button>
+          <label class="file-button" for="import-input">导入记录</label>
+          <input id="import-input" type="file" accept="application/json" hidden />
+        </div>
+        <p id="run-meta" class="run-meta">SEED — · 记录 — · HASH —</p>
+      </footer>
+    </main>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
