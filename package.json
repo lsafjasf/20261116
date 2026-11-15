@@ -1,0 +1,12 @@
+{
+  "name": "subsea-cable-sim",
+  "version": "1.0.0",
+  "description": "确定性海底电缆维修仿真：固定 seed、操作回放、暂停/单步/恢复、断缆恢复与失败回放",
+  "private": true,
+  "scripts": {
+    "test": "node tests/run.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
