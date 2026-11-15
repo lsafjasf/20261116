@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>多媒体时间线自检工作台</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header>
+    <h1>多媒体时间线自检工作台</h1>
+    <span class="meta-pill">工程：<strong id="meta-name">-</strong></span>
+    <span class="meta-pill">数据版本：<strong id="meta-version">-</strong></span>
+    <span class="meta-pill">总时长：<strong id="meta-duration">-</strong></span>
+    <span class="meta-pill">当前筛选：<strong id="meta-filter">-</strong></span>
+    <span class="meta-pill">导出口径：<strong id="meta-scope">-</strong></span>
+    <span class="meta-pill">视图对象：<strong id="meta-clips">-</strong></span>
+  </header>
+
+  <main>
+    <section>
+      <div class="card">
+        <h2>控制台</h2>
+        <div class="toolbar">
+          <select id="sample-select">
+            <option value="sample-a">固定样例 A（课堂录像）</option>
+            <option value="sample-b">固定样例 B（短视频混剪）</option>
+          </select>
+          <select id="filter-track">
+            <option value="all">全部轨道</option>
+            <option value="video-1">视频轨 V1</option>
+            <option value="audio-a">音频轨 A1</option>
+            <option value="audio-b">音频轨 A2</option>
+            <option value="sub-a">字幕 S1</option>
+            <option value="sub-b">字幕 S2</option>
+            <option value="sub-c">字幕 S3</option>
+          </select>
+          <select id="filter-kind">
+            <option value="all">全部类型</option>
+            <option value="video">仅视频</option>
+            <option value="audio">仅音频</option>
+            <option value="subtitle">仅字幕</option>
+          </select>
+          <input id="filter-keyword" placeholder="名称/字幕关键字" />
+          <button id="zoom-out" type="button">缩小视图 −</button>
+          <button id="zoom-in" type="button">放大视图 +</button>
+          <label>播放头(秒) <input id="playhead-input" type="number" min="0" step="1" value="0" style="width:86px"></label>
+        </div>
+        <div class="toolbar" style="margin-top:8px">
+          <button id="split-button" type="button">在中点分割选中片段</button>
+          <button id="illegal-button" class="danger" type="button">演示一次非法重叠</button>
+          <button id="scope-all" type="button">口径：全量导出</button>
+          <button id="scope-filtered" type="button">口径：仅筛选结果</button>
+          <button id="save-button" class="primary" type="button">保存工程</button>
+          <button id="reload-button" type="button">重新载入工程</button>
+          <button id="export-button" class="primary" type="button">导出报告</button>
+          <button id="run-self-check" type="button">运行浏览器自检</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>六轨时间线（可拖动片段；斜纹=空洞，红框=重叠，虚线框=时长离群）</h2>
+        <div class="timeline-scroll">
+          <div id="timeline"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>播放头同步预览（当前 <span id="playhead-value">0s</span>）</h2>
+        <div class="preview-grid">
+          <div class="preview-box"><h3>画面</h3><div id="preview-video"></div></div>
+          <div class="preview-box"><h3>音频</h3><div id="preview-audio"></div></div>
+          <div class="preview-box"><h3>字幕</h3><div id="preview-subtitle"></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>总时长检查</h2>
+        <div id="duration-check"></div>
+      </div>
+
+      <div class="card">
+        <h2>入库问题（空值 / 重复 / 异常值 / 越界）</h2>
+        <div id="ingest-issues"></div>
+      </div>
+
+      <div class="card" id="self-check">
+        <h2>浏览器自检结果（与 Node 共用同一份 tests/scenarios.js）</h2>
+        <div id="self-check-results"><span class="empty">点击“运行浏览器自检”。</span></div>
+      </div>
+    </section>
+
+    <aside>
+      <div class="card">
+        <h2>调试面板 · 中间计算状态</h2>
+        <div id="debug-panel" class="debug"></div>
+        <h2 style="margin-top:10px">实时状态快照</h2>
+        <pre id="debug-state" class="debug"></pre>
+      </div>
+    </aside>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "multimedia-timeline-selfcheck",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "多媒体时间线：六轨编辑、重叠/空洞标记、播放头同步、工程持久化、导出报告与可复跑自检",
+  "scripts": {
+    "test": "node tests/run-tests.js",
+    "test:dom": "node tests/dom-smoke.js",
+    "demo": "node scripts/demo-run.js",
+    "verify": "node tests/run-tests.js && node tests/dom-smoke.js && node scripts/demo-run.js",
+    "serve": "python3 -m http.server 8080"
+  },
+  "devDependencies": {
+    "jsdom": "^26.0.0"
+  }
+}
