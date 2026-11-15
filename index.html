@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="带依赖感知缓存的图形编辑器验证工作台" />
+    <title>Lattice — 图形缓存工作台</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232c5d48'/%3E%3Cpath d='M9 9h6v6H9zm8 8h6v6h-6z' fill='%23fbfaf6'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Lattice 首页">
+          <span class="brand-mark" aria-hidden="true">
+            <i></i><i></i><i></i><i></i>
+          </span>
+          <span class="brand-name">LATTICE</span>
+          <span class="brand-edition">CACHE LAB</span>
+        </a>
+        <div class="document-title">
+          <span class="status-dot"></span>
+          <strong>Spring Editorial</strong>
+          <span class="slash">/</span>
+          <span>画布 01</span>
+        </div>
+        <div class="top-actions">
+          <span class="saved-state">已自动保存</span>
+          <button class="button button-ghost" id="resetButton" type="button">重置画布</button>
+          <button class="button button-primary" id="openBenchmark" type="button">
+            <span class="spark-icon" aria-hidden="true">✦</span>
+            运行缓存验证
+          </button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="panel layers-panel" aria-label="图层">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">DOCUMENT</span>
+              <h2>图层</h2>
+            </div>
+            <span class="count-badge" id="layerCount">0</span>
+          </div>
+          <div class="layer-tree" id="layerTree"></div>
+
+          <section class="scenario-panel">
+            <div class="scenario-heading">
+              <span class="eyebrow">FIXED CHANGES</span>
+              <span class="scenario-hint">一键复现</span>
+            </div>
+            <button class="scenario-button" data-scenario="resize" type="button">
+              <span class="scenario-index">01</span>
+              <span class="scenario-copy">
+                <strong>父尺寸</strong>
+                <small>Hero 500 × 580 → 420 × 580</small>
+              </span>
+              <span class="scenario-arrow">↗</span>
+            </button>
+            <button class="scenario-button" data-scenario="font" type="button">
+              <span class="scenario-index">02</span>
+              <span class="scenario-copy">
+                <strong>继承字体</strong>
+                <small>标题组 68 → 78 px</small>
+              </span>
+              <span class="scenario-arrow">↗</span>
+            </button>
+            <button class="scenario-button" data-scenario="visibility" type="button">
+              <span class="scenario-index">03</span>
+              <span class="scenario-copy">
+                <strong>图层显隐</strong>
+                <small>装饰层 visible → false</small>
+              </span>
+              <span class="scenario-arrow">↗</span>
+            </button>
+          </section>
+        </aside>
+
+        <section class="stage" aria-label="设计画布">
+          <div class="stage-toolbar">
+            <div class="tool-group">
+              <button class="icon-button is-active" type="button" aria-label="选择工具">V</button>
+              <button class="icon-button" type="button" aria-label="手形工具">H</button>
+            </div>
+            <div class="stage-mode">
+              <span class="pulse-dot"></span>
+              增量缓存
+              <span class="mode-separator"></span>
+              <span id="selectionTrail">选择任意图层查看依赖</span>
+            </div>
+            <div class="stage-tools">
+              <button class="icon-button" id="fitButton" type="button" aria-label="适应画布">F</button>
+              <button class="icon-button" id="zoomOut" type="button" aria-label="缩小">−</button>
+              <span id="zoomLabel">100%</span>
+              <button class="icon-button" id="zoomIn" type="button" aria-label="放大">+</button>
+            </div>
+          </div>
+          <div class="canvas-wrap" id="canvasWrap">
+            <canvas id="editorCanvas"></canvas>
+            <div class="canvas-caption">
+              <span>ARTBOARD 01</span>
+              <span>940 × 660</span>
+            </div>
+            <div class="change-toast" id="changeToast" role="status" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <aside class="panel inspector-panel" aria-label="属性与指标">
+          <section class="inspector-section">
+            <div class="panel-heading compact">
+              <div>
+                <span class="eyebrow">INSPECTOR</span>
+                <h2 id="selectedName">Hero 卡片</h2>
+              </div>
+              <span class="type-chip" id="selectedType">GROUP</span>
+            </div>
+            <div class="selection-meta">
+              <span id="selectedId">hero</span>
+              <span class="lock-chip">⌘ 已链接</span>
+            </div>
+            <div class="property-grid">
+              <label class="property">
+                <span>X</span>
+                <input id="propX" type="number" value="0" />
+              </label>
+              <label class="property">
+                <span>Y</span>
+                <input id="propY" type="number" value="0" />
+              </label>
+              <label class="property">
+                <span>W</span>
+                <input id="propW" type="number" value="0" />
+              </label>
+              <label class="property">
+                <span>H</span>
+                <input id="propH" type="number" value="0" />
+              </label>
+            </div>
+            <div class="property-row">
+              <label class="range-label" for="propFont">继承字号</label>
+              <span class="range-value" id="fontValue">68 px</span>
+            </div>
+            <input class="range" id="propFont" type="range" min="32" max="96" value="68" />
+            <div class="inspector-actions">
+              <button class="button button-soft" id="toggleVisible" type="button">
+                <span id="visibilityLabel">隐藏图层</span>
+              </button>
+              <button class="button button-danger-ghost" id="deleteNode" type="button">删除</button>
+            </div>
+          </section>
+
+          <section class="inspector-section metrics-section">
+            <div class="section-title-row">
+              <div>
+                <span class="eyebrow">LIVE TELEMETRY</span>
+                <h2>实时指标</h2>
+              </div>
+              <span class="live-badge"><i></i> LIVE</span>
+            </div>
+            <div class="metric-grid">
+              <article class="metric-card metric-emphasis">
+                <span class="metric-label">帧时间</span>
+                <strong id="metricFrame">0.00<small>ms</small></strong>
+                <span class="metric-trend">绘制 + 缓存核算</span>
+              </article>
+              <article class="metric-card">
+                <span class="metric-label">缓存命中率</span>
+                <strong id="metricHitRate">0<small>%</small></strong>
+                <span class="metric-trend" id="metricHits">0 hit / 0 miss</span>
+              </article>
+              <article class="metric-card">
+                <span class="metric-label">失效候选</span>
+                <strong id="metricCandidates">0</strong>
+                <span class="metric-trend" id="metricCandidateDetail">等待一次变更</span>
+              </article>
+              <article class="metric-card">
+                <span class="metric-label">重算次数</span>
+                <strong id="metricRecompute">0</strong>
+                <span class="metric-trend" id="metricRecomputeDetail">L0 · P0</span>
+              </article>
+              <article class="metric-card">
+                <span class="metric-label">活跃节点</span>
+                <strong id="metricNodes">0</strong>
+                <span class="metric-trend" id="metricCaches">0 条缓存</span>
+              </article>
+              <article class="metric-card metric-dangling">
+                <span class="metric-label">悬空引用</span>
+                <strong id="metricDangling">0</strong>
+                <span class="metric-trend">删除后即时核算</span>
+              </article>
+            </div>
+          </section>
+
+          <section class="inspector-section cache-section">
+            <div class="section-title-row">
+              <div>
+                <span class="eyebrow">CACHE KEY</span>
+                <h2>依赖追踪</h2>
+              </div>
+              <button class="text-button" id="inspectCache" type="button">查看明细</button>
+            </div>
+            <div class="cache-key-card" id="cacheKeyCard">
+              <div class="cache-key-head">
+                <span class="key-swatch"></span>
+                <strong>layout:</strong>
+                <code id="layoutKey">—</code>
+              </div>
+              <div class="cache-key-head">
+                <span class="key-swatch paint"></span>
+                <strong>paint:</strong>
+                <code id="paintKey">—</code>
+              </div>
+              <div class="dependency-line">
+                <span>依赖</span>
+                <div class="dependency-pills" id="dependencyPills"></div>
+              </div>
+            </div>
+          </section>
+        </aside>
+      </main>
+
+      <footer class="statusbar">
+        <div class="status-left">
+          <span class="status-ok"><i></i> 缓存图有效</span>
+          <span>布局键包含父级键</span>
+          <span>绘制键包含子级键</span>
+        </div>
+        <div class="status-right">
+          <span id="statusUpdate">初始化完成</span>
+          <span class="status-divider"></span>
+          <span>FNV-1a / 32-bit</span>
+        </div>
+      </footer>
+    </div>
+
+    <dialog class="benchmark-dialog" id="benchmarkDialog">
+      <div class="dialog-shell">
+        <header class="dialog-header">
+          <div>
+            <span class="eyebrow">REGRESSION HARNESS</span>
+            <h2>缓存验证台</h2>
+            <p>同一组固定变更，比较全量失效、增量失效与边界参数。</p>
+          </div>
+          <button class="dialog-close" id="closeBenchmark" type="button" aria-label="关闭">×</button>
+        </header>
+        <div class="dialog-body" id="benchmarkBody">
+          <div class="benchmark-loading">
+            <span class="loading-ring"></span>
+            正在运行 3 组固定场景…
+          </div>
+        </div>
+        <footer class="dialog-footer">
+          <div class="verdict" id="benchmarkVerdict">等待验证</div>
+          <div class="dialog-actions">
+            <button class="button button-ghost" id="rerunBenchmark" type="button">重新运行</button>
+            <button class="button button-primary" id="applyBoundary" type="button">应用边界参数</button>
+          </div>
+        </footer>
+      </div>
+    </dialog>
+
+    <div class="cache-drawer" id="cacheDrawer" aria-hidden="true">
+      <div class="drawer-scrim" id="drawerScrim"></div>
+      <section class="drawer-panel" aria-label="缓存明细">
+        <div class="drawer-header">
+          <div>
+            <span class="eyebrow">DEPENDENCY GRAPH</span>
+            <h2>缓存明细</h2>
+          </div>
+          <button class="dialog-close" id="closeDrawer" type="button" aria-label="关闭">×</button>
+        </div>
+        <div class="drawer-body" id="cacheDrawerBody"></div>
+      </section>
+    </div>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
