@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#20231f">
+  <title>触感画布 · 手势验收</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%2320231f'/%3E%3Cpath d='M9 11h14M9 16h14M9 21h14' stroke='%23d7ff52' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#canvasViewport">跳到画布</a>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="触感画布首页">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>触感画布</span>
+      </a>
+      <div class="project-trail" aria-label="当前项目">
+        <span class="trail-muted">工作室</span>
+        <span class="trail-slash" aria-hidden="true">/</span>
+        <strong>手势验收板</strong>
+      </div>
+      <div class="topbar-actions">
+        <div id="saveIndicator" class="save-indicator" role="status" aria-live="polite">
+          <span class="save-dot" aria-hidden="true"></span>
+          <span id="saveText">准备就绪</span>
+        </div>
+        <button id="helpButton" class="icon-button" type="button" aria-label="查看手势帮助" aria-expanded="false" aria-controls="helpPopover">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 18h.01M9.4 9a2.8 2.8 0 0 1 5.4 1c0 2-2.8 2.2-2.8 4.2M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z"/></svg>
+        </button>
+        <div class="avatar" aria-label="当前用户：林屿">LY</div>
+      </div>
+      <div id="helpPopover" class="help-popover" hidden>
+        <strong>三种输入，同一份状态</strong>
+        <p>触屏单指平移、双指缩放、长按对象多选。鼠标拖动空白处平移，按 Shift 点选多选。</p>
+        <p>键盘聚焦画布后方向键平移，<kbd>+</kbd> / <kbd>-</kbd> 缩放；对象按 <kbd>Enter</kbd> 选择。</p>
+      </div>
+    </header>
+
+    <main id="mainContent" class="workspace">
+      <section class="intro" aria-labelledby="pageTitle">
+        <div>
+          <p class="eyebrow">SPATIAL WORKSPACE · 01</p>
+          <h1 id="pageTitle">手势验收板</h1>
+          <p class="intro-copy">移动画布、靠近细节，然后删掉不再需要的灵感。所有输入实时汇入同一个可恢复快照。</p>
+        </div>
+        <div class="intro-side">
+          <span class="live-pill"><i aria-hidden="true"></i> 本地实时同步</span>
+          <p>页面滚动仅在画布外生效</p>
+        </div>
+      </section>
+
+      <div class="work-grid">
+        <section class="canvas-card" aria-labelledby="canvasHeading">
+          <h2 id="canvasHeading" class="sr-only">图形画布</h2>
+          <div class="canvas-toolbar" role="toolbar" aria-label="画布工具">
+            <div class="tool-group" aria-label="工具">
+              <button class="tool-button is-active" type="button" data-tool="select" aria-pressed="true" title="选择工具 (V)">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 3 14 8-6 2-2 6L5 3Z"/></svg>
+                <span>选择</span>
+              </button>
+              <button class="tool-button" type="button" data-tool="pen" aria-pressed="false" title="画笔工具 (P)">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5 4 4M4 20l3.5-.8L20 6.7a1.4 1.4 0 0 0 0-2L19.3 4a1.4 1.4 0 0 0-2 0L4.8 16.5 4 20Z"/></svg>
+                <span>画笔</span>
+              </button>
+              <button id="multiSelectButton" class="tool-button" type="button" aria-pressed="false" title="多选模式 (M)">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><path d="m14 17 2 2 4-5"/></svg>
+                <span>多选</span>
+              </button>
+            </div>
+            <span class="toolbar-divider" aria-hidden="true"></span>
+            <div class="tool-group" aria-label="历史">
+              <button id="undoButton" class="icon-button toolbar-icon" type="button" disabled aria-label="撤销 (Ctrl+Z)" title="撤销 (Ctrl+Z)">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5M4 9h9a7 7 0 0 1 0 14h-3"/></svg>
+              </button>
+              <button id="redoButton" class="icon-button toolbar-icon" type="button" disabled aria-label="重做 (Ctrl+Shift+Z)" title="重做 (Ctrl+Shift+Z)">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 14 5-5-5-5M20 9h-9a7 7 0 0 0 0 14h3"/></svg>
+              </button>
+            </div>
+            <span class="toolbar-divider" aria-hidden="true"></span>
+            <div class="tool-group" aria-label="视图">
+              <button id="zoomOutButton" class="icon-button toolbar-icon" type="button" aria-label="缩小画布">−</button>
+              <output id="zoomReadout" class="zoom-readout" aria-label="当前缩放比例">81%</output>
+              <button id="zoomInButton" class="icon-button toolbar-icon" type="button" aria-label="放大画布">+</button>
+              <button id="fitButton" class="text-button" type="button" title="回到内容 (F)">回到内容</button>
+            </div>
+            <div class="toolbar-spacer"></div>
+            <button id="addNoteButton" class="primary-button" type="button" aria-label="新建便签">
+              <span aria-hidden="true">+</span> 新建便签
+            </button>
+            <button id="deleteButton" class="danger-button" type="button" disabled aria-label="删除选中对象">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></svg>
+              删除
+              <span id="deleteCount" class="button-count" hidden>0</span>
+            </button>
+          </div>
+
+          <div id="canvasViewport" class="canvas-viewport" tabindex="0" role="group" aria-label="图形画布。方向键平移，加减键缩放，Tab 浏览对象。" aria-describedby="canvasHint">
+            <div id="world" class="canvas-world">
+              <canvas id="inkCanvas" width="1600" height="1100" aria-hidden="true"></canvas>
+              <div id="objectsLayer" class="objects-layer" role="listbox" aria-label="画布对象" aria-multiselectable="true"></div>
+            </div>
+            <div class="canvas-grain" aria-hidden="true"></div>
+            <div id="longPressRing" class="long-press-ring" aria-hidden="true"><span></span></div>
+            <div id="gestureBadge" class="gesture-badge" aria-hidden="true">
+              <span id="gestureIcon">↔</span>
+              <span id="gestureText">平移</span>
+            </div>
+            <div id="emptySelectionHint" class="empty-selection-hint" aria-hidden="true">
+              <span>长按对象可多选</span>
+            </div>
+          </div>
+
+          <div class="canvas-footer">
+            <p id="canvasHint"><span class="hint-key">触屏</span> 单指平移 · 双指缩放 · 长按多选</p>
+            <div class="canvas-metrics" aria-live="off">
+              <span><b id="objectCount">0</b> 对象</span>
+              <span class="metric-dot" aria-hidden="true"></span>
+              <span><b id="strokeCount">0</b> 笔迹</span>
+              <span class="metric-dot" aria-hidden="true"></span>
+              <span id="viewportReadout">x 0 · y 0 · 100%</span>
+            </div>
+          </div>
+          <div id="interactionStatus" class="sr-only" role="status" aria-live="polite"></div>
+        </section>
+
+        <aside class="inspector" aria-labelledby="inspectorTitle">
+          <div class="inspector-heading">
+            <div>
+              <p class="eyebrow">LIVE INSPECTOR</p>
+              <h2 id="inspectorTitle">同步检查台</h2>
+            </div>
+            <span class="sync-badge"><i aria-hidden="true"></i> LIVE</span>
+          </div>
+          <div class="status-stack">
+            <div class="status-row">
+              <span class="status-index">01</span>
+              <div class="status-content">
+                <span class="status-label">输入</span>
+                <strong id="inputStatus">鼠标 · 待机</strong>
+                <small id="inputDetail">等待交互</small>
+              </div>
+            </div>
+            <div class="status-row">
+              <span class="status-index">02</span>
+              <div class="status-content">
+                <span class="status-label">存储</span>
+                <strong id="storageStatus">已保存到本地</strong>
+                <small id="storageDetail">主快照 + 备份快照</small>
+              </div>
+            </div>
+            <div class="status-row">
+              <span class="status-index">03</span>
+              <div class="status-content">
+                <span class="status-label">渲染</span>
+                <strong id="renderStatus">0 对象 · 0 选中</strong>
+                <small id="renderDetail">世界坐标与屏幕坐标已对齐</small>
+              </div>
+            </div>
+          </div>
+          <div class="sync-chain" aria-label="数据同步链路">
+            <span>指针</span><i aria-hidden="true">→</i><span>状态</span><i aria-hidden="true">→</i><span>渲染</span><i aria-hidden="true">→</i><span>存储</span>
+          </div>
+          <div id="draftIndicator" class="draft-indicator" role="status" hidden>
+            <span class="draft-indicator-dot" aria-hidden="true"></span>
+            <div>
+              <strong id="draftIndicatorTitle">未提交草稿已保留</strong>
+              <small id="draftIndicatorBody">关闭弹窗或刷新后仍可继续</small>
+            </div>
+          </div>
+          <div class="selection-block">
+            <div class="selection-heading">
+              <span>当前选择</span>
+              <button id="clearSelectionButton" class="link-button" type="button" disabled>清除</button>
+            </div>
+            <div id="selectionList" class="selection-list">
+              <p class="selection-empty">尚未选择对象</p>
+            </div>
+          </div>
+          <div id="recoveryBanner" class="recovery-banner" role="alert" hidden>
+            <strong>快照恢复需要检查</strong>
+            <p id="recoveryMessage">已保留可读快照，当前画布仍可继续编辑。</p>
+            <button id="copySnapshotButton" class="text-button" type="button">复制可读快照</button>
+          </div>
+          <details class="snapshot-details" open>
+            <summary>
+              <span>可读状态快照</span>
+              <span id="revisionBadge" class="revision-badge">rev 1</span>
+            </summary>
+            <pre id="snapshotText" tabindex="0" aria-label="当前状态的可读 JSON 快照"></pre>
+            <div class="snapshot-footer">
+              <span id="snapshotMeta">刚刚写入</span>
+              <button id="reloadSnapshotButton" class="link-button" type="button">从磁盘恢复</button>
+            </div>
+          </details>
+        </aside>
+      </div>
+
+      <section class="acceptance" aria-labelledby="acceptanceTitle">
+        <div class="acceptance-heading">
+          <div>
+            <p class="eyebrow">ACCEPTANCE NOTES</p>
+            <h2 id="acceptanceTitle">每种输入都能完成同一件事</h2>
+          </div>
+          <p>焦点顺序从工具栏开始，依次经过画布与画布对象；状态变化均有文字提示，不依赖颜色单独表达。</p>
+        </div>
+        <div class="acceptance-grid">
+          <article>
+            <span class="acceptance-number">A</span>
+            <h3>触屏手势</h3>
+            <p>单指平移、双指缩放、长按进入多选。缩放期间不产生笔迹，手势结束后对象保持原位。</p>
+            <span class="check-line"><i aria-hidden="true">✓</i> 世界坐标锁定</span>
+          </article>
+          <article>
+            <span class="acceptance-number">B</span>
+            <h3>鼠标 + 键盘</h3>
+            <p>鼠标可拖拽平移、点按选择；聚焦画布后用方向键平移，<kbd>+</kbd> / <kbd>-</kbd> 缩放。</p>
+            <span class="check-line"><i aria-hidden="true">✓</i> 完整焦点顺序</span>
+          </article>
+          <article>
+            <span class="acceptance-number">C</span>
+            <h3>可恢复会话</h3>
+            <p>刷新、关闭便签和撤销会保留草稿、选择与页面滚动。主快照损坏时回退到备份。</p>
+            <span class="check-line"><i aria-hidden="true">✓</i> 失败保留文本快照</span>
+          </article>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <p>触感画布 · 输入、状态、渲染共用一条链路</p>
+        <p id="clockLabel" aria-label="当前时间">--:--</p>
+      </footer>
+    </main>
+  </div>
+
+  <dialog id="noteDialog" class="note-dialog" aria-labelledby="noteDialogTitle">
+    <form id="noteForm" method="dialog">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">NEW NOTE</p>
+          <h2 id="noteDialogTitle">给灵感留一张便签</h2>
+        </div>
+        <button id="closeNoteButton" class="icon-button" type="button" aria-label="关闭便签，保留草稿">×</button>
+      </div>
+      <label for="noteTitle">标题</label>
+      <input id="noteTitle" name="title" type="text" maxlength="60" autocomplete="off" placeholder="例如：再靠近一点" aria-required="true" aria-describedby="draftStatus">
+      <label for="noteBody">内容</label>
+      <textarea id="noteBody" name="body" rows="5" maxlength="240" placeholder="写下尚未提交的想法…" aria-describedby="draftStatus"></textarea>
+      <div class="draft-state" role="status" aria-live="polite">
+        <span id="draftDot" class="save-dot"></span>
+        <span id="draftStatus">草稿会随会话保留</span>
+      </div>
+      <div class="dialog-actions">
+        <button id="discardDraftButton" class="text-button danger-text" type="button">丢弃草稿</button>
+        <div class="dialog-actions-right">
+          <button id="cancelNoteButton" class="secondary-button" type="button">关闭并保留</button>
+          <button class="primary-button" type="submit">放到画布上</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toastRegion" class="toast-region" role="status" aria-live="polite" aria-atomic="true"></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
