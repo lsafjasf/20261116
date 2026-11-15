@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>时间序列清洗监测面板</title>
+    <link rel="stylesheet" href="src/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>时间序列清洗监测面板</h1>
+      <div class="samples">
+        <label>固定样例
+          <select id="sampleSelect">
+            <option value="sampleA">样例 A（7 空值 / 3 重复 / 4 尖峰）</option>
+            <option value="sampleB">样例 B（7 空值 / 4 重复 / 4 尖峰）</option>
+          </select>
+        </label>
+        <div class="window-tabs" role="tablist">
+          <button class="window-tab" data-window="W1" type="button">窗口 1 · 前半段</button>
+          <button class="window-tab" data-window="W2" type="button">窗口 2 · 后半段</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="controls card">
+        <h2>清洗规则</h2>
+        <label class="rule-line">
+          <input type="checkbox" id="dedupe" />
+          去重（保留首次出现，不改变顺序）
+        </label>
+        <label class="rule-line">空值处理
+          <select id="nullStrategy">
+            <option value="linear">线性插值</option>
+            <option value="forward">前向填充</option>
+            <option value="zero">置 0</option>
+          </select>
+        </label>
+        <label class="rule-line">尖峰处理
+          <select id="spikeStrategy">
+            <option value="median">局部中位数替换</option>
+            <option value="clip">阈值截断</option>
+            <option value="none">不处理</option>
+          </select>
+        </label>
+        <label class="rule-line">尖峰窗口
+          <input type="number" id="spikeWindow" min="3" max="15" step="1" />
+        </label>
+        <label class="rule-line">稳健 Z 阈值
+          <input type="number" id="spikeThreshold" min="1" max="10" step="0.1" />
+        </label>
+        <button id="resetRules" type="button">恢复默认规则</button>
+
+        <h2>导出</h2>
+        <button id="exportPng" type="button">导出前后对比 PNG</button>
+        <button id="exportLog" type="button">导出清洗日志 JSON</button>
+        <button id="saveProject" type="button">保存工程文件</button>
+        <label class="rule-line">载入工程
+          <input type="file" id="loadProject" accept="application/json" />
+        </label>
+      </section>
+
+      <section class="main-pane">
+        <div class="status-bar card">
+          <div><span class="label">当前筛选</span><code id="currentFilter"></code></div>
+          <div><span class="label">数据版本</span><code id="dataVersion"></code></div>
+          <div><span class="label">导出口径</span><code id="exportScope"></code></div>
+          <div><span class="label">刷新序号</span><code id="revision"></code></div>
+        </div>
+
+        <div class="metrics card">
+          <div>
+            <h2>窗口误差</h2>
+            <div id="overallMetrics"></div>
+            <table id="seriesMetrics">
+              <thead>
+                <tr><th>序列</th><th>点数</th><th>平均误差 MAE</th><th>最大偏差</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="legend">
+            <span><i style="background:#d1495b"></i>原始</span>
+            <span><i style="background:#2a9d8f"></i>清洗后</span>
+            <span><i style="background:#3a6ea5"></i>参考曲线</span>
+            <span><i style="background:rgba(42,157,143,.35)"></i>误差带</span>
+          </div>
+        </div>
+
+        <div class="card chart-card">
+          <canvas id="chart"></canvas>
+        </div>
+
+        <details class="card debug" open>
+          <summary>调试面板 · 中间计算状态（每阶段快照）</summary>
+          <div class="debug-grid">
+            <div>
+              <h3>管线阶段日志</h3>
+              <pre id="pipelineLog"></pre>
+            </div>
+            <div>
+              <h3>当前窗口派生状态</h3>
+              <pre id="debugState"></pre>
+            </div>
+            <div>
+              <h3>尖峰替换明细</h3>
+              <pre id="replacements"></pre>
+            </div>
+          </div>
+        </details>
+      </section>
+    </main>
+
+    <script type="module" src="src/app.js"></script>
+  </body>
+</html>
