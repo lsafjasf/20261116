@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#05080d" />
+    <title>Orbital Lab — Fixed-Step Flight</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main id="app">
+      <canvas id="scene" aria-label="2D fixed-step flight physics scene"></canvas>
+      <div class="scanlines" aria-hidden="true"></div>
+
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark">OL</span>
+          <div>
+            <p class="eyebrow">ORBITAL LAB / FLIGHT 07</p>
+            <h1>FIXED-STEP FLIGHT</h1>
+          </div>
+        </div>
+        <div class="top-actions">
+          <div class="live-chip"><i></i><span id="run-state">LIVE</span></div>
+          <button class="icon-button" id="pause-button" type="button" title="Pause / resume (Space)">
+            <span id="pause-icon">Ⅱ</span><span id="pause-label">PAUSE</span>
+          </button>
+          <button class="icon-button" id="reset-button" type="button" title="Reset scene (R)">
+            ↺<span>RESET</span>
+          </button>
+        </div>
+      </header>
+
+      <section class="telemetry panel" aria-label="Live telemetry">
+        <div class="panel-heading">
+          <span>FLIGHT TELEMETRY</span>
+          <span class="pulse-dot"></span>
+        </div>
+        <div class="metric-grid">
+          <article class="metric metric-wide">
+            <span class="metric-label">FRAME TIME / FPS</span>
+            <strong><span data-metric="frameMs">0.0</span><small> ms</small></strong>
+            <em><span data-metric="fps">0</span> fps</em>
+          </article>
+          <article class="metric">
+            <span class="metric-label">PHYSICS CPU</span>
+            <strong><span data-metric="physicsMs">0.00</span><small> ms</small></strong>
+          </article>
+          <article class="metric">
+            <span class="metric-label">CANDIDATES</span>
+            <strong data-metric="candidates">0</strong>
+          </article>
+          <article class="metric">
+            <span class="metric-label">CACHE HIT</span>
+            <strong><span data-metric="cacheHit">0</span><small> %</small></strong>
+          </article>
+          <article class="metric">
+            <span class="metric-label">NODE COUNT</span>
+            <strong data-metric="nodes">0</strong>
+          </article>
+          <article class="metric metric-wide compact">
+            <span class="metric-label">SIM CLOCK</span>
+            <div class="inline-stats">
+              <span>α <b data-metric="alpha">0.00</b></span>
+              <span>STEP <b data-metric="substeps">0</b></span>
+              <span>DROP <b data-metric="dropped">0</b></span>
+            </div>
+          </article>
+        </div>
+        <div class="thruster-row">
+          <span class="metric-label">THRUSTER</span>
+          <span class="thruster-state" data-thruster>STANDBY</span>
+          <span class="fixed-badge">Δt = 8.333 ms</span>
+        </div>
+      </section>
+
+      <aside class="lab panel" aria-label="Validation lab">
+        <div class="panel-heading">
+          <span>VALIDATION LAB</span>
+          <span class="lab-id">EXP. 613</span>
+        </div>
+        <div class="lab-intro">
+          <p>Same input. Three display rates.</p>
+          <button class="primary-button" id="validate-button" type="button">RUN VALIDATION</button>
+        </div>
+        <div class="result-block" id="trajectory-results">
+          <div class="result-title"><span>TRAJECTORY ERROR</span><span>PX</span></div>
+          <div class="empty-result">AWAITING 30 / 60 / 144 FPS RECORDINGS</div>
+        </div>
+        <div class="result-block" id="pause-results">
+          <div class="result-title"><span>PAUSE / RESUME</span><span>PROBE</span></div>
+          <div class="empty-result">AWAITING PROBE</div>
+        </div>
+        <div class="result-block scenario-block" id="scenario-results">
+          <div class="result-title"><span>OPT / BOUNDARY</span><span>FIXED SCENE</span></div>
+          <div class="empty-result">AWAITING FIXED-SCENE RUN</div>
+        </div>
+        <p class="equivalence-note" id="equivalence-note">Compares output hashes, exception logs and resource usage.</p>
+      </aside>
+
+      <footer class="bottombar">
+        <div class="key-hints">
+          <span><kbd>W</kbd><kbd>↑</kbd> THRUST</span>
+          <span><kbd>A</kbd><kbd>D</kbd> TURN</span>
+          <span><kbd>Space</kbd> PAUSE</span>
+          <span><kbd>R</kbd> RESET</span>
+        </div>
+        <div class="speed-control" role="group" aria-label="Simulation speed">
+          <span>TIME SCALE</span>
+          <button type="button" data-speed="0.5">0.5×</button>
+          <button type="button" data-speed="1" class="active">1×</button>
+          <button type="button" data-speed="2">2×</button>
+        </div>
+        <div class="clock-readout">T+ <span data-metric="simTime">00:00.000</span></div>
+      </footer>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </main>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
