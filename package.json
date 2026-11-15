@@ -1,0 +1,9 @@
+{
+  "name": "bridge-install-coop",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node test/run-tests.mjs && node test/ui-smoke.mjs",
+    "start": "python3 -m http.server 8000"
+  }
+}
