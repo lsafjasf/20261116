@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>离线小游戏 · 版本化本地存档演示</title>
+    <link rel="stylesheet" href="src/ui/styles.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <header>
+        <h1>离线寻路小游戏</h1>
+        <p class="subtitle">
+          点击地图移动 · 存档带版本号与 FNV-1a 校验码 · 双快照轮转恢复
+        </p>
+      </header>
+
+      <section id="recovery-banner" class="banner idle" role="status">
+        <span id="recovery-text">尚未保存</span>
+        <span id="recovery-meta"></span>
+      </section>
+
+      <section class="panels">
+        <div class="board-wrap">
+          <canvas id="board" width="600" height="400"></canvas>
+          <p class="hint">点击格子寻路；墙体不可达时记录结构化异常日志。</p>
+        </div>
+
+        <aside class="side">
+          <h2>实时可观测指标</h2>
+          <dl class="metrics">
+            <div>
+              <dt>帧时间 (ms)</dt>
+              <dd id="metric-frame">0.000</dd>
+              <dd class="sub" id="metric-frame-avg">avg 0.000</dd>
+            </div>
+            <div>
+              <dt>候选节点峰值</dt>
+              <dd id="metric-candidates">0</dd>
+              <dd class="sub" id="metric-candidates-avg">avg 0</dd>
+            </div>
+            <div>
+              <dt>缓存命中率</dt>
+              <dd id="metric-hitrate">0.000</dd>
+              <dd class="sub" id="metric-cache-size">size 0/0</dd>
+            </div>
+            <div>
+              <dt>扩展节点数</dt>
+              <dd id="metric-nodes">0</dd>
+              <dd class="sub" id="metric-queries">queries 0</dd>
+            </div>
+          </dl>
+
+          <h2>状态</h2>
+          <ul class="state-list">
+            <li>分数：<b id="state-score">0</b></li>
+            <li>步数：<b id="state-moves">0</b></li>
+            <li>宝石：<b id="state-gems">0</b></li>
+            <li>回放摘要：<b id="state-replay">0 条 / 0 步</b></li>
+          </ul>
+
+          <h2>设置（随存档持久化）</h2>
+          <label class="setting">
+            音量
+            <input id="setting-volume" type="range" min="0" max="1" step="0.05" />
+            <span id="setting-volume-value">0.70</span>
+          </label>
+          <label class="setting">
+            难度
+            <select id="setting-difficulty">
+              <option>easy</option>
+              <option selected>normal</option>
+              <option>hard</option>
+            </select>
+          </label>
+          <label class="setting checkbox">
+            <input id="setting-particles" type="checkbox" checked />
+            粒子效果
+          </label>
+
+          <h2>缓存开关（优化对照）</h2>
+          <label class="setting checkbox">
+            <input id="cache-toggle" type="checkbox" checked />
+            启用 LRU 路径缓存（容量 256）
+          </label>
+        </aside>
+      </section>
+
+      <section class="controls">
+        <button id="btn-save" class="primary">保存快照</button>
+        <button id="btn-load">读取快照</button>
+        <button id="btn-corrupt">模拟主存档损坏</button>
+        <button id="btn-interrupt">模拟写入中断</button>
+        <button id="btn-legacy">注入 v1 旧存档</button>
+        <button id="btn-quota">模拟存储空间不足</button>
+        <button id="btn-clear">清空存档</button>
+      </section>
+
+      <section class="logs">
+        <h2>恢复 / 异常日志</h2>
+        <pre id="log">（空）</pre>
+      </section>
+    </main>
+
+    <script type="module" src="src/ui/app.js"></script>
+  </body>
+</html>

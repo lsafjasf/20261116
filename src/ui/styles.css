@@ -1,0 +1,205 @@
+:root {
+  color-scheme: dark;
+  --bg: #10141c;
+  --panel: #18202c;
+  --panel-2: #1f2a39;
+  --text: #e7edf6;
+  --muted: #93a1b5;
+  --accent: #55c2f0;
+  --good: #4cc38a;
+  --warn: #f0b355;
+  --bad: #ef6f6c;
+  --border: #2a3748;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.layout {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+
+h2 {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin: 18px 0 8px;
+}
+
+.subtitle {
+  margin: 0 0 14px;
+  color: var(--muted);
+}
+
+.banner {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  margin-bottom: 14px;
+}
+
+.banner.idle {
+  border-color: var(--border);
+}
+.banner.saved,
+.banner.loaded {
+  border-color: var(--good);
+}
+.banner.recovered,
+.banner.migrated {
+  border-color: var(--warn);
+  background: #2a2417;
+}
+.banner.quota,
+.banner.save-failed,
+.banner.empty {
+  border-color: var(--bad);
+  background: #2c1a1a;
+}
+
+#recovery-meta {
+  color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+
+.panels {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 14px;
+}
+
+.board-wrap,
+.side,
+.logs {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+canvas {
+  width: 100%;
+  height: auto;
+  background: #0d1117;
+  border-radius: 8px;
+  display: block;
+  cursor: crosshair;
+}
+
+.hint {
+  color: var(--muted);
+  margin: 8px 0 0;
+  font-size: 12px;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 0;
+}
+
+.metrics div {
+  background: var(--panel-2);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.metrics dt {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.metrics dd {
+  margin: 2px 0 0;
+  font-size: 18px;
+  font-family: ui-monospace, monospace;
+}
+
+.metrics dd.sub {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.state-list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.setting {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.setting input[type="range"] {
+  flex: 1;
+}
+
+.setting.checkbox {
+  justify-content: flex-start;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+button {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: var(--accent);
+}
+
+button.primary {
+  background: var(--accent);
+  color: #06121b;
+  font-weight: 700;
+}
+
+#log {
+  max-height: 220px;
+  overflow: auto;
+  background: #0d1117;
+  border-radius: 8px;
+  padding: 10px;
+  margin: 0;
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 900px) {
+  .panels {
+    grid-template-columns: 1fr;
+  }
+}

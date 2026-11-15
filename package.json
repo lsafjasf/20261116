@@ -1,0 +1,13 @@
+{
+  "name": "offline-mini-save-demo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Offline mini game with versioned, checksummed, snapshot-rotated local saves",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "paths": "node scripts/save_paths.js",
+    "scenarios": "node scripts/scenarios.js",
+    "serve": "node scripts/serve.js"
+  }
+}
