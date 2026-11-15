@@ -1,0 +1,13 @@
+{
+  "name": "seamlab-procedural-texture-editor",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Seamless procedural stone and fabric texture editor",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node tests/core.test.mjs",
+    "test:e2e": "node tests/e2e.mjs",
+    "test:all": "npm test && npm run test:e2e"
+  }
+}

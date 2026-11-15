@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#11100e" />
+    <title>SeamLab — 程序化纹理工作台</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23221d16'/%3E%3Cpath d='M8 8h7v7H8zm9 0h7v7h-7zM8 17h7v7H8zm9 0h7v7h-7z' fill='%23ce9560'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          <div>
+            <strong>SEAMLAB</strong>
+            <span>程序化材质工作台</span>
+          </div>
+        </div>
+        <div class="project-title">
+          <span class="status-dot"></span>
+          <div>
+            <b id="projectName">石灰岩 · 风化面</b>
+            <small id="saveState">已保存到本机</small>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button class="icon-btn" id="undoBtn" title="撤销 (Ctrl+Z)" aria-label="撤销">
+            <svg viewBox="0 0 24 24"><path d="M9 7 4 12l5 5M5 12h8a6 6 0 0 1 6 6" /></svg>
+          </button>
+          <button class="icon-btn" id="redoBtn" title="重做 (Ctrl+Shift+Z)" aria-label="重做">
+            <svg viewBox="0 0 24 24"><path d="m15 7 5 5-5 5m4-5h-8a6 6 0 0 0-6 6" /></svg>
+          </button>
+          <button class="text-btn" id="saveBtn">保存工程</button>
+          <button class="primary-btn" id="quickExport">
+            <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 20h14" /></svg>
+            导出 1024
+          </button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="left-rail">
+          <section class="panel layers-panel">
+            <div class="panel-heading">
+              <span>材质与图层</span>
+              <span class="count-badge" id="layerCount">2</span>
+            </div>
+            <div class="preset-grid" aria-label="材质预设">
+              <button class="preset-card active" id="presetStone">
+                <span class="preset-swatch stone-swatch"></span>
+                <span><b>石灰岩</b><small>矿物 / 层理</small></span>
+              </button>
+              <button class="preset-card" id="presetFabric">
+                <span class="preset-swatch fabric-swatch"></span>
+                <span><b>亚麻布</b><small>经纬 / 竹节</small></span>
+              </button>
+            </div>
+            <div class="section-label">
+              <span>图层堆栈</span>
+              <span>上 → 下</span>
+            </div>
+            <div class="layer-list" id="layerList"></div>
+            <div class="layer-actions">
+              <button id="addStoneLayer">+ 石材层</button>
+              <button id="addFabricLayer">+ 布纹层</button>
+              <button id="addBrushLayer">+ 刷痕层</button>
+            </div>
+          </section>
+
+          <section class="panel snapshot-panel">
+            <div class="panel-heading">
+              <span>工程快照</span>
+              <button class="mini-link" id="reloadBtn" title="保存并重新载入工程">重载验证</button>
+            </div>
+            <p class="panel-note">每次导出前自动留档，包含图层顺序、关键帧、坐标与颜色。</p>
+            <div class="snapshot-list" id="snapshotList"></div>
+          </section>
+        </aside>
+
+        <section class="stage-column">
+          <div class="stage-toolbar">
+            <div class="tool-group">
+              <button class="tool-btn active" id="toolBrush" data-tool="brush" title="跨边界画笔 (B)">
+                <svg viewBox="0 0 24 24"><path d="m14 4 6 6-9 9H5v-6l9-9Z" /><path d="m12 6 6 6" /></svg>
+                画笔
+              </button>
+              <button class="tool-btn" id="toolHand" data-tool="hand" title="平移画布 (H)">
+                <svg viewBox="0 0 24 24"><path d="M8 12V6a1.5 1.5 0 0 1 3 0v5-7a1.5 1.5 0 0 1 3 0v7-5a1.5 1.5 0 0 1 3 0v6-3a1.5 1.5 0 0 1 3 0v6c0 4-3 6-7 6h-1c-3 0-5-2-6-4l-2-4a1.5 1.5 0 0 1 2.5-1.5L8 14" /></svg>
+                抓手
+              </button>
+            </div>
+            <span class="toolbar-rule"></span>
+            <button class="chip-btn active" id="seamToggle" title="在视口中叠加接缝检查">
+              <span class="edge-icon"></span> 接缝参考
+            </button>
+            <button class="chip-btn" id="tileToggle" title="显示 2×2 平铺">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg>
+              2×2 平铺
+            </button>
+            <div class="toolbar-spacer"></div>
+            <div class="zoom-control">
+              <button id="zoomOut" aria-label="缩小">−</button>
+              <input id="zoomRange" type="range" min="25" max="200" value="100" aria-label="缩放" />
+              <button id="zoomIn" aria-label="放大">+</button>
+              <span id="zoomLabel">100%</span>
+            </div>
+            <button class="icon-btn small" id="resetView" title="重置视图">
+              <svg viewBox="0 0 24 24"><path d="M4 8V4h4M20 8V4h-4M4 16v4h4m12-4v4h-4" /><circle cx="12" cy="12" r="3" /></svg>
+            </button>
+          </div>
+
+          <div class="canvas-shell" id="canvasShell">
+            <canvas id="previewCanvas" aria-label="无缝纹理预览与画笔画布"></canvas>
+            <div class="canvas-vignette"></div>
+            <div class="canvas-top-left">
+              <span class="live-dot"></span>
+              <span id="renderMode">实时预览 · 1024 基准</span>
+            </div>
+            <div class="canvas-bottom-left">
+              <span class="coord-pill"><b>U</b> <span id="coordU">0.500</span> <b>V</b> <span id="coordV">0.500</span></span>
+              <span class="coord-pill brush-pill" id="brushCursorBadge">Ø 28 px · 跨边界同步</span>
+            </div>
+            <div class="canvas-bottom-right">
+              <button class="round-btn" id="rotateLeft" title="逆时针旋转 15°">↺</button>
+              <span class="rotation-pill" id="rotationLabel">0°</span>
+              <button class="round-btn" id="rotateRight" title="顺时针旋转 15°">↻</button>
+            </div>
+            <div class="edge-guide x-guide" id="edgeGuideX"></div>
+            <div class="edge-guide y-guide" id="edgeGuideY"></div>
+          </div>
+
+          <div class="stage-footer">
+            <div class="footer-metric"><span>接缝误差</span><b id="seamMetric">检测中…</b></div>
+            <div class="footer-metric"><span>四边连续性</span><b class="ok" id="continuityMetric">周期场</b></div>
+            <div class="footer-metric"><span>预览引擎</span><b>Canvas 2D · 同步</b></div>
+            <div class="stage-hint">滚轮缩放 · Alt + 拖动平移 · 画笔可越过任意边界</div>
+          </div>
+        </section>
+
+        <aside class="right-rail">
+          <section class="panel inspector-panel">
+            <div class="panel-heading inspector-head">
+              <div>
+                <span class="eyebrow">当前选择</span>
+                <strong id="selectedLayerName">石材 · 基底</strong>
+              </div>
+              <span class="type-badge" id="selectedLayerMeta">PROCEDURAL</span>
+            </div>
+
+            <div class="control-section" id="materialControls">
+              <div class="section-title"><span>材质参数</span><span id="materialKindLabel">STONE</span></div>
+              <div id="stoneControls">
+                <label class="control-row"><span>晶粒尺度</span><output id="stoneScaleOut">8.0</output><input id="stoneScale" type="range" min="3" max="14" step="1" value="8" /></label>
+                <label class="control-row"><span>矿物对比</span><output id="stoneContrastOut">64%</output><input id="stoneContrast" type="range" min="0" max="100" value="64" /></label>
+                <label class="control-row"><span>细颗粒</span><output id="stoneGrainOut">35%</output><input id="stoneGrain" type="range" min="0" max="100" value="35" /></label>
+                <label class="control-row"><span>风化程度</span><output id="stoneWeatherOut">26%</output><input id="stoneWeather" type="range" min="0" max="100" value="26" /></label>
+              </div>
+              <div id="fabricControls" hidden>
+                <label class="control-row"><span>经纬密度</span><output id="fabricThreadsOut">44</output><input id="fabricThreads" type="range" min="16" max="96" step="2" value="44" /></label>
+                <label class="control-row"><span>竹节变化</span><output id="fabricSlubOut">34%</output><input id="fabricSlub" type="range" min="0" max="100" value="34" /></label>
+                <label class="control-row"><span>褶皱起伏</span><output id="fabricWrinkleOut">34%</output><input id="fabricWrinkle" type="range" min="0" max="100" value="34" /></label>
+                <label class="control-row"><span>织线对比</span><output id="fabricContrastOut">46%</output><input id="fabricContrast" type="range" min="0" max="100" value="46" /></label>
+              </div>
+              <div class="color-row">
+                <label><span>基色</span><input id="colorBase" type="color" value="#9b9589" /></label>
+                <label><span>深纹</span><input id="colorVein" type="color" value="#504b43" /></label>
+                <label><span>点缀</span><input id="colorAccent" type="color" value="#c39b68" /></label>
+              </div>
+            </div>
+
+            <div class="control-section" id="brushControls">
+              <div class="section-title"><span>跨边界画笔</span><span class="sync-label"><i></i> SYNC</span></div>
+              <label class="control-row"><span>笔刷尺寸</span><output id="brushSizeOut">28 px</output><input id="brushSize" type="range" min="2" max="160" value="28" /></label>
+              <label class="control-row"><span>硬度</span><output id="brushHardnessOut">65%</output><input id="brushHardness" type="range" min="0" max="100" value="65" /></label>
+              <label class="control-row"><span>流量</span><output id="brushOpacityOut">55%</output><input id="brushOpacity" type="range" min="5" max="100" value="55" /></label>
+              <div class="brush-color-row">
+                <span>笔刷颜色</span>
+                <div class="swatches">
+                  <button class="swatch active" data-color="#d8b074" style="--swatch:#d8b074"></button>
+                  <button class="swatch" data-color="#a6b7a0" style="--swatch:#a6b7a0"></button>
+                  <button class="swatch" data-color="#7d9fb1" style="--swatch:#7d9fb1"></button>
+                  <button class="swatch" data-color="#e4ded3" style="--swatch:#e4ded3"></button>
+                  <input id="brushColor" type="color" value="#d8b074" title="自定义笔刷颜色" />
+                </div>
+              </div>
+              <p class="brush-help">笔触在 U/V 两个方向自动取模；边缘外的笔画会同步绘制到对边。</p>
+            </div>
+          </section>
+
+          <section class="panel export-panel">
+            <div class="panel-heading">
+              <span>导出与验样</span>
+              <span class="export-badge">PNG</span>
+            </div>
+            <div class="export-sizes">
+              <button id="export512"><b>512</b><span>× 512</span></button>
+              <button id="export1024" class="active"><b>1024</b><span>× 1024</span></button>
+            </div>
+            <button class="wide-primary" id="exportBoth">导出 512 + 1024 两张</button>
+            <div class="check-actions">
+              <button id="exportTile">导出 2×2 平铺检查</button>
+              <button id="exportCompare">512 / 1024 对比报告</button>
+            </div>
+            <div class="export-status" id="exportStatus">
+              <span class="status-led"></span>
+              <span>预览与导出使用同一归一化场景</span>
+            </div>
+          </section>
+
+          <section class="panel diagnostics-panel">
+            <div class="panel-heading">
+              <span>故障回退演练</span>
+              <span class="diag-badge">AUTO</span>
+            </div>
+            <p class="panel-note">强制失效后自动从工程参数或主纹理重建，并显示原因。</p>
+            <div class="failure-buttons">
+              <button id="failureCache">清理材质缓存</button>
+              <button id="failureThumb">缩略图失效</button>
+              <button id="failureAsync">异步请求失效</button>
+            </div>
+            <button class="test-suite-btn" id="runParamTests">运行默认 / 边界 / 异常参数测试</button>
+            <div class="diagnostic-status" id="diagnosticStatus"><i></i><span>所有回退通道待命</span></div>
+          </section>
+        </aside>
+      </main>
+
+      <footer class="timeline">
+        <div class="timeline-head">
+          <div>
+            <span class="eyebrow">演化关键帧</span>
+            <strong>风化 / 织造参数</strong>
+          </div>
+          <button class="timeline-add" id="addKeyframe">+ 添加关键帧</button>
+        </div>
+        <div class="timeline-body">
+          <span class="frame-time" id="currentTime">00:00</span>
+          <div class="track-wrap">
+            <div class="track-ruler"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
+            <div class="keyframe-track" id="keyframeTrack">
+              <div class="track-line"></div>
+              <div class="playhead" id="playhead"><i></i></div>
+            </div>
+            <input class="timeline-range" id="playheadRange" type="range" min="0" max="100" value="50" aria-label="关键帧时间" />
+          </div>
+          <div class="keyframe-cards" id="keyframeList"></div>
+        </div>
+        <div class="timeline-hint" id="keyframeHint">50% · 中间态</div>
+      </footer>
+    </div>
+    <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
