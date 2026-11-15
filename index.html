@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>24 小时气象同时间轴可视化（全 Canvas 绘制）</title>
+  <style>
+    body { margin: 0; background: #060a12; color: #dfe8f2;
+      font-family: "Noto Sans CJK SC", "PingFang SC", "Microsoft YaHei",
+        system-ui, sans-serif; }
+    header { padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 10px;
+      align-items: center; border-bottom: 1px solid #1c2740; }
+    label { font-size: 12px; color: #9fb0c3; }
+    select, button { background: #121c2e; color: #e9f0fa; border: 1px solid #2a3a55;
+      border-radius: 6px; padding: 5px 9px; font-size: 12px; }
+    button:hover { border-color: #4c78a8; }
+    .stations { display: flex; gap: 8px; }
+    .stations label { display: flex; align-items: center; gap: 3px; }
+    .grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 10px; padding: 10px; }
+    canvas { background: #0f1623; border: 1px solid #1c2740; border-radius: 8px;
+      width: 100%; display: block; }
+    .col { display: flex; flex-direction: column; gap: 10px; }
+    #chartCanvas { height: 430px; }
+    #mapCanvas { height: 300px; }
+    #readoutCanvas { height: 250px; }
+    #debugCanvas { height: 210px; font-family: monospace; }
+    #status { font-size: 11px; color: #7ee787; margin-left: auto; }
+  </style>
+</head>
+<body>
+  <header>
+    <label>数据集
+      <select id="datasetSel">
+        <option value="A">样例 A</option>
+        <option value="B">样例 B</option>
+      </select>
+    </label>
+    <label>时间窗口
+      <select id="windowSel"></select>
+    </label>
+    <label>游标（小时）
+      <input id="cursorRange" type="range" min="0" max="23" value="12" />
+      <span id="cursorLabel">12:00</span>
+    </label>
+    <div class="stations" id="stationBox"></div>
+    <button id="markBtn">标记游标峰值</button>
+    <button id="exportBtn">导出报告 JSON</button>
+    <button id="saveBtn">保存工程</button>
+    <label>载入工程<input id="loadFile" type="file" accept="application/json" hidden /></label>
+    <button id="loadBtn">载入工程</button>
+    <span id="status"></span>
+  </header>
+
+  <div class="grid">
+    <div class="col">
+      <canvas id="chartCanvas"></canvas>
+      <canvas id="debugCanvas"></canvas>
+    </div>
+    <div class="col">
+      <canvas id="mapCanvas"></canvas>
+      <canvas id="readoutCanvas"></canvas>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.mjs"></script>
+</body>
+</html>

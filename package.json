@@ -1,0 +1,15 @@
+{
+  "name": "meteo-timeline-canvas",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "24 小时温度/降水/风向同时间轴 Canvas 可视化（内置样例、空值/重复/异常处理、双窗口核对与导出）",
+  "scripts": {
+    "test": "node test/run-tests.mjs",
+    "test:browser": "node test/browser-smoke.mjs",
+    "serve": "node test/serve.mjs"
+  },
+  "devDependencies": {
+    "puppeteer": "^25.17.0"
+  }
+}
