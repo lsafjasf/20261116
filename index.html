@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#151613">
+  <title>Kinetic / Atlas 数据叙事台</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%23171814'/%3E%3Cpath d='M8 23V11h4v12zm6 0V6h4v17zm6 0v-8h4v8z' fill='%23d7ff45'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark"><i></i><i></i><i></i></span>
+      <span class="brand-name">KINETIC<span>/26</span></span>
+    </div>
+    <div class="project-heading">
+      <span class="eyebrow">动态图形工作台</span>
+      <h1>Atlas 数据叙事台 <span class="edition">LAUNCH REEL</span></h1>
+    </div>
+    <div class="top-actions">
+      <span id="saveStatus" class="save-status"><i></i> 本地工程 · 已就绪</span>
+      <button id="saveTemplateBtn" class="button ghost">保存模板</button>
+      <button id="saveInstancesBtn" class="button ghost">保存实例</button>
+      <button id="saveProjectBtn" class="button ghost">保存工程</button>
+      <button id="loadProjectBtn" class="button ghost">载入工程</button>
+      <button id="exportBtn" class="button primary">
+        <span class="export-icon">↓</span> 导出 12s
+      </button>
+      <input id="projectFileInput" type="file" accept=".json,application/json" hidden>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="inspector panel">
+      <div class="panel-head">
+        <div>
+          <span class="eyebrow">Inspector</span>
+          <h2>参数面板</h2>
+        </div>
+        <span id="templateVersion" class="version-tag">T.04</span>
+      </div>
+      <div class="tabs" role="tablist" data-tabs="inspector">
+        <button class="tab active" data-tab="params">参数</button>
+        <button class="tab" data-tab="keys">关键帧 <span id="keyCountBadge">3</span></button>
+      </div>
+      <div class="tab-panel active" data-panel="params">
+        <section class="control-section">
+          <div class="section-title"><span>模板</span><span id="templateIdLabel">T-ATLAS-04</span></div>
+          <label class="field">
+            <span>模板名称</span>
+            <input id="templateNameInput" value="Atlas / Product Pulse" autocomplete="off">
+          </label>
+          <div class="field-row">
+            <label class="field">
+              <span>画幅</span>
+              <select id="formatSelect">
+                <option value="16:9">16:9 横屏</option>
+                <option value="9:16">9:16 竖屏</option>
+                <option value="1:1">1:1 方形</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>节奏</span>
+              <select id="tempoSelect">
+                <option value="calm">克制</option>
+                <option value="pulse" selected>脉冲</option>
+                <option value="rapid">快速</option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <section class="control-section">
+          <div class="section-title"><span>实例文案</span><span class="variant-count">2 个变体</span></div>
+          <div class="variant-switch" id="variantSwitch">
+            <button class="active" data-variant="short"><b>01</b> 短文案</button>
+            <button data-variant="long"><b>02</b> 长文案</button>
+          </div>
+          <label class="field">
+            <span>标题 <em id="titleLengthLabel">12 字</em></span>
+            <textarea id="titleInput" rows="3"></textarea>
+          </label>
+          <label class="field">
+            <span>眉题</span>
+            <input id="kickerInput" value="GROWTH / Q3 SIGNAL" autocomplete="off">
+          </label>
+          <div class="auto-layout-note">
+            <span class="pulse-dot"></span>
+            <span>自适应排印已开启 · 画布实时重排</span>
+            <strong id="layoutMeasure">--</strong>
+          </div>
+        </section>
+
+        <section class="control-section">
+          <div class="section-title"><span>数据卡</span><span id="cardCountLabel">03 CARDS</span></div>
+          <div class="field-row">
+            <label class="field">
+              <span>卡片数量</span>
+              <input id="cardCountInput" type="range" min="1" max="4" step="1" value="3">
+            </label>
+            <label class="field">
+              <span>卡间距</span>
+              <input id="cardGapInput" type="range" min="8" max="32" step="1" value="16">
+            </label>
+          </div>
+          <label class="field">
+            <span>主强调色</span>
+            <div class="color-field">
+              <input id="accentInput" type="color" value="#d7ff45">
+              <input id="accentTextInput" value="#D7FF45" autocomplete="off">
+            </div>
+          </label>
+        </section>
+
+        <section class="control-section">
+          <div class="section-title"><span>转场背景</span><span id="transitionName">ORBIT</span></div>
+          <div class="transition-grid" id="transitionGrid">
+            <button class="active" data-transition="orbit"><i class="orbit-icon"></i>轨道</button>
+            <button data-transition="sweep"><i class="sweep-icon"></i>扫掠</button>
+            <button data-transition="grid"><i class="grid-icon"></i>网格</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="tab-panel" data-panel="keys">
+        <div class="keyframe-head">
+          <div>
+            <span class="eyebrow">Motion graph</span>
+            <h3>颜色 · 位置 · 透明度</h3>
+          </div>
+          <button id="addKeyframeBtn" class="mini-button">+ 捕获</button>
+        </div>
+        <div class="keyframe-list" id="keyframeList"></div>
+        <div class="keyframe-editor" id="keyframeEditor">
+          <div class="key-current">
+            <span>当前关键帧</span>
+            <strong id="keyCurrentTime">0.00s</strong>
+          </div>
+          <label class="field compact">
+            <span>时间</span>
+            <input id="keyTimeInput" type="number" min="0" max="12" step="0.25" value="0">
+          </label>
+          <label class="field compact">
+            <span>位置 X / Y</span>
+            <div class="dual-input">
+              <input id="keyXInput" type="number" step="1" value="76">
+              <input id="keyYInput" type="number" step="1" value="0">
+            </div>
+          </label>
+          <label class="field compact">
+            <span>透明度</span>
+            <input id="keyOpacityInput" type="range" min="0" max="1" step="0.01" value="1">
+          </label>
+          <label class="field compact">
+            <span>颜色</span>
+            <input id="keyColorInput" type="color" value="#d7ff45">
+          </label>
+          <div class="key-actions">
+            <button id="deleteKeyframeBtn" class="mini-button danger">删除</button>
+            <button id="applyKeyframeBtn" class="mini-button solid">应用</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <section class="stage-column">
+      <div class="stage-toolbar">
+        <div>
+          <span class="eyebrow">Scene 01 / Live canvas</span>
+          <div class="scene-title">
+            <h2 id="sceneTitle">Launch / 短文案</h2>
+            <span class="instance-pill" id="instancePill">INST-01 · LINKED</span>
+          </div>
+        </div>
+        <div class="stage-tools">
+          <span class="fps-readout"><i></i> 30 FPS</span>
+          <button id="fitBtn" class="icon-button" title="适配画布">⌗</button>
+          <button id="fullscreenBtn" class="icon-button" title="全屏预览">↗</button>
+        </div>
+      </div>
+      <div class="canvas-shell">
+        <div class="canvas-topline">
+          <span>ARTBOARD 1280 × 720</span>
+          <span class="safe-tag"><i></i> SAFE 5%</span>
+        </div>
+        <div class="canvas-wrap" id="canvasWrap">
+          <canvas id="stageCanvas" width="1280" height="720"></canvas>
+          <div class="canvas-hud hud-tl"></div><div class="canvas-hud hud-tr"></div>
+          <div class="canvas-hud hud-bl"></div><div class="canvas-hud hud-br"></div>
+          <div class="export-overlay" id="exportOverlay">
+            <span class="rec-dot"></span>
+            <strong>REC</strong>
+            <span id="exportOverlayTime">00:00.0</span>
+          </div>
+        </div>
+        <div class="canvas-caption">
+          <span>自动布局：<strong id="layoutStatus">2 行 / 60px</strong></span>
+          <span>绑定：<strong id="bindingStatus">样例 A · 3 项指标</strong></span>
+          <span>渲染节点：<strong id="nodeCount">18</strong></span>
+        </div>
+      </div>
+
+      <div class="timeline panel">
+        <div class="timeline-controls">
+          <button id="playBtn" class="play-button" title="播放 / 暂停">▶</button>
+          <span id="timecode" class="timecode">00:00.00 <em>/ 00:12.00</em></span>
+          <div class="timeline-spacer"></div>
+          <span class="timeline-hint">点击轨道定位 · 关键帧自动插值</span>
+          <button id="loopBtn" class="icon-button on" title="循环">↻</button>
+        </div>
+        <div class="timeline-body">
+          <div class="track-labels">
+            <span>KEY</span><span>BG</span><span>TYPE</span><span>CARD</span>
+          </div>
+          <div class="track-area" id="trackArea">
+            <div class="track-grid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="track-row key-track" id="timelineKeys"></div>
+            <div class="track-row bg-track"><span class="clip color-clip" style="left:0;width:100%">ORBIT · COLOR SHIFT</span></div>
+            <div class="track-row type-track"><span class="clip type-clip" style="left:4.5%;width:78%">AUTO TYPE / POSITION</span></div>
+            <div class="track-row card-track"><span class="clip card-clip" style="left:12%;width:66%">CARD STAGGER</span></div>
+            <div class="playhead" id="playhead"><i></i></div>
+          </div>
+        </div>
+        <div class="timeline-footer">
+          <span>0s</span><span>2s</span><span>4s</span><span>6s</span><span>8s</span><span>10s</span><span>12s</span>
+        </div>
+      </div>
+    </section>
+
+    <aside class="data-panel panel">
+      <div class="panel-head">
+        <div>
+          <span class="eyebrow">Data binding</span>
+          <h2>数据视图</h2>
+        </div>
+        <span id="dataHealth" class="health-pill"><i></i> VALID</span>
+      </div>
+      <div class="data-context">
+        <div class="context-row"><span>当前筛选</span><strong id="filterValue">全部渠道 · 全部地区</strong></div>
+        <div class="context-row"><span>数据版本</span><strong id="dataVersion">v2026.11.16-A</strong></div>
+        <div class="context-row"><span>导出口径</span><strong id="exportScope">样例 A · 6 源记录</strong></div>
+      </div>
+      <div class="sample-switch" id="sampleSwitch">
+        <button class="active" data-sample="A"><span>A</span><b>星港零售</b><em>6 records</em></button>
+        <button data-sample="B"><span>B</span><b>研发运营</b><em>6 records</em></button>
+      </div>
+      <div class="filter-row">
+        <label>
+          <span>渠道 / 单元</span>
+          <select id="filterSelect"><option value="all">全部</option></select>
+        </label>
+        <button id="refreshDataBtn" class="mini-button">模拟更新 ↻</button>
+      </div>
+      <div class="metric-grid" id="metricGrid"></div>
+      <div class="records-head">
+        <span>规范化记录</span>
+        <span id="recordCount">5 / 6</span>
+      </div>
+      <div class="records-table-wrap">
+        <table class="records-table">
+          <thead><tr><th>ID</th><th>对象</th><th>数值</th><th>状态</th></tr></thead>
+          <tbody id="recordsBody"></tbody>
+        </table>
+      </div>
+      <div class="quality-block">
+        <div class="quality-head"><span>数据质量检查</span><strong id="qualityScore">98 / 100</strong></div>
+        <div class="quality-bars" id="qualityBars"></div>
+        <div class="issue-legend">
+          <span><i class="null"></i>空值 <b id="nullCount">1</b></span>
+          <span><i class="dup"></i>重复 <b id="dupCount">1</b></span>
+          <span><i class="outlier"></i>异常 <b id="outlierCount">1</b></span>
+        </div>
+      </div>
+      <div class="binding-list">
+        <div class="binding-row"><span>KPI 01</span><strong id="binding1">--</strong><em>revenue.sum</em></div>
+        <div class="binding-row"><span>KPI 02</span><strong id="binding2">--</strong><em>orders.sum</em></div>
+        <div class="binding-row"><span>KPI 03</span><strong id="binding3">--</strong><em>aov.calc</em></div>
+      </div>
+    </aside>
+  </main>
+
+  <section class="debug-panel" id="debugPanel">
+    <div class="debug-bar">
+      <div class="debug-title">
+        <span class="terminal-dot"></span>
+        <span>DEBUG / INTERMEDIATE STATE</span>
+        <span id="debugClock">00:00:00</span>
+      </div>
+      <div class="debug-tabs" data-tabs="debug">
+        <button class="active" data-tab="pipeline">计算链路</button>
+        <button data-tab="integrity">对象校验</button>
+        <button data-tab="references">工程引用</button>
+      </div>
+      <button id="debugToggle" class="debug-toggle">收起</button>
+    </div>
+    <div class="debug-content" id="debugContent">
+      <div class="debug-tab-panel active" data-panel="pipeline">
+        <div class="debug-grid">
+          <div class="debug-card">
+            <div class="debug-card-head"><span>01 / INGEST</span><em id="ingestStatus">OK</em></div>
+            <pre id="ingestDebug"></pre>
+          </div>
+          <div class="debug-card">
+            <div class="debug-card-head"><span>02 / NORMALIZE</span><em id="normalizeStatus">OK</em></div>
+            <pre id="normalizeDebug"></pre>
+          </div>
+          <div class="debug-card">
+            <div class="debug-card-head"><span>03 / AGGREGATE</span><em id="aggregateStatus">OK</em></div>
+            <pre id="aggregateDebug"></pre>
+          </div>
+          <div class="debug-card binding-debug">
+            <div class="debug-card-head"><span>04 / BIND → CANVAS</span><em id="bindStatus">SYNCED</em></div>
+            <pre id="bindDebug"></pre>
+          </div>
+        </div>
+      </div>
+      <div class="debug-tab-panel" data-panel="integrity">
+        <div class="integrity-grid">
+          <div class="integrity-summary">
+            <div class="integrity-seal" id="integritySeal">MATCH</div>
+            <p>导出前后对工程对象、关键数值与画布签名做快照比对。任何漂移都会在此处标记。</p>
+          </div>
+          <div class="snapshot-card">
+            <h4>PRE-EXPORT SNAPSHOT</h4>
+            <pre id="preExportDebug">尚未导出</pre>
+          </div>
+          <div class="snapshot-card">
+            <h4>POST-EXPORT SNAPSHOT</h4>
+            <pre id="postExportDebug">等待比对</pre>
+          </div>
+        </div>
+      </div>
+      <div class="debug-tab-panel" data-panel="references">
+        <div class="reference-grid">
+          <div class="reference-card">
+            <h4>模板存储 / TEMPLATE STORE</h4>
+            <pre id="templateStoreDebug"></pre>
+          </div>
+          <div class="reference-card">
+            <h4>实例引用 / INSTANCE LINKS</h4>
+            <pre id="instanceRefDebug"></pre>
+          </div>
+          <div class="reference-card">
+            <h4>重载审计 / RELOAD AUDIT</h4>
+            <pre id="reloadAuditDebug"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+  <script src="./vendor/fix-webm-duration.js"></script>
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>

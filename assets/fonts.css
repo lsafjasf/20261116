@@ -1,0 +1,28 @@
+@font-face {
+  font-family: "Noto Sans SC";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("./NotoSansSC-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Noto Sans SC";
+  font-style: normal;
+  font-weight: 500 900;
+  font-display: block;
+  src: url("./NotoSansSC-Bold.ttf") format("truetype");
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("./IBMPlexMono-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 500 700;
+  font-display: block;
+  src: url("./IBMPlexMono-Regular.ttf") format("truetype");
+}

@@ -1,0 +1,14 @@
+{
+  "name": "kinetic-data-studio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "verify": "node tools/verify.mjs"
+  },
+  "devDependencies": {
+    "ffprobe-static": "^3.1.0",
+    "playwright": "^1.56.0"
+  }
+}
