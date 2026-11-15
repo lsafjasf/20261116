@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#081b24" />
+    <title>泊位协商台 · Berth 04</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+    <main class="shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark">04</span>
+          <div>
+            <p class="eyebrow">PORT AUTHORITY / SHARED CONSOLE</p>
+            <h1>泊位协商台</h1>
+          </div>
+        </div>
+        <div class="top-actions">
+          <label class="seed-field">
+            <span>种子</span>
+            <input id="seed-input" maxlength="32" value="PORT-640" spellcheck="false" />
+          </label>
+          <button class="icon-button" id="sound-button" type="button" aria-pressed="true">
+            <span class="icon" aria-hidden="true">◖</span><span id="sound-label">声音开</span>
+          </button>
+          <button class="icon-button" id="pause-button" type="button">
+            <span class="icon" aria-hidden="true">Ⅱ</span><span id="pause-label">暂停</span>
+          </button>
+          <button class="icon-button danger" id="restart-button" type="button">
+            <span class="icon" aria-hidden="true">↺</span><span>重开</span>
+          </button>
+        </div>
+      </header>
+
+      <section class="mission-strip" aria-live="polite">
+        <div class="mission-copy">
+          <span class="section-label">当前目标</span>
+          <p id="goal-text">双人接管共享仪表，准备协商装船顺序。</p>
+        </div>
+        <div class="phase-block">
+          <span class="live-dot" id="live-dot"></span>
+          <div>
+            <span class="phase-caption">状态机</span>
+            <strong id="phase-label">待接管</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="dashboard">
+        <aside class="left-rail">
+          <div class="panel role-panel">
+            <div class="panel-heading">
+              <span class="section-label">协商席位</span>
+              <span class="tiny">本地双人 · 热座</span>
+            </div>
+            <article class="role-card" id="dispatcher-card">
+              <span class="role-symbol">D</span>
+              <div>
+                <h2>码头调度员</h2>
+                <p>掌握泊位、潮汐与装船节拍</p>
+              </div>
+              <span class="role-state">待命</span>
+            </article>
+            <div class="handoff" aria-hidden="true"><span></span>请求 / 回应<span></span></div>
+            <article class="role-card" id="owner-card">
+              <span class="role-symbol">O</span>
+              <div>
+                <h2>货主</h2>
+                <p>掌握货值、时效与优先权预算</p>
+              </div>
+              <span class="role-state">待命</span>
+            </article>
+          </div>
+
+          <div class="panel resources-panel">
+            <div class="panel-heading">
+              <span class="section-label">关键资源</span>
+              <span class="tiny">实时</span>
+            </div>
+            <div class="resource-grid">
+              <div class="resource">
+                <span>港口信用</span>
+                <strong id="credit-value">60</strong>
+                <div class="meter"><i id="credit-meter"></i></div>
+              </div>
+              <div class="resource">
+                <span>协商点</span>
+                <strong id="negotiation-value">14</strong>
+                <div class="meter amber"><i id="negotiation-meter"></i></div>
+              </div>
+              <div class="resource compact">
+                <span>已装</span><strong id="loaded-value">0 / 4</strong>
+              </div>
+              <div class="resource compact">
+                <span>风险次数</span><strong id="risk-value">0</strong>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <section class="center-stage">
+          <div class="canvas-frame">
+            <canvas id="harbor-canvas" aria-label="港口货位、船舶和请求倒计时"></canvas>
+            <div class="canvas-overlay">
+              <div class="canvas-chip">
+                <span>共享泊位 04</span>
+                <strong id="tide-chip">潮汐平稳</strong>
+              </div>
+              <div class="countdown-chip" id="countdown-chip">
+                <span>回应窗口</span>
+                <strong id="countdown-value">--</strong>
+              </div>
+            </div>
+            <div class="pause-veil" id="pause-veil">
+              <span>Ⅱ</span>
+              <strong>协商已暂停</strong>
+              <small>倒计时、输入与音频均已冻结</small>
+            </div>
+            <div class="start-veil" id="start-veil">
+              <span class="section-label">双人协作简报</span>
+              <h2>顺序比速度更重要。</h2>
+              <p>调度员与货主共看一块仪表。只能发送优先权请求，不能自由聊天；请求会被接受或延迟。</p>
+              <button class="primary-button" id="begin-button" type="button">双人接管 · 开始协商</button>
+            </div>
+          </div>
+          <div class="last-change" id="last-change">
+            <span class="pulse-mark"></span>
+            <div>
+              <span class="section-label">最近状态变化</span>
+              <p id="last-change-text">港区系统就绪，等待双人接管。</p>
+            </div>
+            <span class="tick-label" id="tick-label">T+0</span>
+          </div>
+        </section>
+
+        <aside class="right-rail">
+          <div class="panel request-panel">
+            <div class="panel-heading">
+              <span class="section-label">优先权请求</span>
+              <span class="tiny" id="input-owner">仅当前席位可操作</span>
+            </div>
+            <div class="cargo-list" id="cargo-list"></div>
+            <div class="mode-list" id="mode-list"></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="lower-deck">
+        <div class="panel response-panel">
+          <div class="response-copy">
+            <span class="section-label">对方回应</span>
+            <h2 id="response-title">等待提出请求</h2>
+            <p id="response-detail">接受会扣协商点并装船；延迟会损耗信用，并抬高下一次成本。</p>
+          </div>
+          <div class="response-actions">
+            <button class="secondary-button" id="delay-button" type="button">延迟请求 <span>-3 信用</span></button>
+            <button class="primary-button" id="accept-button" type="button">接受并装船</button>
+          </div>
+        </div>
+
+        <div class="panel log-panel">
+          <div class="panel-heading">
+            <span class="section-label">仪表记录</span>
+            <span class="tiny" id="hash-label">HASH --------</span>
+          </div>
+          <ol class="event-log" id="event-log"></ol>
+        </div>
+      </section>
+
+      <footer class="system-footer">
+        <div class="footer-meta">
+          <span>SEED <strong id="footer-seed">PORT-640</strong></span>
+          <span>TICK <strong id="footer-tick">0</strong></span>
+          <span>CHECKPOINT <strong id="footer-checkpoint">--</strong></span>
+        </div>
+        <div class="footer-actions">
+          <button class="text-button" id="restore-button" type="button">恢复检查点</button>
+          <button class="text-button" id="replay-button" type="button">回放本局</button>
+          <button class="text-button" id="save-button" type="button">保存 seed + 输入</button>
+          <button class="text-button accent" id="verify-button" type="button">复算哈希</button>
+        </div>
+      </footer>
+    </main>
+
+    <dialog class="report-dialog" id="report-dialog">
+      <button class="dialog-close" id="dialog-close" type="button" aria-label="关闭">×</button>
+      <span class="section-label" id="dialog-kicker">REPLAY REPORT</span>
+      <h2 id="dialog-title">确定性复算</h2>
+      <pre id="dialog-body"></pre>
+      <div class="dialog-actions">
+        <button class="secondary-button" id="dialog-secondary" type="button">关闭</button>
+        <button class="primary-button" id="dialog-primary" type="button">下载记录</button>
+      </div>
+    </dialog>
+
+    <div class="replay-bar" id="replay-bar" hidden>
+      <span class="replay-tag">回放</span>
+      <strong id="replay-status">准备中</strong>
+      <span id="replay-tick">T+0</span>
+      <button class="text-button" id="replay-pause" type="button">暂停</button>
+      <button class="text-button" id="replay-speed" type="button">4×</button>
+      <button class="text-button" id="replay-exit" type="button">退出回放</button>
+    </div>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
