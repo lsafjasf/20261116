@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Canvas HiDPI 坐标修复演示</title>
+  <style>
+    html, body { margin: 0; height: 100%; font: 13px/1.4 monospace; }
+    #stage { display: block; width: 100vw; height: calc(100vh - 96px); touch-action: none; }
+    #bar { display: flex; gap: 12px; align-items: center; padding: 6px 10px; flex-wrap: wrap; }
+    #hud { color: #064; }
+    #selftest { color: #1b6ef3; }
+    #log { color: #c00; white-space: pre-wrap; max-height: 40px; overflow: auto; }
+  </style>
+</head>
+<body>
+  <canvas id="stage"></canvas>
+  <div id="bar">
+    <button id="selftest-btn">自测(四边+中心)</button>
+    <button id="fullscreen-btn">全屏切换</button>
+    <span>指标: <span id="hud">-</span></span>
+  </div>
+  <div id="bar2">自测: <span id="selftest">-</span></div>
+  <div id="log"></div>
+  <script type="module" src="./src/canvas-tool.js"></script>
+</body>
+</html>
