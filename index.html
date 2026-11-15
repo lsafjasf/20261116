@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <title>Framecraft · 媒体编辑器</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23f0a365'/%3E%3Cpath d='M19 15h27v8H28v8h15v8H28v12h-9z' fill='%231b130d'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#workspace">跳到编辑工作区</a>
+
+    <header class="topbar">
+      <div class="brand" aria-label="Framecraft">
+        <span class="brand-mark" aria-hidden="true">F</span>
+        <div>
+          <strong>FRAMECRAFT</strong>
+          <span>城市呼吸 / 00:24</span>
+        </div>
+      </div>
+      <div class="topbar-context">
+        <span class="eyebrow">工程</span>
+        <label class="sr-only" for="project-title">工程名称</label>
+        <input id="project-title" class="project-title" value="城市呼吸 · 预热片" autocomplete="off">
+      </div>
+      <div class="topbar-actions">
+        <div class="save-status" id="save-status" role="status" aria-live="polite">
+          <span class="save-dot" aria-hidden="true"></span>
+          <span id="save-status-text">已载入本地工程</span>
+        </div>
+        <button class="icon-button" id="undo-btn" type="button" title="撤销（Ctrl/⌘ Z）" aria-label="撤销" disabled>
+          <span aria-hidden="true">↶</span>
+        </button>
+        <button class="icon-button" id="redo-btn" type="button" title="重做（Ctrl/⌘ Shift Z）" aria-label="重做" disabled>
+          <span aria-hidden="true">↷</span>
+        </button>
+        <button class="button button-quiet" id="open-logs" type="button" aria-haspopup="dialog">运行日志 <span class="count-badge" id="log-count">0</span></button>
+        <button class="button button-accent" id="open-export" type="button" aria-haspopup="dialog">导出设置</button>
+      </div>
+    </header>
+
+    <div class="global-banner" id="global-banner" role="alert" hidden>
+      <strong>界面已进入安全模式</strong>
+      <span id="global-banner-text">某个视图未能绘制，编辑数据仍保留在本地快照中。</span>
+      <button class="text-button" id="global-dismiss" type="button">保留提示并继续</button>
+    </div>
+
+    <main class="workspace" id="workspace">
+      <aside class="rail" aria-label="工程导航">
+        <section class="rail-section" aria-labelledby="scenes-title">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">时间线</span>
+              <h2 id="scenes-title">场景对象</h2>
+            </div>
+            <span class="meta-pill" id="clip-count">0 项</span>
+          </div>
+          <div class="scene-list" id="scene-list"></div>
+        </section>
+
+        <section class="rail-section" aria-labelledby="resources-title">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">幂等账本</span>
+              <h2 id="resources-title">已创建资源</h2>
+            </div>
+            <span class="meta-pill" id="resource-count">0 个</span>
+          </div>
+          <div class="resource-list" id="resource-list"></div>
+          <p class="microcopy" id="reuse-summary">重试会复用同一资源键。</p>
+        </section>
+
+        <section class="rail-section fault-lab" aria-labelledby="fault-title">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">可重复验收</span>
+              <h2 id="fault-title">故障实验室</h2>
+            </div>
+            <span class="status-dot status-warn" aria-hidden="true"></span>
+          </div>
+          <p class="microcopy">故障只影响对应模块，选中项和草稿会保留。</p>
+          <div class="fault-grid">
+            <button class="fault-button" id="fault-image" type="button"><span>图像</span><small>解码失败</small></button>
+            <button class="fault-button" id="fault-audio" type="button"><span>音频</span><small>合成失败</small></button>
+            <button class="fault-button" id="fault-export" type="button"><span>导出</span><small>编码失败</small></button>
+          </div>
+          <label class="check-row">
+            <input id="persistent-fault" type="checkbox">
+            <span>重试仍失败（检查安全快照）</span>
+          </label>
+          <div class="fault-note" id="fault-note" role="status" aria-live="polite">尚未注入故障</div>
+        </section>
+      </aside>
+
+      <section class="canvas-column" aria-label="预览与时间线">
+        <section class="preview-card" aria-labelledby="preview-title">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">节目监视器</span>
+              <h2 id="preview-title">合成预览</h2>
+            </div>
+            <div class="preview-badges">
+              <span class="render-badge" id="preview-source-badge">草稿预览</span>
+              <span class="meta-pill" id="preview-resolution">1920 × 1080</span>
+            </div>
+          </div>
+          <div class="preview-stage" id="preview-stage" role="img" aria-label="城市夜景合成预览">
+            <div class="preview-grid" aria-hidden="true"></div>
+            <div class="preview-sky" aria-hidden="true"></div>
+            <div class="preview-sun" aria-hidden="true"></div>
+            <div class="preview-buildings" id="preview-image" data-render-image>
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+            <div class="preview-waveform" id="preview-waveform" aria-hidden="true"></div>
+            <div class="preview-selection" id="preview-selection">
+              <span class="selection-label" id="selection-label">图像 · 城市夜景</span>
+              <span class="selection-handle" aria-hidden="true"></span>
+            </div>
+            <div class="preview-overlay">
+              <span class="timecode">00:04:12</span>
+              <span id="preview-filter-label">亮度 112 · 模糊 0px</span>
+            </div>
+          </div>
+          <div class="preview-footer">
+            <div class="playback" aria-label="播放控件">
+              <button class="round-button" id="preview-play" type="button" aria-label="播放预览">▶</button>
+              <span class="mono" id="playhead-label">00:04:12</span>
+            </div>
+            <div class="preview-health" id="preview-health" role="status" aria-live="polite">三个模块就绪</div>
+          </div>
+        </section>
+
+        <section class="timeline-card" aria-labelledby="timeline-title">
+          <div class="panel-heading compact">
+            <div>
+              <span class="eyebrow">内容层</span>
+              <h2 id="timeline-title">时间线</h2>
+            </div>
+            <div class="timeline-actions">
+              <span class="meta-pill" id="selected-summary">已选：城市夜景</span>
+              <button class="icon-button small" id="zoom-out" type="button" aria-label="时间线缩小">−</button>
+              <span class="zoom-value mono" id="zoom-value">100%</span>
+              <button class="icon-button small" id="zoom-in" type="button" aria-label="时间线放大">＋</button>
+            </div>
+          </div>
+          <div class="timeline-scroller" id="timeline-scroller" tabindex="0" aria-label="可横向滚动的时间线">
+            <div class="timeline-ruler" aria-hidden="true">
+              <span>00:00</span><span>00:04</span><span>00:08</span><span>00:12</span><span>00:16</span><span>00:20</span><span>00:24</span>
+            </div>
+            <div class="timeline-track" id="timeline-track"></div>
+            <div class="playhead-line" aria-hidden="true"></div>
+          </div>
+          <p class="scroll-hint">滚动位置会随工程保存：<span class="mono" id="scroll-position-label">0 px</span></p>
+        </section>
+
+        <section class="state-mirror" aria-labelledby="mirror-title">
+          <div class="panel-heading compact">
+            <div>
+              <span class="eyebrow">同步探针</span>
+              <h2 id="mirror-title">输入 / 存储 / 渲染</h2>
+            </div>
+            <span class="sync-badge" id="sync-badge" role="status" aria-live="polite">校验中</span>
+          </div>
+          <div class="mirror-grid">
+            <article class="mirror-cell">
+              <h3>输入层 <span class="mono" id="input-hash">—</span></h3>
+              <pre id="mirror-input"></pre>
+            </article>
+            <article class="mirror-cell">
+              <h3>存储层 <span class="mono" id="storage-hash">—</span></h3>
+              <pre id="mirror-storage"></pre>
+            </article>
+            <article class="mirror-cell">
+              <h3>渲染层 <span class="mono" id="render-hash">—</span></h3>
+              <pre id="mirror-render"></pre>
+            </article>
+          </div>
+          <p class="microcopy" id="sync-explanation">输入、localStorage 与 DOM 快照会逐项核对。</p>
+        </section>
+      </section>
+
+      <aside class="inspector" aria-label="模块参数">
+        <div class="inspector-heading">
+          <div>
+            <span class="eyebrow">检查器</span>
+            <h2>处理模块</h2>
+          </div>
+          <span class="module-health" id="module-health">3 / 3 可用</span>
+        </div>
+        <div class="inspector-body" id="inspector-body" tabindex="0" aria-label="可纵向滚动的模块参数">
+          <section class="module-card" id="module-image" data-module="image" aria-labelledby="module-image-title">
+            <div class="module-header">
+              <div class="module-title">
+                <span class="module-icon icon-image" aria-hidden="true">▧</span>
+                <div><h3 id="module-image-title">图像处理</h3><p>调色、模糊与画布预览</p></div>
+              </div>
+              <span class="module-state state-ready" id="module-image-state">就绪</span>
+            </div>
+            <div class="module-progress" id="module-image-progress" hidden><span></span></div>
+            <div class="boundary-slot" id="module-image-boundary" aria-live="assertive"></div>
+            <div class="module-fields" id="module-image-fields">
+              <label class="field-row" for="image-brightness">
+                <span>亮度 <output class="mono" id="image-brightness-value">112</output></span>
+                <input id="image-brightness" data-draft="image.brightness" type="range" min="50" max="150" value="112">
+              </label>
+              <label class="field-row" for="image-blur">
+                <span>模糊 <output class="mono" id="image-blur-value">0 px</output></span>
+                <input id="image-blur" data-draft="image.blur" type="range" min="0" max="16" step="0.5" value="0">
+              </label>
+              <label class="field-row" for="image-warmth">
+                <span>色温 <output class="mono" id="image-warmth-value">+12</output></span>
+                <input id="image-warmth" data-draft="image.warmth" type="range" min="-30" max="30" value="12">
+              </label>
+              <label class="text-field" for="image-note">
+                <span>镜头备注 <small>未提交也会保存</small></span>
+                <input id="image-note" data-draft="image.note" type="text" value="保留霓虹层次" autocomplete="off">
+              </label>
+              <div class="inline-status">
+                <span class="status-chip" id="image-commit-state">未提交草稿</span>
+                <span class="mono" id="image-resource-label">资源待分配</span>
+              </div>
+            </div>
+            <div class="module-actions">
+              <button class="button button-primary" id="run-image" type="button">应用图像处理</button>
+              <button class="text-button" id="reset-image" type="button">恢复已提交</button>
+            </div>
+          </section>
+
+          <section class="module-card" id="module-audio" data-module="audio" aria-labelledby="module-audio-title">
+            <div class="module-header">
+              <div class="module-title">
+                <span class="module-icon icon-audio" aria-hidden="true">≋</span>
+                <div><h3 id="module-audio-title">音频合成</h3><p>振荡器、时长与氛围纹理</p></div>
+              </div>
+              <span class="module-state state-ready" id="module-audio-state">就绪</span>
+            </div>
+            <div class="module-progress" id="module-audio-progress" hidden><span></span></div>
+            <div class="boundary-slot" id="module-audio-boundary" aria-live="assertive"></div>
+            <div class="module-fields" id="module-audio-fields">
+              <label class="field-row" for="audio-frequency">
+                <span>基频 <output class="mono" id="audio-frequency-value">220 Hz</output></span>
+                <input id="audio-frequency" data-draft="audio.frequency" type="range" min="80" max="880" step="10" value="220">
+              </label>
+              <label class="field-row" for="audio-duration">
+                <span>时长 <output class="mono" id="audio-duration-value">7.2 s</output></span>
+                <input id="audio-duration" data-draft="audio.duration" type="range" min="1" max="24" step="0.2" value="7.2">
+              </label>
+              <label class="text-field" for="audio-texture">
+                <span>纹理</span>
+                <select id="audio-texture" data-draft="audio.texture">
+                  <option value="空气感">空气感</option>
+                  <option value="磁带暖">磁带暖</option>
+                  <option value="数字颗粒">数字颗粒</option>
+                </select>
+              </label>
+              <div class="waveform-preview" id="audio-waveform-preview" aria-label="当前合成波形"></div>
+              <div class="inline-status">
+                <span class="status-chip" id="audio-commit-state">未提交草稿</span>
+                <span class="mono" id="audio-resource-label">资源待分配</span>
+              </div>
+            </div>
+            <div class="module-actions">
+              <button class="button button-primary" id="run-audio" type="button">生成音频</button>
+              <button class="text-button" id="play-audio" type="button" disabled>试听</button>
+            </div>
+          </section>
+
+          <section class="module-card" id="module-export" data-module="export" aria-labelledby="module-export-title">
+            <div class="module-header">
+              <div class="module-title">
+                <span class="module-icon icon-export" aria-hidden="true">↗</span>
+                <div><h3 id="module-export-title">导出工程</h3><p>收集时间线并生成交付包</p></div>
+              </div>
+              <span class="module-state state-ready" id="module-export-state">就绪</span>
+            </div>
+            <div class="module-progress" id="module-export-progress" hidden><span></span></div>
+            <div class="boundary-slot" id="module-export-boundary" aria-live="assertive"></div>
+            <div class="module-fields" id="module-export-fields">
+              <label class="text-field" for="export-name">
+                <span>文件名</span>
+                <input id="export-name" data-draft="export.name" type="text" value="城市呼吸-精剪" autocomplete="off">
+              </label>
+              <div class="field-pair">
+                <label class="text-field" for="export-format">
+                  <span>容器</span>
+                  <select id="export-format" data-draft="export.format">
+                    <option value="webm">WebM</option>
+                    <option value="mp4">MP4</option>
+                    <option value="json">工程 JSON</option>
+                  </select>
+                </label>
+                <label class="text-field" for="export-quality">
+                  <span>质量</span>
+                  <select id="export-quality" data-draft="export.quality">
+                    <option value="高">高</option>
+                    <option value="平衡">平衡</option>
+                    <option value="快速">快速</option>
+                  </select>
+                </label>
+              </div>
+              <div class="inline-status">
+                <span class="status-chip" id="export-commit-state">未提交草稿</span>
+                <span class="mono" id="export-resource-label">资源待分配</span>
+              </div>
+            </div>
+            <div class="module-actions">
+              <button class="button button-primary" id="run-export" type="button">开始导出</button>
+              <button class="text-button" id="edit-export" type="button">打开弹窗</button>
+            </div>
+          </section>
+        </div>
+      </aside>
+    </main>
+
+    <dialog class="dialog" id="export-dialog" aria-labelledby="export-dialog-title">
+      <form method="dialog" id="export-form">
+        <div class="dialog-heading">
+          <div>
+            <span class="eyebrow">交付设置</span>
+            <h2 id="export-dialog-title">导出工程</h2>
+          </div>
+          <button class="icon-button" id="close-export" type="button" aria-label="关闭导出设置">×</button>
+        </div>
+        <p class="dialog-copy">这些设置属于未提交草稿。按 Esc 或关闭后仍会保留。</p>
+        <label class="text-field" for="dialog-export-name">
+          <span>文件名</span>
+          <input id="dialog-export-name" data-draft="export.name" type="text" value="城市呼吸-精剪" autocomplete="off">
+        </label>
+        <div class="field-pair">
+          <label class="text-field" for="dialog-export-format">
+            <span>容器</span>
+            <select id="dialog-export-format" data-draft="export.format">
+              <option value="webm">WebM</option>
+              <option value="mp4">MP4</option>
+              <option value="json">工程 JSON</option>
+            </select>
+          </label>
+          <label class="text-field" for="dialog-export-quality">
+            <span>质量</span>
+            <select id="dialog-export-quality" data-draft="export.quality">
+              <option value="高">高</option>
+              <option value="平衡">平衡</option>
+              <option value="快速">快速</option>
+            </select>
+          </label>
+        </div>
+        <div class="dialog-summary" id="dialog-summary">2 个时间线对象 · 预计 24 秒</div>
+        <div class="dialog-actions">
+          <button class="button button-quiet" id="cancel-export" type="button">关闭并保留草稿</button>
+          <button class="button button-accent" id="confirm-export" type="button">保存并开始导出</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="dialog log-dialog" id="log-dialog" aria-labelledby="log-dialog-title">
+      <div class="dialog-heading">
+        <div>
+          <span class="eyebrow">可核对事件流</span>
+          <h2 id="log-dialog-title">运行日志</h2>
+        </div>
+        <button class="icon-button" id="close-logs" type="button" aria-label="关闭运行日志">×</button>
+      </div>
+      <p class="dialog-copy">日志一并记录模块、阶段、尝试次数、资源键和恢复结果。</p>
+      <div class="log-list" id="log-list"></div>
+      <div class="dialog-actions">
+        <button class="button button-quiet" id="copy-log" type="button">复制日志</button>
+        <button class="button button-accent" id="close-logs-footer" type="button">关闭</button>
+      </div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>

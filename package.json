@@ -1,0 +1,14 @@
+{
+  "name": "framecraft-media-editor",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test tests/state.test.mjs",
+    "test:e2e": "node tests/acceptance.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.1"
+  }
+}
