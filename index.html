@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101820">
+  <title>双索 · 山崖绞车救援</title>
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <i></i><i></i><i></i>
+        </span>
+        <div>
+          <p class="eyebrow">TWIN CABLE / CO-OP RESCUE</p>
+          <h1>双索 · 山崖绞车</h1>
+        </div>
+      </div>
+      <div class="top-metrics">
+        <div class="metric">
+          <span>任务时钟</span>
+          <strong id="missionClock">00:00.000</strong>
+        </div>
+        <div class="metric">
+          <span>救出</span>
+          <strong><b id="progressValue">0</b><small>/ 3</small></strong>
+        </div>
+        <div class="metric durability-metric">
+          <span>吊篮耐久</span>
+          <strong><b id="durabilityValue">100</b><small>%</small></strong>
+          <div class="mini-meter"><i id="durabilityMeter"></i></div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="icon-button" id="audioToggle" type="button" aria-pressed="false">
+          <span class="audio-wave" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span id="audioLabel">启用双声部</span>
+        </button>
+        <button class="icon-button ghost" id="helpButton" type="button">操作说明</button>
+      </div>
+    </header>
+
+    <main class="rescue-deck">
+      <aside class="player-card player-one" aria-labelledby="playerOneTitle">
+        <div class="player-heading">
+          <span class="player-tag">P1</span>
+          <div>
+            <p class="eyebrow">HOIST WINCH</p>
+            <h2 id="playerOneTitle">升降卷扬机</h2>
+          </div>
+          <span class="live-dot">在线</span>
+        </div>
+
+        <div class="tension-display">
+          <div class="gauge-label">
+            <span>左侧张力</span>
+            <small id="leftWinchState">LIVE</small>
+          </div>
+          <div class="gauge-value">
+            <strong id="leftTensionValue">42</strong>
+            <span>kN</span>
+          </div>
+          <div class="tension-track">
+            <i id="leftTensionMeter"></i>
+            <em class="safe-line"></em>
+          </div>
+          <div class="gauge-meta">
+            <span>绳长 <b id="leftLengthValue">0</b>m</span>
+            <span>机温 <b id="leftTempValue">34</b>°</span>
+          </div>
+        </div>
+
+        <div class="control-cluster">
+          <p class="control-label">按住调整吊篮高度</p>
+          <div class="vertical-keys">
+            <button class="key-button hold-key" type="button"
+              data-player="p1" data-control="up" aria-label="P1 收绳上升">
+              <kbd>W</kbd><span>收绳上升</span>
+            </button>
+            <button class="key-button hold-key" type="button"
+              data-player="p1" data-control="down" aria-label="P1 放绳下降">
+              <kbd>S</kbd><span>放绳下降</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="player-foot">
+          <span class="status-pip"></span>
+          <span id="p1Hint">等待升降指令</span>
+        </div>
+      </aside>
+
+      <section class="stage" aria-label="救援场景">
+        <div class="stage-heading">
+          <div>
+            <p class="eyebrow">LIVE SHARED STATE</p>
+            <h2 id="statusText">等待双人协作</h2>
+          </div>
+          <div class="mission-track" id="missionTrack" aria-label="三处救援进度">
+            <span class="mission-node active" data-point="low"><i>01</i><b>低台</b></span>
+            <span class="mission-line"></span>
+            <span class="mission-node" data-point="bridge"><i>02</i><b>断桥</b></span>
+            <span class="mission-line"></span>
+            <span class="mission-node" data-point="nest"><i>03</i><b>鹰巢</b></span>
+          </div>
+          <button class="small-button restart-button" id="restartMission" type="button" hidden>
+            重新开始
+          </button>
+        </div>
+
+        <div class="canvas-shell">
+          <canvas id="scene" width="1000" height="620"
+            aria-label="悬崖双索吊篮救援场景"></canvas>
+          <div class="canvas-hud canvas-hud-left">
+            <span>目标</span>
+            <strong id="targetLabel">低台 · 438m</strong>
+          </div>
+          <div class="canvas-hud canvas-hud-right">
+            <span>阵风</span>
+            <strong><b id="windValue">32</b> m/s</strong>
+            <i class="wind-arrow" id="windArrow">→</i>
+          </div>
+          <div class="notice-line" id="noticeText" aria-live="polite">
+            调整吊篮至救援点
+          </div>
+          <div class="capture-ring" id="captureHud" aria-hidden="true">
+            <span>抓取</span>
+            <strong id="captureValue">0%</strong>
+          </div>
+          <div class="protection-banner" id="protectionBanner" hidden>
+            <span class="shield-icon">!</span>
+            <div>
+              <small>FAIL-SAFE ACTIVE</small>
+              <strong id="protectionTitle">右侧断索 · 全制动保护</strong>
+              <p id="protectionDetail">安全绳已承载，吊篮锁止</p>
+            </div>
+            <button class="small-button" id="releaseProtection" type="button">
+              复位保护
+            </button>
+          </div>
+          <div class="stage-vignette"></div>
+        </div>
+
+        <div class="stage-footer">
+          <div class="legend">
+            <span><i class="legend-cable left"></i>左索 · 低音声部</span>
+            <span><i class="legend-cable right"></i>右索 · 高音声部</span>
+          </div>
+          <div class="shared-readout">
+            <span>共享状态 <b id="sharedStateLabel">READY</b></span>
+            <span>回放帧 <b id="frameCounter">0</b></span>
+          </div>
+        </div>
+      </section>
+
+      <aside class="player-card player-two" aria-labelledby="playerTwoTitle">
+        <div class="player-heading">
+          <span class="player-tag warm">P2</span>
+          <div>
+            <p class="eyebrow">SWING ARM + SAFETY</p>
+            <h2 id="playerTwoTitle">摆臂与安全绳</h2>
+          </div>
+          <span class="live-dot">在线</span>
+        </div>
+
+        <div class="tension-display">
+          <div class="gauge-label">
+            <span>右侧张力</span>
+            <small id="rightWinchState">LIVE</small>
+          </div>
+          <div class="gauge-value">
+            <strong id="rightTensionValue">42</strong>
+            <span>kN</span>
+          </div>
+          <div class="tension-track warm">
+            <i id="rightTensionMeter"></i>
+            <em class="safe-line"></em>
+          </div>
+          <div class="gauge-meta">
+            <span>绳长 <b id="rightLengthValue">0</b>m</span>
+            <span>机温 <b id="rightTempValue">34</b>°</span>
+          </div>
+        </div>
+
+        <div class="control-cluster">
+          <p class="control-label">摆臂横移 / 锁紧安全绳</p>
+          <div class="horizontal-keys">
+            <button class="key-button hold-key" type="button"
+              data-player="p2" data-control="left" aria-label="P2 向左摆臂">
+              <kbd>A</kbd><span>左摆</span>
+            </button>
+            <button class="key-button hold-key" type="button"
+              data-player="p2" data-control="right" aria-label="P2 向右摆臂">
+              <kbd>D</kbd><span>右摆</span>
+            </button>
+            <button class="key-button hold-key safety-key" type="button"
+              data-player="p2" data-control="safety" aria-label="P2 锁紧安全绳">
+              <kbd>SPACE</kbd><span>锁绳</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="safety-display">
+          <span>安全绳载荷</span>
+          <div class="safety-track"><i id="safetyMeter"></i></div>
+          <strong id="safetyValue">8%</strong>
+        </div>
+
+        <div class="player-foot">
+          <span class="status-pip warm"></span>
+          <span id="p2Hint">等待摆臂与锁绳</span>
+        </div>
+      </aside>
+    </main>
+
+    <section class="timeline-console" aria-labelledby="timelineTitle">
+      <div class="timeline-topline">
+        <div class="timeline-title">
+          <span class="record-light" id="recordLight"></span>
+          <div>
+            <p class="eyebrow">UNIFIED EVENT TIMELINE</p>
+            <h2 id="timelineTitle">输入 · 共享状态 · 碰撞结果</h2>
+          </div>
+        </div>
+        <div class="timeline-stats">
+          <span>采样 <b id="sampleRateValue">20</b> Hz</span>
+          <span>事件 <b id="eventCountValue">0</b></span>
+          <span>终态校验 <b id="finalHashValue">—</b></span>
+        </div>
+        <div class="timeline-actions">
+          <button class="small-button danger" id="disconnectTest" type="button"
+            aria-label="进行右侧断索保护测试">
+            断索测试
+          </button>
+          <button class="small-button" id="loadReplay" type="button">载入本局回放</button>
+          <button class="small-button" id="loadDemoReplay" type="button">范例回放</button>
+          <button class="small-button primary" id="exportReplay" type="button">
+            导出时间线
+          </button>
+        </div>
+      </div>
+
+      <div class="replay-bar">
+        <button class="replay-button" id="replayToggle" type="button">
+          <span id="replayIcon">▶</span><span id="replayLabel">回放</span>
+        </button>
+        <button class="replay-button step" id="replayStep" type="button">单步</button>
+        <label class="speed-control">
+          <span>倍速</span>
+          <select id="replaySpeed">
+            <option value="0.5">0.5×</option>
+            <option value="1" selected>1×</option>
+            <option value="2">2×</option>
+            <option value="4">4×</option>
+          </select>
+        </label>
+        <input id="replayScrubber" type="range" min="0" max="0" value="0"
+          aria-label="回放进度">
+        <span class="replay-time"><b id="replayTime">00:00.000</b> / <span id="replayDuration">00:00.000</span></span>
+        <span class="replay-proof" id="replayProof">等待回放</span>
+      </div>
+
+      <div class="timeline-grid">
+        <div class="event-stream">
+          <div class="stream-heading">
+            <span>最近时间线</span>
+            <span class="stream-legend">
+              <i class="dot p1"></i>P1
+              <i class="dot p2"></i>P2
+              <i class="dot hit"></i>碰撞
+            </span>
+          </div>
+          <ol id="eventList" class="event-list">
+            <li class="empty-event">系统待命，操作将记录在同一时间线。</li>
+          </ol>
+        </div>
+        <div class="conflict-panel">
+          <div class="stream-heading">
+            <span>动作顺序冲突</span>
+            <span class="conflict-count"><b id="conflictCountValue">0</b> 次</span>
+          </div>
+          <div id="conflictList" class="conflict-list">
+            <p class="empty-event">若双人动作顺序叠加导致危险，将标出精确时刻与吊篮位置。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="app-footer">
+      <span>W/S 升降</span>
+      <span>A/D 摆臂</span>
+      <span>SPACE 安全绳</span>
+      <span>训练场 · 自动存档 <b id="saveState">就绪</b></span>
+    </footer>
+  </div>
+
+  <div class="help-modal" id="helpModal" hidden>
+    <div class="help-card" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+      <button class="modal-close" id="helpClose" type="button" aria-label="关闭">×</button>
+      <p class="eyebrow">FIELD MANUAL 04</p>
+      <h2 id="helpTitle">双人绞车操作规程</h2>
+      <div class="help-grid">
+        <article>
+          <span>P1</span>
+          <h3>只管升降</h3>
+          <p>W 收绳上升，S 放绳下降。靠近崖壁时避免与 P2 同时满速操作，否则单侧收绳速度会越过安全线。</p>
+        </article>
+        <article>
+          <span>P2</span>
+          <h3>摆臂 + 安全绳</h3>
+          <p>A/D 控制横向摆臂。贴近救援点后按住 SPACE 锁紧安全绳，速度降下来才会累计抓取进度。</p>
+        </article>
+        <article>
+          <span>01—03</span>
+          <h3>抓取并返航</h3>
+          <p>依次在低台、断桥、鹰巢抓取伤员，再返回左侧平台。每次移交都会推进任务进度。</p>
+        </article>
+        <article>
+          <span>R / REPLAY</span>
+          <h3>复盘不改写结果</h3>
+          <p>回放中的暂停、单步和倍速只改变观看速度，不会重新模拟或改变最终状态。</p>
+        </article>
+      </div>
+      <p class="help-note">断索测试会立即触发全制动保护；点击“复位保护”后可继续训练。</p>
+    </div>
+  </div>
+
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
