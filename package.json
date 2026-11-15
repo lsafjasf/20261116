@@ -1,0 +1,26 @@
+{
+  "name": "uid623",
+  "version": "1.0.0",
+  "description": "关键帧工程导入器：Worker 分块解析、进度/取消、错误定位、状态持久化",
+  "scripts": {
+    "gen": "node tools/gen_data.js",
+    "test": "node test/run_tests.js",
+    "test:acceptance": "node test/acceptance.js",
+    "start": "python3 -m http.server 8000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lsafjasf/20261116.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/lsafjasf/20261116/issues"
+  },
+  "homepage": "https://github.com/lsafjasf/20261116#readme",
+  "dependencies": {
+    "playwright": "^1.65.1"
+  }
+}

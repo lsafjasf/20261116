@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>关键帧工程导入器</title>
+<link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+<header>
+  <h1>关键帧工程导入器</h1>
+  <p class="hint">支持十万级关键帧 JSON（顶层数组）。解析在 Worker 中分块进行，界面保持可响应。</p>
+</header>
+
+<main>
+  <section class="panel" aria-labelledby="import-h">
+    <h2 id="import-h">1. 选择并导入</h2>
+    <div class="row">
+      <input type="file" id="fileInput" accept=".json,application/json" aria-label="选择关键帧 JSON 文件">
+      <button id="importBtn" disabled>开始导入</button>
+    </div>
+    <p id="fileMeta" class="muted" aria-live="polite">未选择文件</p>
+  </section>
+
+  <div id="statusRegion" class="status" role="status" aria-live="polite">就绪</div>
+
+  <section id="errorPanel" class="panel error" hidden aria-labelledby="error-h">
+    <h2 id="error-h">导入失败</h2>
+    <dl>
+      <dt>错误</dt><dd id="errMessage"></dd>
+      <dt>对象序号</dt><dd id="errObject">—</dd>
+      <dt>字段路径</dt><dd id="errPath">—</dd>
+      <dt>字节偏移</dt><dd id="errOffset">—</dd>
+      <dt>上下文片段</dt><dd><code id="errSnippet">—</code></dd>
+    </dl>
+  </section>
+
+  <section id="resultPanel" class="panel" hidden aria-labelledby="result-h">
+    <h2 id="result-h">2. 导入结果</h2>
+    <dl>
+      <dt>对象数量</dt><dd id="resCount">—</dd>
+      <dt>SHA-256</dt><dd><code id="resHash">—</code></dd>
+      <dt>文件</dt><dd id="resFile">—</dd>
+      <dt>耗时</dt><dd id="resDuration">—</dd>
+    </dl>
+  </section>
+
+  <section class="panel" aria-labelledby="notes-h">
+    <h2 id="notes-h">3. 备注（未提交内容自动保存）</h2>
+    <textarea id="notes" rows="3" aria-label="导入备注"
+      placeholder="例如：本次导入对应镜头 A 的动画曲线…"></textarea>
+    <div class="row">
+      <button id="commitNotesBtn">提交备注</button>
+      <button id="undoBtn" disabled>撤销</button>
+      <span id="notesState" class="muted" aria-live="polite"></span>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="list-h">
+    <h2 id="list-h">4. 对象预览（前 200 条）</h2>
+    <p class="muted">点击或用 ↑/↓/PageUp/PageDown/Home/End 选择对象；选中项与滚动位置会自动保存。</p>
+    <div id="listBox" class="listbox" tabindex="0" role="listbox"
+         aria-label="关键帧对象列表" aria-activedescendant="">
+      <div id="listSpacer"></div>
+    </div>
+    <p id="selInfo" class="muted" aria-live="polite">未选中对象</p>
+  </section>
+
+  <section class="panel" aria-labelledby="debug-h">
+    <h2 id="debug-h">关键状态（输入 / 存储 / 渲染同步核对）</h2>
+    <pre id="debugState" aria-label="关键状态快照">{}</pre>
+  </section>
+
+  <div id="snapshotBanner" class="banner" hidden role="alert">
+    <strong>状态恢复失败，已保留可读快照：</strong>
+    <pre id="snapshotText"></pre>
+  </div>
+</main>
+
+<dialog id="progressDialog" aria-labelledby="dlg-h">
+  <h2 id="dlg-h">正在导入</h2>
+  <progress id="progressBar" max="100" value="0" aria-label="导入进度"></progress>
+  <p id="progressText" aria-live="polite">0%</p>
+  <button id="cancelBtn">取消导入</button>
+  <p class="muted">按 Esc 或点击“取消导入”中止；已解析的临时数据会被丢弃，不会产生半成品。</p>
+</dialog>
+
+<script src="src/sha256.js"></script>
+<script src="src/stream_parser.js"></script>
+<script src="src/import_core.js"></script>
+<script src="src/store.js"></script>
+<script src="src/app.js"></script>
+</body>
+</html>
