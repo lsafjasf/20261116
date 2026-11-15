@@ -1,0 +1,12 @@
+{
+  "name": "river-gate-pump-cop",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Two-player deterministic urban river gate/pump dispatch simulator with timeline replay",
+  "scripts": {
+    "sim": "node tools/headless.js",
+    "smoke": "node tools/smoke.mjs",
+    "test": "node --test tests/determinism.test.js tests/storage.test.js"
+  }
+}

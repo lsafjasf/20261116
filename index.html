@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>城市河道双人调度 · 闸门与泵站</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>城市河道协同调度</h1>
+      <div class="toolbar">
+        <label>剧本
+          <select id="scenario">
+            <option value="success">成功协同</option>
+            <option value="failure_overheat">失败：泵站过热</option>
+            <option value="failure_flood">失败：街区淹没</option>
+            <option value="order_demo">顺序冲突演示</option>
+          </select>
+        </label>
+        <button id="btn-start">开始模拟</button>
+        <button id="btn-auto">双人自动驾驶</button>
+        <button id="btn-save">保存进度</button>
+        <button id="btn-load">重载进度</button>
+        <button id="btn-audio">开启音频</button>
+      </div>
+    </header>
+
+    <main>
+      <canvas id="stage" width="1040" height="460"></canvas>
+
+      <section class="panels">
+        <div class="panel" id="panel-p1">
+          <h2>P1 上游闸门</h2>
+          <p class="hint">看到上游来水与渠道水位，控制闸门开度。</p>
+          <label>目标开度 <span id="p1-gate-val">50%</span>
+            <input type="range" id="p1-gate" min="0" max="1" step="0.05" value="0.5" />
+          </label>
+          <p class="keys">键盘：<b>Q</b> 关小 · <b>E</b> 开大 · <b>1</b> 应急关 · <b>2</b> 应急开</p>
+          <div id="p1-status" class="status"></div>
+        </div>
+
+        <div class="panel" id="panel-p2">
+          <h2>P2 下游泵站</h2>
+          <p class="hint">看到泵负荷、机温与街区积水，控制泵速。</p>
+          <label>泵速目标 <span id="p2-pump-val">0%</span>
+            <input type="range" id="p2-pump" min="0" max="1" step="0.05" value="0" />
+          </label>
+          <p class="keys">键盘：<b>,</b> 降速 · <b>.</b> 升速 · <b>O</b> 停机冷却 · <b>P</b> 满负荷</p>
+          <div id="p2-status" class="status"></div>
+        </div>
+      </section>
+
+      <section class="replay">
+        <h2>时间线回放</h2>
+        <div class="toolbar">
+          <button id="rp-play">播放/暂停</button>
+          <button id="rp-step">单步 +1 tick</button>
+          <button id="rp-restart">回到起点</button>
+          <label>倍速
+            <select id="rp-speed">
+              <option value="0.5">0.5×</option>
+              <option value="1" selected>1×</option>
+              <option value="2">2×</option>
+              <option value="4">4×</option>
+            </select>
+          </label>
+          <input type="range" id="rp-scrub" min="0" max="7200" value="0" />
+          <button id="btn-csv">导出压力 CSV</button>
+          <button id="btn-svg">导出压力 SVG</button>
+        </div>
+        <div id="replay-status" class="status"></div>
+        <div id="conflict-list" class="conflicts"></div>
+      </section>
+
+      <section class="replay">
+        <h2>压力曲线</h2>
+        <canvas id="chart" width="1000" height="220"></canvas>
+      </section>
+    </main>
+
+    <script type="module" src="src/app.js"></script>
+  </body>
+</html>
