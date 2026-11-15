@@ -1,0 +1,14 @@
+{
+  "name": "subflow-layout-lab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "test": "node --test",
+    "stress": "node scripts/stress.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

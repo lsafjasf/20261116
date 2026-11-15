@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>Subflow · 动态字幕排版实验室</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">SF</div>
+          <div>
+            <h1>Subflow</h1>
+            <p>动态字幕排版实验室</p>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <div class="status-pill" id="statusPill">
+            <span class="status-dot"></span>
+            <span id="statusText">实时渲染</span>
+          </div>
+          <div class="fps-readout"><strong id="fpsValue">--</strong><span>FPS</span></div>
+          <button class="button primary" id="runStressTop">运行对照压测</button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="stage-column">
+          <div class="stage-card" id="stageCard">
+            <canvas id="stageCanvas" aria-label="动态字幕预览"></canvas>
+            <div class="stage-overlay top-left">
+              <span class="scene-chip">SCENE 04</span>
+              <span class="scene-meta" id="cueMeta">C01 · 旁白</span>
+            </div>
+            <div class="stage-overlay top-right">
+              <span class="live-dot"></span>
+              <span>LAYOUT LIVE</span>
+            </div>
+            <div class="stage-overlay bottom-left">
+              <span id="stageMode">LRU CACHE ON</span>
+            </div>
+            <div class="stage-overlay bottom-right">
+              <span id="stageTransform">ZOOM 100% · SCROLL 20%</span>
+            </div>
+          </div>
+
+          <div class="transport">
+            <button class="icon-button" id="playToggle" aria-label="暂停动画">
+              <span id="playIcon">Ⅱ</span>
+            </button>
+            <div class="transport-time" id="timecode">00:00.0</div>
+            <div class="timeline">
+              <div class="timeline-fill" id="timelineFill"></div>
+              <div class="timeline-ticks"></div>
+            </div>
+            <div class="transport-cue" id="transportCue">C01</div>
+            <button class="button ghost small" id="restoreTimeline">恢复时间轴</button>
+          </div>
+
+          <div class="stage-footnote">
+            <span>每帧重绘画面，排版只在样式键变化时重新测量。</span>
+            <span class="mono" id="lineCount">0 行</span>
+          </div>
+        </section>
+
+        <aside class="sidebar">
+          <section class="panel metrics-panel">
+            <div class="panel-heading">
+              <div>
+                <span class="eyebrow">OBSERVABILITY</span>
+                <h2>实时指标</h2>
+              </div>
+              <span class="tag" id="metricMode">CACHE ON</span>
+            </div>
+            <div class="metrics-grid">
+              <article class="metric-card">
+                <span class="metric-label">帧时 avg</span>
+                <strong><span id="metricFrame">0.00</span><small>ms</small></strong>
+                <span class="metric-sub">p95 <b id="metricP95">0.00</b> ms</span>
+              </article>
+              <article class="metric-card">
+                <span class="metric-label">候选测量</span>
+                <strong><span id="metricCandidates">0</span><small>/帧</small></strong>
+                <span class="metric-sub">累计 <b id="metricCandidateTotal">0</b></span>
+              </article>
+              <article class="metric-card">
+                <span class="metric-label">缓存命中</span>
+                <strong><span id="metricHitRate">0.0</span><small>%</small></strong>
+                <span class="metric-sub" id="metricHitSub">0 hit / 0 look</span>
+              </article>
+              <article class="metric-card">
+                <span class="metric-label">DOM 节点</span>
+                <strong><span id="metricNodes">0</span><small>nodes</small></strong>
+                <span class="metric-sub">布局 <b id="metricLayoutNodes">0</b> 行</span>
+              </article>
+            </div>
+            <div class="spark-wrap">
+              <canvas id="sparkCanvas" width="560" height="84"></canvas>
+              <div class="spark-axis"><span>frame work</span><span>最近 90 帧</span></div>
+            </div>
+            <div class="metric-foot">
+              <span>缓存条目 <b id="cacheEntries">0</b></span>
+              <span>异常 <b id="errorCount">0</b></span>
+              <span>驱逐 <b id="evictionCount">0</b></span>
+            </div>
+          </section>
+
+          <section class="panel controls-panel">
+            <div class="panel-heading compact">
+              <div>
+                <span class="eyebrow">LAYOUT CONTROLS</span>
+                <h2>样式与舞台</h2>
+              </div>
+              <div class="segmented" role="group" aria-label="缓存模式">
+                <button data-cache="off">无缓存</button>
+                <button data-cache="on" class="active">LRU 缓存</button>
+              </div>
+            </div>
+
+            <label class="field">
+              <span class="field-label">字幕文本 <em id="textState">时间轴</em></span>
+              <textarea id="textInput" rows="2" spellcheck="false"></textarea>
+            </label>
+
+            <div class="field-grid">
+              <label class="field">
+                <span class="field-label">字体</span>
+                <select id="fontFamily"></select>
+              </label>
+              <label class="field">
+                <span class="field-label">字重</span>
+                <select id="fontWeight">
+                  <option value="400">Regular 400</option>
+                  <option value="600" selected>Semibold 600</option>
+                  <option value="700">Bold 700</option>
+                </select>
+              </label>
+            </div>
+
+            <label class="field range-field">
+              <span class="field-label">字号 <b id="fontSizeValue">34 px</b></span>
+              <input id="fontSize" type="range" min="18" max="64" value="34" />
+            </label>
+            <label class="field range-field">
+              <span class="field-label">排版宽度 <b id="layoutWidthValue">680 px</b></span>
+              <input id="layoutWidth" type="range" min="180" max="860" step="10" value="680" />
+            </label>
+
+            <div class="field">
+              <span class="field-label">对齐</span>
+              <div class="segmented wide" role="group" aria-label="对齐方式">
+                <button data-align="left">左对齐</button>
+                <button data-align="center" class="active">居中</button>
+                <button data-align="right">右对齐</button>
+              </div>
+            </div>
+
+            <div class="field-grid">
+              <label class="field range-field">
+                <span class="field-label">缩放 <b id="zoomValue">100%</b></span>
+                <input id="zoom" type="range" min="60" max="200" value="100" />
+              </label>
+              <label class="field range-field">
+                <span class="field-label">滚动 <b id="scrollValue">20%</b></span>
+                <input id="scroll" type="range" min="0" max="100" value="20" />
+              </label>
+            </div>
+          </section>
+
+          <section class="panel report-panel">
+            <div class="panel-heading compact">
+              <div>
+                <span class="eyebrow">STRESS PARITY</span>
+                <h2>固定场景对照</h2>
+              </div>
+              <button class="button ghost small" id="openReport" disabled>查看报告</button>
+            </div>
+            <div class="report-summary" id="reportSummary">
+              <span class="report-placeholder-dot"></span>
+              <p>尚未运行。压测将比较优化前、优化后与边界参数，并校验输出字符串、异常日志和资源占用。</p>
+            </div>
+            <div class="report-mini" id="reportMini" hidden>
+              <div><span>语义等值</span><b id="miniParity">—</b></div>
+              <div><span>帧时降幅</span><b id="miniSpeedup">—</b></div>
+              <div><span>候选降幅</span><b id="miniCandidates">—</b></div>
+              <div><span>异常 / 重叠</span><b id="miniErrors">—</b></div>
+            </div>
+            <button class="button secondary full" id="runStressSide">运行三组固定场景</button>
+          </section>
+        </aside>
+      </main>
+    </div>
+
+    <dialog id="reportDialog" class="report-dialog">
+      <div class="dialog-head">
+        <div>
+          <span class="eyebrow">PERFORMANCE PARITY REPORT</span>
+          <h2>缓存前后 · 固定场景压测</h2>
+        </div>
+        <button class="icon-button" id="closeReport" aria-label="关闭报告">×</button>
+      </div>
+      <div id="dialogBody"></div>
+    </dialog>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
