@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>回声航道 · 可访问 Canvas 游戏</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%2374f2c1'/><path d='M9 20c5 0 5-8 10-8h4' stroke='%2307100f' stroke-width='3' fill='none'/></svg>" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#game-canvas">跳到游戏棋盘</a>
+
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="回声航道首页">
+        <span class="brand-mark" aria-hidden="true">⌁</span>
+        <span>
+          <strong>ECHO RELAY</strong>
+          <small>回声航道</small>
+        </span>
+      </a>
+      <div class="header-meta">
+        <span class="pill">本地存档</span>
+        <span class="pill pill-live"><span aria-hidden="true">●</span> 键盘可玩</span>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero" aria-labelledby="page-title">
+        <p class="eyebrow">CANVAS / SEMANTIC LAYER / LOCAL SNAPSHOT</p>
+        <h1 id="page-title">穿过噪声，把信号带回去。</h1>
+        <p class="hero-copy">
+          先取得 <strong>C2 的信号钥匙</strong>，再抵达 <strong>E5 出口</strong>。
+          红色脉冲格不可进入；读屏会报告位置、目标方向、附近危险和每次操作结果。
+        </p>
+        <ol class="mission-strip" aria-label="任务步骤">
+          <li><span>01</span>取得信号钥匙</li>
+          <li><span>02</span>避开脉冲危险</li>
+          <li><span>03</span>抵达出口</li>
+        </ol>
+      </section>
+
+      <div class="workspace">
+        <section class="board-card" aria-labelledby="board-heading">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">LIVE BOARD</p>
+              <h2 id="board-heading">棋盘</h2>
+            </div>
+            <span class="status-badge" id="status-badge">任务进行中</span>
+          </div>
+
+          <p class="board-help" id="board-help">
+            用 Tab 聚焦棋盘，方向键或 WASD 移动；Enter 查看当前格。
+            也可直接点击相邻格移动。方向按钮支持逐项 Tab 操作。
+          </p>
+
+          <div class="readout-grid" aria-label="可见关键状态">
+            <div class="readout">
+              <span class="readout-label">玩家位置</span>
+              <strong id="readout-position">A1</strong>
+            </div>
+            <div class="readout">
+              <span class="readout-label">目标方向</span>
+              <strong id="readout-objective">C2 · 东方</strong>
+            </div>
+            <div class="readout readout-danger">
+              <span class="readout-label">当前危险</span>
+              <strong id="readout-danger">无</strong>
+            </div>
+          </div>
+
+          <div class="canvas-frame">
+            <canvas
+              id="game-canvas"
+              width="640"
+              height="640"
+              tabindex="0"
+              role="application"
+              aria-label="回声航道棋盘。玩家在 A1，目标方向东北。"
+              aria-describedby="canvas-description semantic-summary"
+            ></canvas>
+            <span class="sr-only" id="canvas-title">回声航道棋盘</span>
+            <p class="sr-only" id="canvas-description">
+              五乘五格棋盘。方向键或 WASD 移动，Enter 查看当前选中格。按 Tab 离开棋盘。
+            </p>
+          </div>
+
+          <div class="result-panel" id="result-panel" data-tone="info">
+            <span class="result-icon" id="result-icon" aria-hidden="true">◎</span>
+            <div>
+              <span class="result-label">最近操作结果</span>
+              <p id="result-text">你在 A1。先向东方前往 C2，取得信号钥匙。</p>
+            </div>
+          </div>
+
+          <div class="controls-row">
+            <div class="dpad" role="group" aria-label="步进控制">
+              <button class="move-button move-up" type="button" data-move="up" aria-label="向上移动">
+                <span aria-hidden="true">↑</span>
+              </button>
+              <button class="move-button move-left" type="button" data-move="left" aria-label="向左移动">
+                <span aria-hidden="true">←</span>
+              </button>
+              <button class="move-button move-down" type="button" data-move="down" aria-label="向下移动">
+                <span aria-hidden="true">↓</span>
+              </button>
+              <button class="move-button move-right" type="button" data-move="right" aria-label="向右移动">
+                <span aria-hidden="true">→</span>
+              </button>
+            </div>
+            <div class="action-buttons">
+              <button class="button button-secondary" id="open-cell" type="button">
+                查看选中格
+              </button>
+              <button class="button button-secondary" id="undo" type="button">
+                撤销上一步
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <aside class="side-panel" aria-label="任务、备注与同步状态">
+          <section class="panel-card mission-card" aria-labelledby="mission-heading">
+            <div class="card-heading">
+              <h2 id="mission-heading">交接任务</h2>
+              <span class="turn-chip" id="turn-chip">第 0 步</span>
+            </div>
+            <ul class="check-list">
+              <li id="key-task">
+                <span class="check-box" aria-hidden="true">□</span>
+                <span>取得 C2 信号钥匙</span>
+              </li>
+              <li id="exit-task">
+                <span class="check-box" aria-hidden="true">□</span>
+                <span>抵达 E5 出口</span>
+              </li>
+            </ul>
+            <div class="selected-object">
+              <span class="selected-kicker">选中对象</span>
+              <strong id="selected-name">A1 · 起点</strong>
+              <span id="selected-detail">安全格。你的当前位置。</span>
+            </div>
+          </section>
+
+          <section class="panel-card" aria-labelledby="draft-heading">
+            <div class="card-heading">
+              <h2 id="draft-heading">未提交备注</h2>
+              <span class="save-chip" id="draft-chip">草稿自动保存</span>
+            </div>
+            <label class="sr-only" for="draft-note">交接备注草稿</label>
+            <textarea
+              id="draft-note"
+              rows="4"
+              maxlength="240"
+              placeholder="记录路线、风险或交接信息…"
+              aria-describedby="draft-help draft-count"
+            ></textarea>
+            <div class="draft-meta">
+              <span id="draft-help">关闭弹窗、撤销或刷新后仍保留。</span>
+              <span id="draft-count">0 / 240</span>
+            </div>
+            <button class="button button-primary" id="submit-note" type="button">
+              提交交接备注
+            </button>
+          </section>
+
+          <section class="panel-card" aria-labelledby="log-heading">
+            <div class="card-heading">
+              <h2 id="log-heading">操作记录</h2>
+              <span class="muted-chip">可滚动</span>
+            </div>
+            <div class="log-scroll" id="log-scroll" tabindex="0" aria-label="操作记录，可滚动">
+              <ol id="log-list"></ol>
+            </div>
+          </section>
+
+          <section class="panel-card sync-card" aria-labelledby="sync-heading">
+            <div class="card-heading">
+              <h2 id="sync-heading">关键状态同步</h2>
+              <span class="storage-chip" id="storage-chip">等待保存</span>
+            </div>
+            <dl class="sync-list">
+              <div><dt>输入</dt><dd id="sync-input">等待输入</dd></div>
+              <div><dt>玩家</dt><dd id="sync-player">A1</dd></div>
+              <div><dt>目标</dt><dd id="sync-target">C2 / 东方</dd></div>
+              <div><dt>选中</dt><dd id="sync-selected">A1</dd></div>
+              <div><dt>草稿</dt><dd id="sync-draft">空</dd></div>
+              <div><dt>存储</dt><dd id="sync-storage">未保存</dd></div>
+              <div><dt>渲染</dt><dd id="sync-render">rev 1</dd></div>
+            </dl>
+            <pre class="state-pin" id="state-pin" tabindex="0" aria-label="当前关键状态快照，可滚动"></pre>
+            <p class="restore-banner" id="restore-banner" hidden></p>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <p>同一状态源驱动画布、读屏语义、可见读数与本地快照。</p>
+      <button class="text-button" id="reset-game" type="button">重新开始一局</button>
+    </footer>
+
+    <dialog class="cell-dialog" id="cell-dialog" aria-labelledby="cell-dialog-title" aria-describedby="cell-dialog-description">
+      <div class="dialog-topline">
+        <span class="eyebrow">CELL INSPECTOR</span>
+        <button class="icon-button" id="close-cell" type="button" aria-label="关闭格点详情">×</button>
+      </div>
+      <h2 id="cell-dialog-title">A1 · 起点</h2>
+      <p id="cell-dialog-description">安全格。你的当前位置。</p>
+      <dl class="dialog-facts">
+        <div><dt>坐标</dt><dd id="dialog-coordinate">A1 / 第 1 行第 1 列</dd></div>
+        <div><dt>类型</dt><dd id="dialog-kind">起点</dd></div>
+        <div><dt>危险</dt><dd id="dialog-danger">无</dd></div>
+      </dl>
+      <p class="dialog-note" id="dialog-note">关闭弹窗不会清空草稿、选中对象或滚动位置。</p>
+      <button class="button button-primary" id="dialog-done" type="button">返回棋盘</button>
+    </dialog>
+
+    <div class="sr-only" id="live-polite" aria-live="polite" aria-atomic="true"></div>
+    <div class="sr-only" id="live-assertive" aria-live="assertive" aria-atomic="true"></div>
+
+    <section class="sr-only" id="game-semantics" aria-labelledby="semantic-heading">
+      <h2 id="semantic-heading">游戏语义状态</h2>
+      <p id="semantic-summary">玩家在 A1。目标方向东方，前往 C2 取得信号钥匙。</p>
+      <p id="semantic-position">玩家当前位置：A1，第 1 行第 1 列。</p>
+      <p id="semantic-objective">当前目标：C2 的信号钥匙。目标方向：东方，向右两格。</p>
+      <p id="semantic-danger">当前危险：无。附近没有可进入的脉冲危险格。</p>
+      <p id="semantic-result">最近操作结果：你在 A1。先向东方前往 C2，取得信号钥匙。</p>
+      <p id="semantic-status">任务状态：进行中，尚未取得信号钥匙，尚未抵达出口。</p>
+      <table id="semantic-board">
+        <caption>五乘五棋盘语义表</caption>
+        <thead>
+          <tr><th scope="col">行</th><th scope="col">A</th><th scope="col">B</th><th scope="col">C</th><th scope="col">D</th><th scope="col">E</th></tr>
+        </thead>
+        <tbody id="semantic-board-body"></tbody>
+      </table>
+    </section>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>

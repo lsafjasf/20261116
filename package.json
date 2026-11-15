@@ -1,0 +1,13 @@
+{
+  "name": "echo-relay-accessibility-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Accessible canvas game with synchronized semantic state and local snapshots",
+  "scripts": {
+    "serve": "python3 -m http.server 47654 --bind 127.0.0.1",
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.1"
+  }
+}
