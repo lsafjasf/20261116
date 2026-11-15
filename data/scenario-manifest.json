@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "scenarios": ["default", "boundary", "abnormal"],
+  "generatedAt": "2026-11-16T00:00:00.000Z"
+}

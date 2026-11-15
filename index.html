@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f2f5f8">
+  <title>Atlas · 二维图表导出工作台</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%232367d1'/%3E%3Cpath d='M7 23l5-9 5 4 4-9 4 14' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 28 28"><path d="M4 21L9 13l5 4 4-9 6 13" /></svg>
+        </div>
+        <div>
+          <p class="eyebrow">ATLAS CHART STUDIO</p>
+          <h1>二维图表导出工作台</h1>
+        </div>
+      </div>
+      <div class="topbar-status" role="status">
+        <span class="status-dot"></span>
+        <span>共享布局引擎</span>
+        <span class="status-separator"></span>
+        <span>零图表依赖</span>
+      </div>
+    </header>
+
+    <section class="scenario-bar" aria-label="测试参数组">
+      <div class="scenario-copy">
+        <span class="section-kicker">参数组</span>
+        <strong id="scenario-note">完整布局、三类图形与离群标注</strong>
+      </div>
+      <nav class="segmented" id="scenario-tabs" aria-label="切换参数组">
+        <button type="button" data-scenario="default">默认参数</button>
+        <button type="button" data-scenario="boundary">边界参数</button>
+        <button type="button" data-scenario="abnormal">异常参数</button>
+      </nav>
+      <div class="scenario-actions">
+        <button class="button button-quiet" type="button" id="refresh-scenario">
+          <span class="button-icon" aria-hidden="true">↻</span> 异步刷新
+        </button>
+        <button class="button button-primary" type="button" id="export-all-svg">
+          导出全部 SVG
+        </button>
+      </div>
+    </section>
+
+    <div class="notice-stack" id="notice-stack" aria-live="polite" aria-atomic="false"></div>
+
+    <main class="workspace">
+      <section class="chart-grid" id="chart-grid" aria-label="图表预览"></section>
+
+      <aside class="sidebar" aria-label="工程与可靠性">
+        <section class="panel">
+          <div class="panel-heading">
+            <div>
+              <span class="section-kicker">工程快照</span>
+              <h2>导出前留档</h2>
+            </div>
+            <span class="count-badge" id="snapshot-count">0</span>
+          </div>
+          <p class="panel-copy">每次导出前自动保存图层顺序、当前关键帧、坐标与颜色。刷新后仍可恢复。</p>
+          <div class="snapshot-actions">
+            <button class="button button-quiet" type="button" id="manual-snapshot">立即快照</button>
+            <button class="button button-quiet" type="button" id="download-snapshot" disabled>下载 JSON</button>
+          </div>
+          <div class="snapshot-list" id="snapshot-list"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-heading">
+            <div>
+              <span class="section-kicker">回退演练</span>
+              <h2>失效不空白</h2>
+            </div>
+            <span class="live-badge">SAFE</span>
+          </div>
+          <p class="panel-copy">逐项触发故障，观察自动回退与明确提示。</p>
+          <div class="failure-list">
+            <label class="failure-row">
+              <span>
+                <strong>缩略图生成故障</strong>
+                <small>回退到矢量占位卡</small>
+              </span>
+              <input type="checkbox" id="fail-thumbnail">
+            </label>
+            <label class="failure-row">
+              <span>
+                <strong>异步请求故障</strong>
+                <small>回退到内置参数</small>
+              </span>
+              <input type="checkbox" id="fail-async">
+            </label>
+            <button class="failure-row failure-button" type="button" id="fail-cache">
+              <span>
+                <strong>缓存读取故障</strong>
+                <small>重载并回退默认工程 →</small>
+              </span>
+              <span class="chevron" aria-hidden="true">›</span>
+            </button>
+          </div>
+          <p class="micro-note" id="fallback-summary">当前未触发故障，所有回退路径待命。</p>
+        </section>
+
+        <section class="panel verification-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="section-kicker">一致性矩阵</span>
+              <h2>可重复验证</h2>
+            </div>
+            <button class="icon-button" type="button" id="run-checks" title="重新检查" aria-label="重新检查">↻</button>
+          </div>
+          <div class="verification-list" id="verification-list"></div>
+          <div class="verification-foot">
+            <span id="verify-time">尚未检查</span>
+            <button class="text-button" type="button" id="copy-report">复制报告</button>
+          </div>
+        </section>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      <span>布局同源：预览 SVG = SVG 导出 = PNG 光栅源</span>
+      <span>负值 · 对数轴 · 缺失分段 · 离群标注</span>
+    </footer>
+  </div>
+
+  <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
