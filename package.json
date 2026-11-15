@@ -1,0 +1,14 @@
+{
+  "name": "dirty-canvas-demo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/serve.js",
+    "test": "node --test test/*.test.js",
+    "benchmark": "node scripts/benchmark.js"
+  },
+  "devDependencies": {
+    "@napi-rs/canvas": "1.1.1"
+  }
+}

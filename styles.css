@@ -1,0 +1,405 @@
+@font-face {
+  font-family: "Noto Sans SC";
+  src: url("./assets/fonts/noto-sans-sc-subset.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: dark;
+  --ink: #e8f2eb;
+  --muted: #8fa8a2;
+  --panel: rgba(12, 31, 34, 0.82);
+  --line: rgba(143, 188, 170, 0.18);
+  --accent: #63e6b0;
+  --accent-soft: rgba(99, 230, 176, 0.13);
+  --danger: #ff8f7a;
+  --warning: #f2c66d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  font-family: "Noto Sans SC", "Avenir Next", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 15% -10%, rgba(57, 144, 124, 0.3), transparent 34rem),
+    radial-gradient(circle at 92% 9%, rgba(45, 39, 105, 0.28), transparent 28rem),
+    #061216;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(20, 45, 47, 0.8);
+  padding: 7px 12px;
+  cursor: pointer;
+  transition: 120ms ease;
+}
+
+button:hover {
+  border-color: rgba(99, 230, 176, 0.55);
+  background: rgba(27, 62, 61, 0.92);
+}
+
+button.active,
+button.primary {
+  border-color: rgba(99, 230, 176, 0.48);
+  background: var(--accent-soft);
+  color: #c9ffe9;
+}
+
+button.danger {
+  border-color: rgba(255, 143, 122, 0.35);
+  color: #ffd4cb;
+}
+
+.app-shell {
+  width: min(1480px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 22px;
+}
+
+.topbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 18px;
+}
+
+.eyebrow {
+  margin: 0 0 5px;
+  color: var(--accent);
+  font: 700 11px/1.2 "Noto Sans SC", ui-monospace, monospace;
+  letter-spacing: 0.19em;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 46px);
+  letter-spacing: -0.045em;
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.status-cluster {
+  display: flex;
+  gap: 8px;
+  padding-bottom: 5px;
+}
+
+.status-pill {
+  border: 1px solid rgba(99, 230, 176, 0.34);
+  border-radius: 999px;
+  padding: 6px 11px;
+  color: #bdffe5;
+  background: var(--accent-soft);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.status-pill.muted {
+  border-color: var(--line);
+  color: var(--muted);
+  background: rgba(12, 30, 34, 0.75);
+}
+
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(12px);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 15px 24px;
+  padding: 13px 15px;
+  margin-bottom: 16px;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.control-group label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+input[type="checkbox"] {
+  accent-color: var(--accent);
+}
+
+.control-label {
+  margin-right: 2px;
+  color: #64837d;
+  font: 700 10px/1 "Noto Sans SC", ui-monospace, monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.segmented {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(4, 15, 18, 0.55);
+}
+
+.segmented button {
+  border: 0;
+  padding: 6px 11px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.segmented button.active {
+  background: var(--accent-soft);
+  color: #d4fff0;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 16px;
+}
+
+.stage {
+  min-width: 0;
+  padding: 13px;
+}
+
+.stage-heading,
+.dispatch-line,
+.metrics-heading,
+.exceptions-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stage-heading {
+  min-height: 28px;
+  padding: 0 3px 10px;
+  font-size: 13px;
+}
+
+.live-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent);
+}
+
+.stage-hint {
+  color: #607d77;
+  font-size: 11px;
+}
+
+.canvas-wrap {
+  overflow: hidden;
+  border: 1px solid rgba(115, 180, 159, 0.2);
+  border-radius: 9px;
+  background: #07191f;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  cursor: grab;
+  touch-action: none;
+}
+
+canvas:active {
+  cursor: grabbing;
+}
+
+.dispatch-line {
+  padding: 10px 3px 0;
+  color: #68837e;
+  font: 11px/1.4 "Noto Sans SC", ui-monospace, monospace;
+}
+
+.dispatch-line b {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.metrics-panel {
+  padding: 16px;
+}
+
+h2 {
+  margin: 0;
+  font-size: 15px;
+}
+
+#sample-time {
+  color: #607d77;
+  font: 10px "Noto Sans SC", ui-monospace, monospace;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.metric {
+  min-height: 91px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: rgba(5, 19, 22, 0.45);
+}
+
+.metric.accent {
+  background: linear-gradient(135deg, rgba(99, 230, 176, 0.13), rgba(5, 19, 22, 0.35));
+}
+
+.metric span,
+.throughput span {
+  display: block;
+  color: #71908a;
+  font-size: 10px;
+}
+
+.metric strong {
+  display: block;
+  margin: 7px 0 5px;
+  color: #dffcf1;
+  font: 600 20px/1.05 "Noto Sans SC", ui-monospace, monospace;
+  letter-spacing: -0.04em;
+}
+
+.metric small {
+  color: #506d67;
+  font: 9px/1.2 "Noto Sans SC", ui-monospace, monospace;
+}
+
+.throughput {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px dashed var(--line);
+  border-radius: 9px;
+}
+
+.throughput b {
+  display: block;
+  margin-top: 5px;
+  color: #cae8df;
+  font: 600 13px "Noto Sans SC", ui-monospace, monospace;
+}
+
+.exceptions {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: rgba(5, 19, 22, 0.4);
+}
+
+.exceptions-title {
+  color: #71908a;
+  font-size: 10px;
+}
+
+.exceptions-title b {
+  color: var(--accent);
+  font: 600 12px "Noto Sans SC", ui-monospace, monospace;
+}
+
+.exceptions p {
+  overflow: hidden;
+  margin: 7px 0 0;
+  color: #66817b;
+  font: 10px/1.4 "Noto Sans SC", ui-monospace, monospace;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.metric-note {
+  margin: 11px 1px 0;
+  color: #5e7a74;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.footnote {
+  padding: 14px 4px 0;
+  color: #57716c;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+code {
+  color: #90cbb8;
+  font-family: "Noto Sans SC", ui-monospace, monospace;
+}
+
+@media (max-width: 1040px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .metrics-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 680px) {
+  .app-shell {
+    width: min(100% - 20px, 1480px);
+    padding-top: 18px;
+  }
+
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .stage-hint {
+    display: none;
+  }
+}

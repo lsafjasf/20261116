@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Canvas 脏矩形更新实验室</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">CANVAS PERFORMANCE LAB</p>
+          <h1>脏矩形更新实验室</h1>
+          <p class="subtitle">静态地形、文字缓存与动态对象分层，像素级对照全量重绘。</p>
+        </div>
+        <div class="status-cluster">
+          <span class="status-pill" id="run-status">已暂停</span>
+          <span class="status-pill muted" id="mode-status">优化后</span>
+        </div>
+      </header>
+
+      <section class="toolbar panel" aria-label="场景控制">
+        <div class="control-group">
+          <span class="control-label">固定场景</span>
+          <div class="segmented" role="group">
+            <button data-scenario="before">优化前</button>
+            <button data-scenario="after" class="active">优化后</button>
+            <button data-scenario="boundary">边界参数</button>
+          </div>
+        </div>
+        <div class="control-group">
+          <span class="control-label">播放</span>
+          <button id="play-button" class="primary">继续</button>
+          <button id="step-button">单帧</button>
+          <button id="reset-button">重置</button>
+        </div>
+        <div class="control-group">
+          <span class="control-label">视口</span>
+          <button id="pan-left" title="向左移动视口">←</button>
+          <button id="pan-right" title="向右移动视口">→</button>
+          <button id="pan-up" title="向上移动视口">↑</button>
+          <button id="pan-down" title="向下移动视口">↓</button>
+        </div>
+        <div class="control-group">
+          <span class="control-label">图层</span>
+          <label><input type="checkbox" data-layer="terrain" checked /> 地形</label>
+          <label><input type="checkbox" data-layer="text" checked /> 文字</label>
+          <label><input type="checkbox" data-layer="dynamic" checked /> 动态</label>
+        </div>
+        <div class="control-group">
+          <button id="delete-button" class="danger">删除可见对象</button>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <div class="stage panel">
+          <div class="stage-heading">
+            <div>
+              <span class="live-dot"></span>
+              <strong id="scenario-title">优化后 · 固定高密度场景</strong>
+            </div>
+            <span class="stage-hint">拖动画布也可移动视口</span>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="scene-canvas" width="960" height="540" aria-label="动画场景"></canvas>
+          </div>
+          <div class="dispatch-line">
+            <span>失效原因：<b id="invalidation-reason">initial</b></span>
+            <span id="pause-proof">暂停后重绘 0 次</span>
+          </div>
+        </div>
+
+        <aside class="metrics-panel panel" aria-label="实时指标">
+          <div class="metrics-heading">
+            <h2>实时指标</h2>
+            <span id="sample-time">等待采样</span>
+          </div>
+          <div class="metrics-grid">
+            <article class="metric accent">
+              <span>帧时间</span>
+              <strong id="metric-frame">--</strong>
+              <small>EMA / latest</small>
+            </article>
+            <article class="metric">
+              <span>重绘面积</span>
+              <strong id="metric-area">--</strong>
+              <small id="metric-area-detail">占视口 --</small>
+            </article>
+            <article class="metric">
+              <span>文字缓存命中率</span>
+              <strong id="metric-cache">--</strong>
+              <small id="metric-cache-detail">hits / requests</small>
+            </article>
+            <article class="metric">
+              <span>候选 / 实绘对象</span>
+              <strong id="metric-candidates">--</strong>
+              <small>空间索引筛选后</small>
+            </article>
+            <article class="metric">
+              <span>脏矩形 / 全量失效</span>
+              <strong id="metric-rects">--</strong>
+              <small>本帧合并结果</small>
+            </article>
+            <article class="metric">
+              <span>场景节点</span>
+              <strong id="metric-nodes">--</strong>
+              <small>地形 · 文字 · 动态</small>
+            </article>
+          </div>
+          <div class="throughput">
+            <div><span>渲染调用</span><b id="metric-render-calls">0</b></div>
+            <div><span>实际重绘帧</span><b id="metric-redraw-calls">0</b></div>
+            <div><span>暂停保护</span><b id="metric-pause-guard">启用</b></div>
+          </div>
+          <div class="exceptions">
+            <div class="exceptions-title">
+              <span>异常日志</span>
+              <b id="exception-count">0</b>
+            </div>
+            <p id="exception-message">无异常</p>
+          </div>
+          <p class="metric-note" id="mode-note">
+            每帧仅重建变化区域；静态层和文字布局重用。
+          </p>
+        </aside>
+      </section>
+
+      <footer class="footnote">
+        固定种子 <code>0x5eedc0de</code> · 9,000 地形 / 260 文字 / 240 动态。
+        边界模式将脏矩形上限设为 2 并缩小文字缓存，用于验证退化路径仍与全量渲染一致。
+      </footer>
+    </main>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
