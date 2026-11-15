@@ -1,0 +1,11 @@
+{
+  "name": "broadphase-collision-lab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test",
+    "benchmark": "node scripts/benchmark.mjs"
+  }
+}

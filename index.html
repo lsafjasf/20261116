@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="二维圆形与旋转矩形碰撞检测的空间网格宽相实验台"
+    />
+    <title>Broadphase Lab · 空间剪枝碰撞实验台</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-a"></div>
+    <div class="ambient ambient-b"></div>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Broadphase Lab 首页">
+          <span class="brand-mark" aria-hidden="true">
+            <i></i><i></i><i></i><i></i>
+          </span>
+          <span class="brand-copy">
+            <strong>Broadphase Lab</strong>
+            <small>空间剪枝碰撞实验台</small>
+          </span>
+        </a>
+
+        <div class="scene-control">
+          <label for="scene-select">固定场景</label>
+          <select id="scene-select" aria-label="选择固定场景"></select>
+        </div>
+
+        <div class="engine-switch" role="group" aria-label="宽相策略">
+          <button type="button" data-engine="brute">
+            <span class="button-dot"></span>暴力检测
+          </button>
+          <button type="button" data-engine="grid" class="is-active">
+            <span class="button-dot"></span>空间网格
+          </button>
+        </div>
+
+        <div class="transport">
+          <button id="step-button" type="button" class="icon-button" title="单步">
+            单步
+          </button>
+          <button id="play-button" type="button" class="primary-button">
+            <span class="play-icon">▶</span><span id="play-label">播放</span>
+          </button>
+          <button id="reset-button" type="button" class="icon-button" title="重置场景">
+            重置
+          </button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="stage-card">
+          <div class="stage-heading">
+            <div>
+              <div class="eyebrow">
+                <span id="scene-short">优化后</span>
+                <span class="eyebrow-separator">/</span>
+                <span>LIVE COLLISION FIELD</span>
+              </div>
+              <h1 id="scene-title">优化后 · 空间网格</h1>
+              <p id="scene-description">与优化前完全相同的 620 个对象和种子，仅启用网格剪枝。</p>
+            </div>
+            <div id="parity-badge" class="parity-badge is-checking">
+              <span class="parity-pulse"></span>
+              <span>
+                <small>一致性审计</small>
+                <strong id="parity-label">正在校验</strong>
+              </span>
+            </div>
+          </div>
+
+          <div class="canvas-frame" id="canvas-frame">
+            <canvas id="scene-canvas" aria-label="二维碰撞场景"></canvas>
+            <div class="canvas-grid-label">1200 × 760</div>
+            <div class="canvas-hint">
+              <span><b>拖动</b> 移动</span>
+              <span><b>滚轮</b> 缩放</span>
+              <span><b>Delete</b> 删除</span>
+            </div>
+            <div id="toast" class="canvas-toast" role="status" aria-live="polite"></div>
+          </div>
+
+          <div class="stage-footer">
+            <div class="legend">
+              <span><i class="legend-swatch circle-swatch"></i>圆形</span>
+              <span><i class="legend-swatch rect-swatch"></i>旋转矩形</span>
+              <span><i class="legend-swatch contact-swatch"></i>接触</span>
+              <span id="selection-legend"><i class="legend-swatch select-swatch"></i>选中</span>
+            </div>
+            <div class="frame-readout">
+              <span>本帧检测</span>
+              <strong id="pair-readout">0 对</strong>
+              <span class="readout-divider"></span>
+              <strong id="time-readout">0.00 ms</strong>
+            </div>
+          </div>
+        </section>
+
+        <aside class="side-panel">
+          <section class="panel metrics-panel">
+            <div class="panel-title">
+              <div>
+                <span class="eyebrow">REALTIME</span>
+                <h2>每帧指标</h2>
+              </div>
+              <span id="fps-chip" class="status-chip">60 FPS</span>
+            </div>
+
+            <div class="metric-grid">
+              <article class="metric-card metric-wide">
+                <div class="metric-label">帧时间 <span>EMA</span></div>
+                <div class="metric-value"><strong id="metric-frame">0.0</strong><small>ms</small></div>
+                <canvas id="frame-sparkline" width="280" height="36"></canvas>
+              </article>
+
+              <article class="metric-card">
+                <div class="metric-label">候选对</div>
+                <div class="metric-value"><strong id="metric-candidates">0</strong></div>
+                <div class="metric-sub" id="metric-pair-ratio">全对 0</div>
+              </article>
+
+              <article class="metric-card">
+                <div class="metric-label">检测耗时</div>
+                <div class="metric-value"><strong id="metric-detect">0.00</strong><small>ms</small></div>
+                <div class="metric-sub" id="metric-narrow">窄相 0 对</div>
+              </article>
+
+              <article class="metric-card">
+                <div class="metric-label">网格节点</div>
+                <div class="metric-value"><strong id="metric-nodes">0</strong></div>
+                <div class="metric-sub" id="metric-cells">0 个占用单元</div>
+              </article>
+
+              <article class="metric-card">
+                <div class="metric-label">索引复用率</div>
+                <div class="metric-value"><strong id="metric-reuse">100</strong><small>%</small></div>
+                <div class="metric-sub" id="metric-index-time">更新 0.00 ms</div>
+              </article>
+
+              <article class="metric-card metric-wide metric-contact">
+                <div>
+                  <div class="metric-label">最终接触</div>
+                  <div class="metric-value"><strong id="metric-contacts">0</strong><small>对</small></div>
+                </div>
+                <div class="contact-digest">
+                  <span>接触摘要</span>
+                  <code id="metric-digest">--------</code>
+                </div>
+              </article>
+            </div>
+
+            <div class="pruning-meter">
+              <div class="pruning-copy">
+                <span>配对剪枝</span>
+                <strong id="pruning-value">0%</strong>
+              </div>
+              <div class="meter-track"><i id="pruning-bar"></i></div>
+              <small id="pruning-detail">等待检测</small>
+            </div>
+          </section>
+
+          <section class="panel inspector-panel">
+            <div class="panel-title compact">
+              <div>
+                <span class="eyebrow">INSPECTOR</span>
+                <h2>对象与网格</h2>
+              </div>
+              <span id="selected-count" class="status-chip muted">未选择</span>
+            </div>
+            <div id="selection-empty" class="selection-empty">
+              点击对象查看参数。移动、缩放和删除会立即刷新网格索引。
+            </div>
+            <div id="selection-detail" class="selection-detail" hidden>
+              <div class="selection-id">
+                <span id="selected-kind">圆形</span>
+                <code id="selected-id">#000</code>
+              </div>
+              <div class="selection-values">
+                <span>X <b id="selected-x">0.0</b></span>
+                <span>Y <b id="selected-y">0.0</b></span>
+                <span id="selected-size-label">R <b id="selected-size">0.0</b></span>
+                <span>角度 <b id="selected-angle">0°</b></span>
+              </div>
+              <div class="selection-actions">
+                <button id="scale-down" type="button">− 缩小</button>
+                <button id="scale-up" type="button">+ 放大</button>
+                <button id="delete-button" type="button" class="danger-button">删除</button>
+              </div>
+              <div class="index-note" id="index-note">索引已同步</div>
+            </div>
+            <div class="grid-control">
+              <label for="cell-size">网格尺寸 <output id="cell-size-output">72 px</output></label>
+              <input id="cell-size" type="range" min="32" max="144" step="8" value="72" />
+              <div class="grid-control-foot">
+                <span>小格更精准</span>
+                <span>大格更省索引</span>
+              </div>
+            </div>
+          </section>
+        </aside>
+      </main>
+
+      <section class="benchmark-panel">
+        <div class="benchmark-heading">
+          <div>
+            <div class="eyebrow">FIXED SCENARIOS / 3 GROUPS</div>
+            <h2>固定场景基准与语义不变量</h2>
+            <p>同一物理快照分别运行暴力检测与空间网格，比较候选、接触、摘要、资源与异常。</p>
+          </div>
+          <div class="benchmark-actions">
+            <span id="benchmark-state" class="status-chip">待运行</span>
+            <button id="audit-button" type="button" class="icon-button">校验当前场景</button>
+            <button id="benchmark-button" type="button" class="primary-button">运行三组基准</button>
+            <button id="export-button" type="button" class="icon-button">导出报告</button>
+          </div>
+        </div>
+
+        <div id="invariant-strip" class="invariant-strip">
+          <div><span class="invariant-mark">✓</span><span>视觉对象状态</span><strong>未改变</strong></div>
+          <div><span class="invariant-mark">✓</span><span>交互与公开数据</span><strong>未改变</strong></div>
+          <div><span class="invariant-mark">✓</span><span>最终接触集合</span><strong>待基准验证</strong></div>
+          <div><span class="invariant-mark">✓</span><span>异常处理</span><strong>无新增异常</strong></div>
+        </div>
+
+        <div class="benchmark-grid">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>固定场景 / 策略</th>
+                  <th>对象</th>
+                  <th>候选对 / 全对</th>
+                  <th>接触</th>
+                  <th>平均 / 最大帧</th>
+                  <th>堆内存</th>
+                  <th>异常</th>
+                  <th>输出</th>
+                </tr>
+              </thead>
+              <tbody id="benchmark-body">
+                <tr class="empty-row">
+                  <td colspan="8">运行基准后显示三组固定场景的完整对照。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <aside class="log-panel">
+            <div class="panel-title compact">
+              <div>
+                <span class="eyebrow">RUNTIME LOG</span>
+                <h2>运行日志</h2>
+              </div>
+              <span id="log-count" class="status-chip muted">0 条</span>
+            </div>
+            <ol id="log-list" class="log-list" aria-live="polite"></ol>
+          </aside>
+        </div>
+
+        <footer class="semantic-footer">
+          <span class="semantic-icon">§</span>
+          <p>
+            性能路径只替换宽相候选生成与索引更新。渲染对象、拖拽/缩放/删除交互、对象字段及
+            接触对公开结构保持一致；错误只进入日志，不改变场景状态或最终输出。
+          </p>
+        </footer>
+      </section>
+    </div>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
