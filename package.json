@@ -1,0 +1,28 @@
+{
+  "name": "uid576",
+  "version": "1.0.0",
+  "description": "Four-lane synth rhythm game with Web Audio scheduling, calibration and resource cleanup tests",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "node tests/run.mjs",
+    "serve": "node tests/server.mjs",
+    "screenshot": "node tests/screenshot.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lsafjasf/20261116.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/lsafjasf/20261116/issues"
+  },
+  "homepage": "https://github.com/lsafjasf/20261116#readme",
+  "devDependencies": {
+    "playwright": "^1.55.0"
+  }
+}
