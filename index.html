@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#07151b" />
+    <title>NORTHLINE · 海上叶片修复控制台</title>
+    <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="ambient-grid" aria-hidden="true"></div>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <div>
+            <div class="brand-line">NORTHLINE <b>O&amp;M</b></div>
+            <div class="brand-sub">海上叶片修复 · 仿真控制台</div>
+          </div>
+        </div>
+
+        <nav class="scenario-switch" aria-label="仿真场景">
+          <button class="scenario-tab is-active" data-scenario="normal">
+            <span>01</span>正常窗口
+          </button>
+          <button class="scenario-tab" data-scenario="equipment">
+            <span>02</span>设备故障
+          </button>
+          <button class="scenario-tab" data-scenario="parameter">
+            <span>03</span>参数越限
+          </button>
+          <button class="scenario-tab" data-scenario="instability">
+            <span>04</span>平台失稳
+          </button>
+        </nav>
+
+        <div class="top-actions">
+          <button class="sound-button" id="soundButton" aria-pressed="false">
+            <span class="sound-icon" aria-hidden="true"></span>
+            <span id="soundLabel">启用音频</span>
+          </button>
+          <div class="link-status"><i></i> TELEMETRY LIVE</div>
+        </div>
+      </header>
+
+      <main class="dashboard">
+        <section class="stage-column">
+          <div class="viewport-panel">
+            <div class="panel-cut corner-a"></div>
+            <div class="panel-cut corner-b"></div>
+            <canvas id="scene" aria-label="风机、叶片、维修平台与风场动态视图"></canvas>
+
+            <div class="scene-top">
+              <div class="scene-id">
+                <span class="eyebrow">ASSET / WT-07</span>
+                <strong>Hornsea Reach · 05</strong>
+              </div>
+              <div class="scene-conditions">
+                <span class="eyebrow">WINDOW STATUS</span>
+                <strong id="sceneWindowState">OPEN · 120s</strong>
+              </div>
+            </div>
+
+            <div class="scene-reticle" aria-hidden="true">
+              <span></span><span></span><span></span><span></span>
+            </div>
+
+            <div class="replay-banner" id="replayBanner" hidden>
+              <span class="replay-dot"></span>
+              FAILURE REPLAY
+              <b id="replayClock">−08.0s</b>
+              <button id="exitReplay">退出回放</button>
+            </div>
+
+            <div class="scene-readout">
+              <div>
+                <span class="eyebrow">ACTIVE OPERATION</span>
+                <strong id="sceneStage">平台进场</strong>
+              </div>
+              <div class="scene-progress">
+                <span id="sceneProgressLabel">B1 / 打磨</span>
+                <div class="thin-meter"><i id="sceneProgressBar"></i></div>
+              </div>
+            </div>
+          </div>
+
+          <section class="blade-panel panel">
+            <header class="panel-heading">
+              <div>
+                <span class="eyebrow">REPAIR MATRIX</span>
+                <h2>叶片修复进度</h2>
+              </div>
+              <span class="panel-meta">SAND → COAT → CURE → LIGHT</span>
+            </header>
+            <div class="blade-grid" id="bladeGrid"></div>
+          </section>
+
+          <section class="log-panel panel">
+            <header class="panel-heading">
+              <div>
+                <span class="eyebrow">UNIFIED EVENT CLOCK</span>
+                <h2>操作与系统记录</h2>
+              </div>
+              <span class="panel-meta" id="eventCount">000 EVENTS</span>
+            </header>
+            <div class="log-columns" aria-hidden="true">
+              <span>TIME</span><span>SOURCE</span><span>EVENT</span>
+            </div>
+            <div class="log-stream" id="logStream" role="log" aria-live="polite"></div>
+          </section>
+        </section>
+
+        <aside class="control-column">
+          <section class="window-card panel" id="windowCard">
+            <header class="window-heading">
+              <div>
+                <span class="eyebrow">WEATHER WINDOW</span>
+                <h2>风窗关闭倒计时</h2>
+              </div>
+              <span class="window-state" id="windowState">OPEN</span>
+            </header>
+            <div class="countdown" id="windowClock">02:00.0</div>
+            <div class="window-track"><i id="windowBar"></i></div>
+            <div class="window-foot">
+              <span>剩余作业余量</span>
+              <b id="windowMargin">120.0 s</b>
+            </div>
+          </section>
+
+          <section class="controls panel">
+            <div class="clock-line">
+              <span class="eyebrow">SIM CLOCK</span>
+              <span id="simClock">T+ 000.00s</span>
+              <span class="clock-state" id="clockState">RUNNING</span>
+            </div>
+            <div class="primary-controls">
+              <button class="control-button primary" id="pauseButton">
+                <span class="button-glyph pause-glyph" aria-hidden="true"></span>
+                <span id="pauseLabel">暂停</span>
+                <kbd>SPACE</kbd>
+              </button>
+              <button class="control-button" id="stepButton" disabled>
+                <span class="button-glyph step-glyph" aria-hidden="true"></span>
+                单步
+                <kbd>N</kbd>
+              </button>
+            </div>
+            <div class="secondary-controls">
+              <button class="text-button" id="resumeButton" disabled>恢复运行</button>
+              <button class="text-button" id="replayButton" disabled>
+                <span class="small-record"></span>失败回放
+              </button>
+              <div class="speed-switch" aria-label="仿真速度">
+                <button data-speed="1">1×</button>
+                <button data-speed="2" class="is-active">2×</button>
+                <button data-speed="4">4×</button>
+              </div>
+            </div>
+            <p class="clock-note" id="clockNote">固定步长 50 ms · 种子驱动的可重复时钟</p>
+          </section>
+
+          <section class="telemetry panel">
+            <header class="panel-heading compact">
+              <div>
+                <span class="eyebrow">ENVIRONMENT / PLATFORM</span>
+                <h2>实时遥测</h2>
+              </div>
+              <span class="live-pulse">LIVE</span>
+            </header>
+            <div class="metric-grid">
+              <div class="metric">
+                <span>风速</span><b><em id="windValue">--</em> m/s</b>
+                <div class="micro-meter"><i id="windMeter"></i></div>
+              </div>
+              <div class="metric">
+                <span>平台摆幅</span><b><em id="swayValue">--</em> m</b>
+                <div class="micro-meter danger"><i id="swayMeter"></i></div>
+              </div>
+              <div class="metric">
+                <span>温度 / 湿度</span><b><em id="tempValue">--</em>° / <em id="humidityValue">--</em>%</b>
+                <div class="micro-meter safe"><i id="humidityMeter"></i></div>
+              </div>
+              <div class="metric">
+                <span>工具接触余量</span><b><em id="contactValue">--</em> m</b>
+                <div class="micro-meter"><i id="contactMeter"></i></div>
+              </div>
+            </div>
+            <div class="equipment-list">
+              <div class="equipment-row">
+                <span class="equipment-icon sander-icon"></span>
+                <span>打磨机</span>
+                <b id="sanderState">待机</b>
+                <small id="sanderTemp">42.0°C</small>
+              </div>
+              <div class="equipment-row">
+                <span class="equipment-icon lamp-icon"></span>
+                <span>复位灯组</span>
+                <b id="lampState">待机</b>
+                <small id="lampVoltage">24.0V</small>
+              </div>
+              <div class="equipment-row">
+                <span class="equipment-icon platform-icon"></span>
+                <span>维修平台</span>
+                <b id="platformState">进场中</b>
+                <small id="platformGap">接触</small>
+              </div>
+            </div>
+          </section>
+
+          <section class="fault-panel panel" id="faultPanel">
+            <header class="panel-heading compact">
+              <div>
+                <span class="eyebrow">FAULT &amp; RECOVERY EVIDENCE</span>
+                <h2>故障证据链</h2>
+              </div>
+              <span class="fault-state" id="faultState">NOMINAL</span>
+            </header>
+            <div class="fault-empty" id="faultEmpty">
+              <span class="fault-empty-mark">✓</span>
+              <div>
+                <b>无活动故障</b>
+                <p>故障发生时会冻结作业阶段，并记录发生时刻、设备/环境余量与系统响应。</p>
+              </div>
+            </div>
+            <div class="fault-content" id="faultContent" hidden>
+              <div class="fault-title-line">
+                <span id="faultCode">F-01</span>
+                <strong id="faultTitle">--</strong>
+                <time id="faultTime">T+ --</time>
+              </div>
+              <p class="fault-cause" id="faultCause"></p>
+              <div class="margin-grid" id="marginGrid"></div>
+              <div class="response-list" id="responseList"></div>
+              <div class="verify-card" id="verifyCard">
+                <div class="verify-top">
+                  <span>恢复后稳定观察</span>
+                  <b id="verifyState">等待安全状态</b>
+                </div>
+                <div class="verify-track"><i id="verifyBar"></i></div>
+                <div class="verify-meta" id="verifyMeta">固定观察窗 12.0 s</div>
+              </div>
+            </div>
+          </section>
+        </aside>
+      </main>
+
+      <footer class="statusbar">
+        <div><i class="status-dot"></i><span id="statusSummary">仿真就绪 · 固定步长 50ms</span></div>
+        <div class="status-right">
+          <span>SCENARIO <b id="scenarioCode">NORMAL</b></span>
+          <span>SEED <b id="seedValue">7407</b></span>
+          <span>BUILD <b>26.11 / R3</b></span>
+        </div>
+      </footer>
+    </div>
+
+    <div class="toast-stack" id="toastStack" aria-live="assertive"></div>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
