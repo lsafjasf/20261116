@@ -1,0 +1,10 @@
+{
+  "name": "binaural-mechanic-diagnosis",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Binaural sound-field mechanical diagnosis game with deterministic engine, Web Audio synthesis and Canvas instruments.",
+  "scripts": {
+    "test": "node tests/run-tests.js && node tests/dom-smoke.js && node tests/scenario-report.js",
+    "serve": "node -e \"const http=require('http'),fs=require('fs'),p=require('path');http.createServer((q,r)=>{const f=p.join(process.cwd(),q.url==='/'?'index.html':q.url);fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);r.end()}else{r.writeHead(200,{'Content-Type':f.endsWith('.js')?'text/javascript':'text/html'});r.end(d)}})}).listen(8080,()=>console.log('http://localhost:8080'))\""
+  }
+}

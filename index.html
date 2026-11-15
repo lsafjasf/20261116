@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>双耳声场机械诊断</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #0d1117; color: #c9d1d9;
+    font: 14px/1.5 system-ui, "PingFang SC", sans-serif; }
+  header { padding: 10px 16px; background: #161b22; border-bottom: 1px solid #30363d; }
+  h1 { font-size: 16px; margin: 0 0 6px; }
+  .hud { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; font-size: 12px; }
+  .hud div { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 6px 8px; }
+  .hud b { color: #58a6ff; display: block; font-weight: 600; }
+  main { display: grid; grid-template-columns: 1fr 300px; gap: 12px; padding: 12px 16px; }
+  canvas { width: 100%; background: #0d1117; border: 1px solid #30363d; border-radius: 10px; }
+  aside { display: flex; flex-direction: column; gap: 10px; }
+  fieldset { border: 1px solid #30363d; border-radius: 10px; margin: 0; padding: 8px 10px; }
+  legend { color: #8b949e; font-size: 12px; }
+  button { background: #21262d; color: #c9d1d9; border: 1px solid #30363d;
+    border-radius: 6px; padding: 5px 9px; cursor: pointer; margin: 2px; }
+  button:hover { border-color: #58a6ff; }
+  input[type=range] { width: 100%; }
+  .row { display: flex; flex-wrap: wrap; }
+  #submit-out, #replay-out { font-family: ui-monospace, monospace; font-size: 11px;
+    min-height: 16px; color: #d29922; word-break: break-all; }
+  .hint { color: #8b949e; font-size: 12px; }
+  body[data-fsm="menu"] .running-only { opacity: .45; pointer-events: none; }
+</style>
+</head>
+<body data-fsm="menu">
+<header>
+  <h1>双耳声场机械诊断 — 仅靠仪表与声场判断 正常 / 松动 / 摩擦 / 过载</h1>
+  <div class="hud">
+    <div><b>状态机</b><span id="hud-fsm">待启动</span></div>
+    <div><b>计时器</b><span id="hud-timer">00:00</span></div>
+    <div><b>当前目标</b><span id="hud-target">D1</span></div>
+    <div><b>关键资源</b><span id="hud-resources">-</span></div>
+    <div><b>最近状态变化</b><span id="hud-transition">-</span> <span id="hud-seed"></span></div>
+  </div>
+</header>
+<main>
+  <canvas id="scope" width="980" height="560"></canvas>
+  <aside>
+    <fieldset>
+      <legend>会话控制（含状态机 / 暂停 / 回放 / 失败恢复）</legend>
+      <button id="btn-start">启动监听</button>
+      <button id="btn-pause">暂停/继续</button>
+      <button id="btn-restart">重新开始</button>
+      <button id="btn-replay">确定性回放</button>
+      <div id="replay-out" class="hint"></div>
+    </fieldset>
+    <fieldset class="running-only">
+      <legend>监听位置（WASD / 方向键，步长 0.5）</legend>
+      <span class="hint">移动到设备甜区（半径 0.9）内才能提交；位置错误会进入失败恢复。</span>
+      <div class="row">
+        <button class="target-btn" data-id="0">目标 D1</button>
+        <button class="target-btn" data-id="1">目标 D2</button>
+        <button class="target-btn" data-id="2">目标 D3</button>
+        <button class="target-btn" data-id="3">目标 D4</button>
+      </div>
+    </fieldset>
+    <fieldset class="running-only">
+      <legend>滤波与增益（过度放大噪声会恶化判定）</legend>
+      HPF <span id="hpf-v"></span><input id="hpf" type="range" min="0" max="4000" step="50" value="0">
+      LPF <input id="lpf" type="range" min="100" max="8000" step="50" value="8000">
+      增益 <input id="gain" type="range" min="0.25" max="6" step="0.05" value="1">
+    </fieldset>
+    <fieldset class="running-only">
+      <legend>提交诊断（四组全部正确才结案）</legend>
+      <div class="row">
+        <button class="state-btn" data-state="normal">正常</button>
+        <button class="state-btn" data-state="loose">松动</button>
+        <button class="state-btn" data-state="friction">摩擦</button>
+        <button class="state-btn" data-state="overload">过载</button>
+      </div>
+      <div id="submit-out"></div>
+    </fieldset>
+  </aside>
+</main>
+<script src="src/rng.js"></script>
+<script src="src/hash.js"></script>
+<script src="src/engine.js"></script>
+<script src="src/audio-host.js"></script>
+<script src="src/renderer.js"></script>
+<script src="src/main.js"></script>
+</body>
+</html>
