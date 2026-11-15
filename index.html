@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="潮汐双向涡轮、泄水闸与船闸的确定性调度仿真"
+    />
+    <title>潮隙 TIDAL GATE · 双向潮汐调度</title>
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-a"></div>
+    <div class="ambient ambient-b"></div>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <div>
+            <p class="eyebrow">DETERMINISTIC TIDAL DISPATCH</p>
+            <h1>潮隙 <span>TIDAL GATE</span></h1>
+          </div>
+        </div>
+
+        <div class="scenario-tabs" id="scenario-tabs" aria-label="演练场景">
+          <button class="scenario-tab is-active" data-scenario="normal">
+            <span class="tab-index">01</span>
+            <span>正常流程<small>全周期验收</small></span>
+          </button>
+          <button class="scenario-tab" data-scenario="bearing">
+            <span class="tab-index">02</span>
+            <span>设备故障<small>轴承过热</small></span>
+          </button>
+          <button class="scenario-tab" data-scenario="pressure">
+            <span class="tab-index">03</span>
+            <span>参数越限<small>高压差开闸</small></span>
+          </button>
+        </div>
+
+        <div class="header-actions">
+          <button class="icon-button" id="audio-toggle" title="开启声场" aria-label="开启声场">
+            <span class="audio-bars" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span id="audio-label">声场关闭</span>
+          </button>
+          <div class="seed-chip" title="固定随机种子，保证同输入同结果">
+            <span>SEED</span><strong>605</strong>
+          </div>
+        </div>
+      </header>
+
+      <main class="main-grid">
+        <section class="stage-card">
+          <div class="stage-toolbar">
+            <div class="live-state">
+              <i id="run-led"></i>
+              <span id="run-state">周期运行中</span>
+              <em id="phase-chip">涨潮</em>
+            </div>
+            <div class="transport" aria-label="仿真播放控制">
+              <button class="transport-button primary" id="pause-button" title="暂停 / 恢复 (Space)">
+                <span id="pause-icon">Ⅱ</span><span id="pause-label">暂停</span>
+              </button>
+              <button class="transport-button" id="step-button" title="单步 1 分钟 (S)">
+                <span>▸|</span><span>单步</span>
+              </button>
+              <select id="speed-select" title="仿真速度" aria-label="仿真速度">
+                <option value="0.5">0.5×</option>
+                <option value="1" selected>1×</option>
+                <option value="2">2×</option>
+                <option value="4">4×</option>
+              </select>
+              <button class="transport-button" id="finish-button" title="快进到 18:00 结算">
+                完成周期
+              </button>
+              <button class="transport-button replay-button" id="replay-button" disabled>
+                故障回放
+              </button>
+            </div>
+          </div>
+
+          <div class="canvas-wrap">
+            <canvas id="scene" aria-label="海湾、双向涡轮、水头与船闸剖面"></canvas>
+            <div class="canvas-corner">
+              <span>LIVE SECTION</span>
+              <strong id="canvas-clock">06:00</strong>
+            </div>
+            <div class="replay-banner" id="replay-banner" hidden>
+              <span>REPLAY</span>
+              正在按原始时钟重建故障前状态
+              <button id="exit-replay">退出回放</button>
+            </div>
+          </div>
+
+          <div class="stage-footer">
+            <div class="legend">
+              <span><i class="legend-dot teal"></i>双向涡轮</span>
+              <span><i class="legend-dot amber"></i>泄水闸</span>
+              <span><i class="legend-dot blue"></i>通航船闸</span>
+              <span><i class="legend-dot red"></i>联锁区</span>
+            </div>
+            <p>固定步长 <strong>1 min</strong> · 环境 / 设备 / 操作日志共用同一整数时钟</p>
+          </div>
+        </section>
+
+        <aside class="console">
+          <section class="panel strategy-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">DISPATCH POLICY</p>
+                <h2>调度策略</h2>
+              </div>
+              <span class="policy-code" id="policy-code">POL-A</span>
+            </div>
+            <div class="strategy-switch" id="strategy-switch">
+              <button class="is-active" data-strategy="balanced">
+                <strong>稳航协同</strong>
+                <small>提前换向 · 预留均压</small>
+              </button>
+              <button data-strategy="power">
+                <strong>电量冲刺</strong>
+                <small>压榨水头 · 延后通航</small>
+              </button>
+            </div>
+            <p class="strategy-copy" id="strategy-copy">
+              在通航请求前 34 分钟停机均压，换向提前量 24 分钟。
+            </p>
+            <div class="strategy-facts">
+              <span><small>换向提前量</small><strong id="fact-lead">24 min</strong></span>
+              <span><small>通航预留</small><strong id="fact-nav">34 min</strong></span>
+              <span><small>闸门上限</small><strong id="fact-gate">92%</strong></span>
+            </div>
+          </section>
+
+          <section class="panel goals-panel">
+            <div class="panel-heading compact">
+              <h2>本周期验收</h2>
+              <span id="goal-status" class="status-badge neutral">进行中</span>
+            </div>
+            <div class="goal-row">
+              <div class="goal-icon">⚡</div>
+              <div class="goal-main">
+                <div><strong>发电量</strong><span id="goal-energy-text">0.0 / 12.0 MWh</span></div>
+                <div class="progress"><i id="energy-bar"></i></div>
+              </div>
+            </div>
+            <div class="goal-row">
+              <div class="goal-icon">⚓</div>
+              <div class="goal-main">
+                <div><strong>两次通航窗口</strong><span id="goal-nav-text">0 / 2 准点</span></div>
+                <div class="nav-slots">
+                  <span id="nav-slot-0">首班 09:42</span>
+                  <span id="nav-slot-1">返程 14:06</span>
+                </div>
+              </div>
+            </div>
+            <div class="goal-row">
+              <div class="goal-icon">◈</div>
+              <div class="goal-main">
+                <div><strong>设备安全</strong><span id="goal-safety-text">余量正常</span></div>
+                <div class="safety-line">
+                  <span>闸门结构</span><strong id="gate-damage-value">0.0%</strong>
+                  <span>长稳</span><strong id="audit-value">未触发</strong>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel telemetry-panel">
+            <div class="panel-heading compact">
+              <h2>统一时钟遥测</h2>
+              <span class="tick-readout">T+<strong id="tick-value">000</strong> min</span>
+            </div>
+            <div class="telemetry-grid">
+              <div class="metric">
+                <span>外海潮位</span><strong id="metric-sea">1.55 <small>m</small></strong>
+                <em id="metric-tide">↗ 涨潮</em>
+              </div>
+              <div class="metric">
+                <span>库区水位</span><strong id="metric-basin">4.08 <small>m</small></strong>
+                <em>调蓄池</em>
+              </div>
+              <div class="metric accent">
+                <span>双向水头</span><strong id="metric-head">-2.53 <small>m</small></strong>
+                <em id="metric-direction">落潮向</em>
+              </div>
+              <div class="metric">
+                <span>总流量</span><strong id="metric-flow">0 <small>m³/s</small></strong>
+                <em id="metric-gate">闸 0%</em>
+              </div>
+              <div class="metric">
+                <span>机械负载</span><strong id="metric-power">0.00 <small>MW</small></strong>
+                <em id="metric-turbine">换向中</em>
+              </div>
+              <div class="metric" id="pressure-metric">
+                <span>闸门压差余量</span><strong id="metric-pressure">1.12 <small>m</small></strong>
+                <em id="metric-pressure-limit">限值 1.65 m</em>
+              </div>
+              <div class="metric">
+                <span>轴承峰值</span><strong id="metric-bearing">63.5 <small>°C</small></strong>
+                <em id="metric-bearing-limit">限值 104 °C</em>
+              </div>
+              <div class="metric">
+                <span>仿真校验</span><strong class="hash" id="metric-hash">00000000</strong>
+                <em>FNV-1a</em>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel control-panel">
+            <div class="panel-heading compact">
+              <h2>人工干预</h2>
+              <span class="micro-note">操作写入时轴并可回放</span>
+            </div>
+            <div class="control-actions">
+              <button id="nav-priority">通航优先</button>
+              <button id="emergency-stop" class="danger">紧急停机</button>
+              <button id="auto-control">交回自动</button>
+            </div>
+            <div class="gate-control">
+              <label for="gate-slider">泄水闸人工开度 <strong id="gate-slider-value">0%</strong></label>
+              <input id="gate-slider" type="range" min="0" max="100" value="0" />
+              <button id="apply-gate">执行 24 min</button>
+            </div>
+          </section>
+        </aside>
+      </main>
+
+      <section class="bottom-grid">
+        <section class="panel log-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">EVENT LEDGER</p>
+              <h2>操作与环境记录</h2>
+            </div>
+            <div class="log-meta">
+              <span id="log-count">1 条</span>
+              <span>按仿真时刻排序</span>
+            </div>
+          </div>
+          <div class="event-list" id="event-list"></div>
+        </section>
+
+        <section class="panel compare-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">A/B SAME WEATHER</p>
+              <h2>两种策略同局对照</h2>
+            </div>
+            <button class="text-button" id="run-compare">重算对照</button>
+          </div>
+          <p class="compare-note">
+            同一潮位、同一通航请求、同一故障种子，仅调度策略不同。
+          </p>
+          <div class="compare-grid" id="compare-grid">
+            <div class="compare-empty">正在跑同条件对照…</div>
+          </div>
+        </section>
+      </section>
+
+      <footer class="app-footer">
+        <span>潮汐周期 12 h · 720 个确定性控制拍</span>
+        <span>Canvas 2D / Web Audio / 0 dependencies</span>
+        <span>Space 暂停 · S 单步 · 恢复后固定观察 120 min</span>
+      </footer>
+    </div>
+
+    <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+    <aside class="incident-drawer" id="incident-drawer" hidden aria-live="assertive">
+      <div class="drawer-topline">
+        <span class="incident-tag">INCIDENT REPORT</span>
+        <button id="close-incident" aria-label="关闭事故详情">×</button>
+      </div>
+      <h2 id="incident-title">事故详情</h2>
+      <div class="incident-time">
+        <span>发生时刻</span><strong id="incident-clock">--:--</strong>
+        <span>控制拍</span><strong id="incident-tick">---</strong>
+      </div>
+      <div class="incident-values">
+        <div><span>当前值</span><strong id="incident-value">--</strong></div>
+        <div><span>安全限值</span><strong id="incident-limit">--</strong></div>
+        <div class="margin-box"><span>当前余量</span><strong id="incident-margin">--</strong></div>
+      </div>
+      <div class="incident-block">
+        <span>系统响应</span>
+        <p id="incident-response">--</p>
+      </div>
+      <div class="incident-block">
+        <span>状态证据</span>
+        <p id="incident-evidence">--</p>
+      </div>
+      <div class="incident-actions">
+        <button class="primary-action" id="recover-incident">检修并复位</button>
+        <button id="replay-incident">回放发生前 8 min</button>
+      </div>
+      <p class="drawer-footnote">
+        复位后保持安全隔离 18 min，随后连续运行 120 min；若出现新增联锁或数值跳变，长稳校验判失败。
+      </p>
+    </aside>
+
+    <div class="result-toast" id="result-toast" hidden>
+      <span id="result-eyebrow">CYCLE COMPLETE</span>
+      <h2 id="result-title">周期结算</h2>
+      <p id="result-copy"></p>
+      <button id="result-close">查看记录</button>
+    </div>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
