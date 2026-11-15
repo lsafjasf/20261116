@@ -1,0 +1,979 @@
+{
+  "generatedAt": "2026-11-15T18:29:03.248Z",
+  "iterations": 20,
+  "scenarios": {
+    "before": {
+      "summary": {
+        "samples": 21,
+        "firstActiveNodes": 14,
+        "lastActiveNodes": 195,
+        "peakActiveNodes": 195,
+        "firstConnections": 14,
+        "lastConnections": 195,
+        "lastListeners": 58,
+        "totalReleases": 0,
+        "totalCandidates": 0,
+        "suppressedCallbacks": 0,
+        "finalCacheHitRate": 0.7619047619047619,
+        "peakHeapBytes": 6096264,
+        "lastHeapBytes": 5321512,
+        "firstHeapBytes": 5386000,
+        "avgFrameMs": 0.02450102380952342,
+        "maxFrameMs": 0.39818599999999904,
+        "errorCount": 0
+      },
+      "headNodes": [
+        14,
+        24,
+        37,
+        44,
+        54
+      ],
+      "tailNodes": [
+        165,
+        178,
+        185,
+        195,
+        195
+      ],
+      "nodeSeries": [
+        14,
+        24,
+        37,
+        44,
+        54,
+        61,
+        71,
+        84,
+        91,
+        101,
+        108,
+        118,
+        131,
+        138,
+        148,
+        155,
+        165,
+        178,
+        185,
+        195,
+        195
+      ],
+      "heapSeries": [
+        5386000,
+        6044432,
+        5448704,
+        5949552,
+        5488432,
+        5501896,
+        5526312,
+        5548776,
+        5564656,
+        5591664,
+        5741312,
+        6096264,
+        5669040,
+        5684224,
+        5218400,
+        5233816,
+        5253936,
+        5278304,
+        5294784,
+        5315008,
+        5321512
+      ],
+      "fingerprintStable": true,
+      "uniqueFingerprints": [
+        "pad#2[sine:220:0.11:0.25|sine:275:0.11:0.25]",
+        "pluck#3[triangle:330:0.06:0.12|triangle:412.5:0.06:0.12|triangle:495:0.06:0.12]",
+        "arpeggio#4[square:440:0.03:0.3|square:550:0.03:0.3|square:660:0.03:0.3|square:770:0.03:0.3]",
+        "bass#2[sawtooth:110:0.1:0.4|sawtooth:137.5:0.1:0.4]",
+        "bell#3[sine:660:0.05333:0.18|sine:825:0.05333:0.18|sine:990:0.05333:0.18]"
+      ],
+      "errors": [],
+      "violations": []
+    },
+    "after": {
+      "summary": {
+        "samples": 21,
+        "firstActiveNodes": 7,
+        "lastActiveNodes": 0,
+        "peakActiveNodes": 13,
+        "firstConnections": 7,
+        "lastConnections": 0,
+        "lastListeners": 0,
+        "totalReleases": 195,
+        "totalCandidates": 195,
+        "suppressedCallbacks": 58,
+        "finalCacheHitRate": 0.7619047619047619,
+        "peakHeapBytes": 6122232,
+        "lastHeapBytes": 5602936,
+        "firstHeapBytes": 5396208,
+        "avgFrameMs": 0.028339833333333193,
+        "maxFrameMs": 0.4930679999999974,
+        "errorCount": 0
+      },
+      "headNodes": [
+        7,
+        10,
+        13,
+        7,
+        10
+      ],
+      "tailNodes": [
+        10,
+        13,
+        7,
+        10,
+        0
+      ],
+      "nodeSeries": [
+        7,
+        10,
+        13,
+        7,
+        10,
+        7,
+        10,
+        13,
+        7,
+        10,
+        7,
+        10,
+        13,
+        7,
+        10,
+        7,
+        10,
+        13,
+        7,
+        10,
+        0
+      ],
+      "heapSeries": [
+        5396208,
+        6122232,
+        5471648,
+        6029840,
+        5533384,
+        5557168,
+        5585312,
+        5621696,
+        5648720,
+        5676728,
+        5703664,
+        5732024,
+        5385328,
+        5411888,
+        5442464,
+        5468056,
+        5497256,
+        5533904,
+        5561408,
+        5590456,
+        5602936
+      ],
+      "fingerprintStable": true,
+      "uniqueFingerprints": [
+        "pad#2[sine:220:0.11:0.25|sine:275:0.11:0.25]",
+        "pluck#3[triangle:330:0.06:0.12|triangle:412.5:0.06:0.12|triangle:495:0.06:0.12]",
+        "arpeggio#4[square:440:0.03:0.3|square:550:0.03:0.3|square:660:0.03:0.3|square:770:0.03:0.3]",
+        "bass#2[sawtooth:110:0.1:0.4|sawtooth:137.5:0.1:0.4]",
+        "bell#3[sine:660:0.05333:0.18|sine:825:0.05333:0.18|sine:990:0.05333:0.18]"
+      ],
+      "errors": [],
+      "violations": [
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        }
+      ]
+    },
+    "boundary": {
+      "summary": {
+        "samples": 21,
+        "firstActiveNodes": 1,
+        "lastActiveNodes": 0,
+        "peakActiveNodes": 37,
+        "firstConnections": 1,
+        "lastConnections": 0,
+        "lastListeners": 0,
+        "totalReleases": 258,
+        "totalCandidates": 258,
+        "suppressedCallbacks": 79,
+        "finalCacheHitRate": 0.047619047619047616,
+        "peakHeapBytes": 6523088,
+        "lastHeapBytes": 6413000,
+        "firstHeapBytes": 5619160,
+        "avgFrameMs": 0.01350161904761911,
+        "maxFrameMs": 0.13932700000000153,
+        "errorCount": 0
+      },
+      "headNodes": [
+        1,
+        4,
+        37,
+        1,
+        4
+      ],
+      "tailNodes": [
+        4,
+        37,
+        1,
+        4,
+        0
+      ],
+      "nodeSeries": [
+        1,
+        4,
+        37,
+        1,
+        4,
+        37,
+        1,
+        4,
+        37,
+        1,
+        4,
+        37,
+        1,
+        4,
+        37,
+        1,
+        4,
+        37,
+        1,
+        4,
+        0
+      ],
+      "heapSeries": [
+        5619160,
+        5630296,
+        5709240,
+        5743368,
+        6173216,
+        5834728,
+        5869688,
+        5881344,
+        5961256,
+        6411752,
+        6425272,
+        6504984,
+        6510824,
+        6523088,
+        6229288,
+        6264728,
+        6277480,
+        6356128,
+        6392712,
+        6405600,
+        6413000
+      ],
+      "fingerprintStable": true,
+      "uniqueFingerprints": [
+        "zero-voices#0[]",
+        "null-type#1[sine:440:0:0]",
+        "heavy#12[sawtooth:55:0.00417:0.5|sawtooth:68.75:0.00417:0.5|sawtooth:82.5:0.00417:0.5|sawtooth:96.25:0.00417:0.5|sawtooth:110:0.00417:0.5|sawtooth:123.75:0.00417:0.5|sawtooth:137.5:0.00417:0.5|sawtooth:151.25:0.00417:0.5|sawtooth:165:0.00417:0.5|sawtooth:178.75:0.00417:0.5|sawtooth:192.5:0.00417:0.5|sawtooth:206.25:0.00417:0.5]"
+      ],
+      "errors": [],
+      "violations": [
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        },
+        {
+          "kind": "callback-after-release",
+          "label": "oscillator",
+          "type": "ended"
+        }
+      ]
+    }
+  },
+  "beforeAfterDiff": {
+    "sameFingerprints": true,
+    "referenceErrors": 0,
+    "candidateErrors": 0,
+    "nodeDelta": -195,
+    "releaseDelta": 195,
+    "heapDeltaBytes": 281424,
+    "frameAvgDeltaMs": 0.003838809523809772
+  },
+  "guarantees": {
+    "outputSemanticsUnchanged": true,
+    "noSustainedNodeGrowth": true,
+    "fullTeardown": true,
+    "noExceptions": true
+  }
+}

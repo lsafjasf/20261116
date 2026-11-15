@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="data:," />
+  <title>Web Audio 集中资源管理实验台</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="app">
+    <header>
+      <h1>Web Audio 资源管理实验台</h1>
+      <p class="subtitle">集中式 ResourceManager · 场景切换 20 次稳定性验证</p>
+    </header>
+
+    <section class="controls">
+      <label>模式
+        <select id="mode-select">
+          <option value="after">优化后（集中托管）</option>
+          <option value="before">优化前（泄漏基线）</option>
+        </select>
+      </label>
+      <label>场景集
+        <select id="library-select">
+          <option value="standard">标准五场景</option>
+          <option value="boundary">边界参数场景</option>
+        </select>
+      </label>
+      <button id="start-btn" type="button">启动音频</button>
+      <button id="switch-btn" type="button" disabled>切换下一场景</button>
+      <button id="loop-btn" type="button" disabled>循环切换 20 次</button>
+      <button id="stop-btn" type="button" disabled>停止并释放</button>
+    </section>
+
+    <section id="metrics-root" aria-label="实时指标"></section>
+
+    <section class="status-row">
+      <span id="scene-label">场景：未启动</span>
+      <span id="switch-count">切换次数：0</span>
+      <span id="audio-state">AudioContext：未创建</span>
+    </section>
+
+    <section class="charts">
+      <div class="chart-card">
+        <h2>活动节点 / 连接趋势（20 次切换）</h2>
+        <canvas id="trend-canvas" width="880" height="240"></canvas>
+      </div>
+      <div class="chart-card">
+        <h2>堆内存趋势</h2>
+        <canvas id="heap-canvas" width="880" height="240"></canvas>
+      </div>
+    </section>
+
+    <section class="log-card">
+      <h2>事件 / 异常日志</h2>
+      <ul id="log-list" class="log-list"></ul>
+    </section>
+
+    <section class="report-card">
+      <h2>固定场景对比报告</h2>
+      <pre id="report-output">尚未运行（点击“循环切换 20 次”后自动生成）</pre>
+    </section>
+  </main>
+  <script type="module" src="./src/main.mjs"></script>
+</body>
+</html>

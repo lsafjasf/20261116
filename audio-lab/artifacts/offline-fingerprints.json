@@ -1,0 +1,90 @@
+{
+  "allEqual": true,
+  "rows": [
+    {
+      "sceneId": "pad",
+      "equal": true,
+      "naiveFingerprint": "pad|11999|0.047674|0.017023|137|684",
+      "managedFingerprint": "pad|11999|0.047674|0.017023|137|684",
+      "rms": 0.01702335961004836,
+      "peak": 0.04767373949289322,
+      "perceptualEqual": true,
+      "perceptual": {
+        "rms": 0.01702335961004836,
+        "peak": 0.04767373949289322,
+        "zeroCrossRate": 0.0057083333333333335,
+        "spectralCentroidBin": 23.428787699421108,
+        "estimatedFundamentalHz": 137,
+        "meanAbs": 0.009722968986721014
+      }
+    },
+    {
+      "sceneId": "pluck",
+      "equal": true,
+      "naiveFingerprint": "pluck|18239|0.028004|0.009435|501|540",
+      "managedFingerprint": "pluck|18239|0.028004|0.009435|501|540",
+      "rms": 0.009435017246613615,
+      "peak": 0.028003674000501633,
+      "perceptualEqual": true,
+      "perceptual": {
+        "rms": 0.009435017246613615,
+        "peak": 0.028003674000501633,
+        "zeroCrossRate": 0.020875,
+        "spectralCentroidBin": 19.38125859600936,
+        "estimatedFundamentalHz": 501.00000000000006,
+        "meanAbs": 0.006152000115918863
+      }
+    },
+    {
+      "sceneId": "arpeggio",
+      "equal": true,
+      "naiveFingerprint": "arpeggio|9599|0.014279|0.003862|3963|0",
+      "managedFingerprint": "arpeggio|9599|0.014279|0.003862|3963|0",
+      "rms": 0.003861633872331099,
+      "peak": 0.014278993010520935,
+      "perceptualEqual": true,
+      "perceptual": {
+        "rms": 0.003861633872331099,
+        "peak": 0.014278993010520935,
+        "zeroCrossRate": 0.165125,
+        "spectralCentroidBin": 25.08936833643387,
+        "estimatedFundamentalHz": 3963,
+        "meanAbs": 0.001628467952502955
+      }
+    },
+    {
+      "sceneId": "bass",
+      "equal": true,
+      "naiveFingerprint": "bass|4799|0.032948|0.006024|53|374",
+      "managedFingerprint": "bass|4799|0.032948|0.006024|53|374",
+      "rms": 0.006023515399463916,
+      "peak": 0.03294845297932625,
+      "perceptualEqual": true,
+      "perceptual": {
+        "rms": 0.006023515399463916,
+        "peak": 0.03294845297932625,
+        "zeroCrossRate": 0.0022083333333333334,
+        "spectralCentroidBin": 28.176396029075107,
+        "estimatedFundamentalHz": 53,
+        "meanAbs": 0.0022036037186889718
+      }
+    },
+    {
+      "sceneId": "bell",
+      "equal": true,
+      "naiveFingerprint": "bell|15358|0.024787|0.008342|633|114",
+      "managedFingerprint": "bell|15358|0.024787|0.008342|633|114",
+      "rms": 0.008342189671876209,
+      "peak": 0.024786679074168205,
+      "perceptualEqual": true,
+      "perceptual": {
+        "rms": 0.008342189671876209,
+        "peak": 0.024786679074168205,
+        "zeroCrossRate": 0.026375,
+        "spectralCentroidBin": 21.206497636933673,
+        "estimatedFundamentalHz": 633,
+        "meanAbs": 0.004966180889384459
+      }
+    }
+  ]
+}

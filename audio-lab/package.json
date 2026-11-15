@@ -1,0 +1,21 @@
+{
+  "name": "audio-lab",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/harness.mjs",
+    "test:e2e": "playwright test",
+    "start": "node tools/server.mjs",
+    "compare": "node tools/compare.mjs",
+    "screenshot": "node tools/screenshot.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@playwright/test": "1.65.1",
+    "playwright": "1.65.1"
+  }
+}
