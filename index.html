@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b1116" />
+    <title>FLT 579 · 双舱协作飞行</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">579</div>
+          <div>
+            <p class="eyebrow">DUAL COCKPIT / FLIGHT SIM</p>
+            <h1>双舱协作飞行</h1>
+          </div>
+        </div>
+        <div class="mission-readout">
+          <div class="readout-cell">
+            <span>任务阶段</span>
+            <strong id="mission-stage" data-testid="mission-stage">起飞前</strong>
+          </div>
+          <div class="readout-cell">
+            <span>任务时钟</span>
+            <strong id="mission-time" data-testid="mission-time">00:00.0</strong>
+          </div>
+          <div class="readout-cell">
+            <span>系统安全</span>
+            <strong id="system-safety" class="safe" data-testid="system-safety">SAFE</strong>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button id="mode-button" class="chip-button" data-testid="mode-button" type="button">
+            双人模式
+          </button>
+          <button id="audio-button" class="chip-button" data-testid="audio-button" type="button">
+            声音 OFF
+          </button>
+          <button id="save-button" class="chip-button" type="button">保存</button>
+          <button id="reset-button" class="chip-button danger" type="button">新任务</button>
+        </div>
+      </header>
+
+      <div id="shared-alert-strip" class="shared-alert-strip" data-testid="shared-alerts">
+        <span class="alert-pulse"></span>
+        <strong>共享告警</strong>
+        <span id="shared-alert-text">两套系统正常，等待滑跑。</span>
+        <span id="debug-badge" class="debug-badge" hidden>单人调试</span>
+      </div>
+
+      <main class="cockpit-grid">
+        <section class="cockpit-panel left-panel" aria-label="左侧驾驶舱：燃油与发动机">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">CAPTAIN / LEFT</p>
+              <h2>燃油 · 发动机</h2>
+            </div>
+            <span class="seat-tag">P1</span>
+          </div>
+          <div class="local-status">
+            <span class="status-dot"></span>
+            <span id="left-status-label">发动机待机</span>
+            <span id="left-durability" data-testid="left-durability">耐久 100%</span>
+          </div>
+
+          <div class="instrument-grid">
+            <div class="digital-gauge accent-amber">
+              <span>N1 转速</span>
+              <strong id="left-rpm" data-testid="left-rpm">0</strong>
+              <small>RPM</small>
+              <div class="bar"><i id="left-rpm-bar"></i></div>
+            </div>
+            <div class="digital-gauge accent-amber">
+              <span>燃油余量</span>
+              <strong id="left-fuel" data-testid="left-fuel">100.0</strong>
+              <small>%</small>
+              <div class="bar"><i id="left-fuel-bar"></i></div>
+            </div>
+            <div class="digital-gauge">
+              <span>推力</span>
+              <strong id="left-thrust" data-testid="left-thrust">0</strong>
+              <small>kN</small>
+            </div>
+            <div class="digital-gauge">
+              <span>排气温度</span>
+              <strong id="left-egt" data-testid="left-egt">42</strong>
+              <small>°C</small>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-label">
+              <span>发动机推力</span>
+              <output id="left-throttle-output">0%</output>
+            </div>
+            <input
+              id="left-throttle"
+              data-testid="left-throttle"
+              class="range amber"
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              value="0"
+              aria-label="左侧发动机推力"
+            />
+            <div class="nudge-row">
+              <button type="button" data-source="left" data-action="throttle" data-delta="-2">−</button>
+              <span class="key-hint"><kbd>W</kbd> / <kbd>S</kbd></span>
+              <button type="button" data-source="left" data-action="throttle" data-delta="2">＋</button>
+            </div>
+          </div>
+
+          <div class="control-group compact">
+            <div class="control-label">
+              <span>燃油泵</span>
+              <output id="left-pump-output">55%</output>
+            </div>
+            <input
+              id="left-fuel-pump"
+              data-testid="left-fuel-pump"
+              class="range amber"
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              value="55"
+              aria-label="左侧燃油泵"
+            />
+            <span class="key-hint small"><kbd>Q</kbd> / <kbd>E</kbd></span>
+          </div>
+        </section>
+
+        <section class="center-stack">
+          <div class="canvas-frame">
+            <canvas id="flight-canvas" aria-label="飞机姿态、发动机、液压与仪表"></canvas>
+            <div class="canvas-top-hud">
+              <span>姿态 <strong id="attitude-value" data-testid="attitude">0.0°</strong></span>
+              <span>高度 <strong id="altitude-value" data-testid="altitude">0 m</strong></span>
+              <span>速度 <strong id="speed-value" data-testid="speed">0 m/s</strong></span>
+            </div>
+            <div id="replay-frame-badge" class="replay-frame-badge" hidden>回放</div>
+            <div id="conflict-overlay" class="conflict-overlay" hidden></div>
+            <div id="mission-result" class="mission-result" hidden>
+              <p class="eyebrow" id="result-eyebrow">MISSION COMPLETE</p>
+              <h3 id="result-title">安全降落</h3>
+              <p id="result-copy"></p>
+              <div class="result-actions">
+                <button id="replay-result" type="button">回放本局</button>
+                <button id="new-result" type="button" class="ghost">再来一次</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="mission-progress">
+            <div class="progress-copy">
+              <span>任务进度</span>
+              <strong id="progress-label" data-testid="progress">0%</strong>
+            </div>
+            <div class="progress-track"><i id="progress-fill"></i></div>
+            <p id="director-hint">左侧推到 65% 以上，开始起飞滑跑。</p>
+          </div>
+
+          <div class="replay-console">
+            <div class="console-heading">
+              <div>
+                <p class="eyebrow">DETERMINISTIC REPLAY</p>
+                <h3>统一时间线</h3>
+              </div>
+              <div class="replay-integrity">
+                <span id="replay-hash" data-testid="replay-hash">LIVE</span>
+                <em id="replay-integrity-label">只读校验</em>
+              </div>
+            </div>
+            <div class="replay-source-row">
+              <button id="load-success-demo" class="small-button" data-testid="load-success-demo" type="button">
+                成功回放
+              </button>
+              <button id="load-failure-demo" class="small-button" data-testid="load-failure-demo" type="button">
+                失败回放
+              </button>
+              <button id="load-current-replay" class="small-button" type="button">本局回放</button>
+              <button id="exit-replay" class="small-button ghost" type="button" hidden>返回任务</button>
+            </div>
+            <div class="replay-controls">
+              <button id="replay-play" data-testid="replay-play" type="button" aria-label="播放或暂停">▶</button>
+              <button id="replay-back" type="button" aria-label="后退一帧">◀︎</button>
+              <button id="replay-step" data-testid="replay-step" type="button" aria-label="前进一帧">▶︎</button>
+              <div class="speed-group" role="group" aria-label="回放速度">
+                <button type="button" data-speed="0.5">0.5×</button>
+                <button type="button" data-speed="1" class="active">1×</button>
+                <button type="button" data-speed="2">2×</button>
+                <button type="button" data-speed="4">4×</button>
+              </div>
+              <input
+                id="replay-scrub"
+                class="range replay-range"
+                type="range"
+                min="0"
+                max="1000"
+                value="0"
+                aria-label="回放进度"
+              />
+              <span id="replay-time" data-testid="replay-time">LIVE</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="cockpit-panel right-panel" aria-label="右侧驾驶舱：液压与起落架">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">FIRST OFFICER / RIGHT</p>
+              <h2>液压 · 起落架</h2>
+            </div>
+            <span class="seat-tag teal">P2</span>
+          </div>
+          <div class="local-status">
+            <span class="status-dot teal"></span>
+            <span id="right-status-label">液压待机</span>
+            <span id="right-durability" data-testid="right-durability">耐久 100%</span>
+          </div>
+
+          <div class="instrument-grid">
+            <div class="digital-gauge accent-teal">
+              <span>液压压力</span>
+              <strong id="right-pressure" data-testid="right-pressure">0</strong>
+              <small>bar</small>
+              <div class="bar teal"><i id="right-pressure-bar"></i></div>
+            </div>
+            <div class="digital-gauge accent-teal">
+              <span>起落架</span>
+              <strong id="right-gear" data-testid="right-gear">DOWN</strong>
+              <small id="right-gear-detail">锁定</small>
+              <div class="bar teal"><i id="right-gear-bar"></i></div>
+            </div>
+            <div class="digital-gauge">
+              <span>泵流量</span>
+              <strong id="right-pump" data-testid="right-pump">0</strong>
+              <small>%</small>
+            </div>
+            <div class="digital-gauge">
+              <span>油液温度</span>
+              <strong id="right-temp" data-testid="right-temp">38</strong>
+              <small>°C</small>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-label">
+              <span>液压泵</span>
+              <output id="right-hydraulic-output">50%</output>
+            </div>
+            <input
+              id="right-hydraulic"
+              data-testid="right-hydraulic"
+              class="range teal"
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              value="50"
+              aria-label="右侧液压泵"
+            />
+            <div class="nudge-row">
+              <button type="button" data-source="right" data-action="hydraulic" data-delta="-2">−</button>
+              <span class="key-hint"><kbd>↑</kbd> / <kbd>↓</kbd></span>
+              <button type="button" data-source="right" data-action="hydraulic" data-delta="2">＋</button>
+            </div>
+          </div>
+
+          <button id="gear-toggle" class="gear-toggle" data-testid="gear-toggle" type="button">
+            <span>起落架手柄</span>
+            <strong id="gear-handle-label">DOWN</strong>
+            <small><kbd>G</kbd> 切换</small>
+          </button>
+        </section>
+      </main>
+
+      <footer class="lower-deck">
+        <section class="timeline-panel">
+          <div class="section-heading">
+            <h3>同步事件</h3>
+            <span id="timeline-count">0 events</span>
+          </div>
+          <ol id="event-list" class="event-list"></ol>
+        </section>
+        <section class="guide-panel">
+          <div class="section-heading">
+            <h3>飞行主任</h3>
+            <span id="stage-step">STEP 01</span>
+          </div>
+          <ol class="checklist">
+            <li id="check-takeoff">推满左侧推力，离地</li>
+            <li id="check-gear">安全高度后收起落架</li>
+            <li id="check-pattern">完成 10 秒绕飞</li>
+            <li id="check-landing">进近放轮，轻触地</li>
+          </ol>
+          <p class="mode-help" id="mode-help">
+            双人：P1 使用 W/S · Q/E，P2 使用 ↑/↓ · G。两侧输入会进入同一时间线。
+          </p>
+        </section>
+        <section class="diagnostic-panel">
+          <div class="section-heading">
+            <h3>时间线诊断</h3>
+            <span id="conflict-count">0 冲突</span>
+          </div>
+          <div id="conflict-card" class="conflict-card" data-testid="conflict-card">
+            <strong>尚未发现顺序敏感动作</strong>
+            <p>同一 tick 的左右输入会做 L→R / R→L 双序比较。</p>
+          </div>
+          <div id="collision-card" class="collision-card">
+            <strong>碰撞结果</strong>
+            <p>尚无碰撞。</p>
+          </div>
+        </section>
+      </footer>
+    </div>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

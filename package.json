@@ -1,0 +1,15 @@
+{
+  "name": "dual-cockpit-flight",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Two-player cockpit survival flight simulator with deterministic replay.",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test tests/simulation.test.mjs tests/persistence.test.mjs",
+    "test:e2e": "node --test tests/e2e.test.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.1"
+  }
+}
