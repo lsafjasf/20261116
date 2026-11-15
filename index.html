@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>程序化视频播放器 · 竞态修复验证</title>
+<style>
+  body { font-family: system-ui, sans-serif; background:#14161a; color:#e6e6e6; margin:0; padding:20px; }
+  h1 { font-size:18px; } h2 { font-size:14px; color:#9ad; margin:14px 0 6px; }
+  .row { display:flex; gap:20px; flex-wrap:wrap; }
+  canvas { background:#000; border-radius:6px; }
+  .panel { background:#1d2026; border:1px solid #2c313a; border-radius:8px; padding:12px 16px; }
+  button, select { background:#2b6cb0; color:#fff; border:0; border-radius:5px; padding:6px 12px; cursor:pointer; }
+  select { background:#2c313a; }
+  input[type=range] { width:320px; }
+  .metrics td { padding:2px 10px 2px 0; font-variant-numeric:tabular-nums; }
+  .metrics td:first-child { color:#8b95a5; }
+  #log { height:150px; overflow:auto; background:#101216; border-radius:6px; padding:8px;
+         font:12px/1.5 monospace; white-space:pre-wrap; }
+  #subtitle { text-align:center; margin-top:6px; color:#ffd76a; min-height:1.4em; }
+  .ok { color:#6f6; } .bad { color:#f66; }
+</style>
+</head>
+<body>
+<h1>程序化视频播放器 · 请求序列 + 取消标记 + 最新帧优先</h1>
+<div class="row">
+  <div>
+    <canvas id="screen" width="320" height="180"></canvas>
+    <div id="subtitle"></div>
+  </div>
+  <div class="panel">
+    <h2>控制</h2>
+    <button id="playBtn">播放</button>
+    <select id="modeSel">
+      <option value="fixed">fixed（优化后）</option>
+      <option value="legacy">legacy（优化前）</option>
+    </select>
+    <select id="latencySel">
+      <option value="normal">延迟 normal</option>
+      <option value="spiky">延迟 spiky</option>
+      <option value="zero">延迟 zero</option>
+    </select>
+    <div style="margin:10px 0">
+      <input id="seekBar" type="range" min="0" max="30" step="0.001" value="0">
+    </div>
+    <div>时间码 <b id="tc">00:00.00</b> ｜ 音频 <b id="audio">0.000s</b> ｜ 状态 <b id="state">暂停</b></div>
+    <h2>可观测指标（实时）</h2>
+    <table class="metrics">
+      <tr><td>帧时间</td><td id="mFrame">-</td></tr>
+      <tr><td>候选 / 丢弃 / 应用</td><td id="mCand">-</td></tr>
+      <tr><td>缓存命中率</td><td id="mHit">-</td></tr>
+      <tr><td>缓存节点数</td><td id="mNodes">-</td></tr>
+      <tr><td>解码总数 / 在途</td><td id="mDec">-</td></tr>
+    </table>
+    <h2>验证</h2>
+    <button id="scrubBtn">快速拖动 ×60</button>
+    <button id="scenarioBtn">运行三场景对比</button>
+  </div>
+</div>
+<h2>日志 / 场景报告</h2>
+<div id="log"></div>
+<script type="module" src="./app.js"></script>
+</body>
+</html>
