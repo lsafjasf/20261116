@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="四轨 Web Audio 混音工作台：通道 EQ、声像、峰值检测、总线压缩、WAV 导出与运行状态自检。"
+    />
+    <title>MIX/04 — 四轨总线工作台</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="MIX/04 首页">
+          <span class="brand-mark">MIX<span>/</span>04</span>
+          <span class="brand-sub">FOUR-TRACK<br />BUS WORKBENCH</span>
+        </a>
+        <div class="topbar-center">
+          <span class="status-dot" id="global-status-dot"></span>
+          <span id="global-status">引擎待命</span>
+          <span class="topbar-separator"></span>
+          <span class="mono muted">20.0 SEC SESSION</span>
+        </div>
+        <nav class="top-actions" aria-label="工程操作">
+          <button class="button button-ghost" id="save-project" type="button">
+            保存工程
+          </button>
+          <button class="button button-ghost" id="load-project" type="button">
+            载入工程
+          </button>
+          <button class="button button-primary" id="export-wav" type="button">
+            导出 WAV
+          </button>
+        </nav>
+      </header>
+
+      <main>
+        <section class="intro">
+          <div class="intro-copy">
+            <p class="eyebrow">
+              <span>SESSION 024</span>
+              <span>104 BPM</span>
+              <span>C MINOR</span>
+            </p>
+            <h1>四轨混音，<br /><em>在一条总线上收束。</em></h1>
+            <p class="intro-note">
+              鼓、贝斯、环境与广播。逐轨塑形，总线压缩，离线核验每一次输出。
+            </p>
+          </div>
+          <div class="session-card">
+            <div class="session-card-head">
+              <span>SESSION MAP</span>
+              <span class="mono" id="session-map-time">00:00.0</span>
+            </div>
+            <div class="session-wave" id="session-wave" aria-hidden="true"></div>
+            <div class="session-beats" id="session-beats" aria-label="节拍点"></div>
+            <div class="session-meta">
+              <span><b id="session-bars">52</b> BARS</span>
+              <span><b>4 / 4</b> METER</span>
+              <span><b>48</b> kHz</span>
+            </div>
+          </div>
+        </section>
+
+        <div class="console-grid">
+          <section class="mixer-panel panel" aria-labelledby="mixer-title">
+            <div class="panel-heading">
+              <div>
+                <p class="section-index">01 / CHANNEL MATRIX</p>
+                <h2 id="mixer-title">四轨输入</h2>
+              </div>
+              <div class="mixer-heading-actions">
+                <span class="hint">拖动推子 · 双击归零</span>
+                <button class="button button-quiet" id="reset-mix" type="button">
+                  重置通道
+                </button>
+              </div>
+            </div>
+
+            <div class="channel-bank" id="channels"></div>
+
+            <div class="transport" aria-label="播放控制">
+              <div class="transport-buttons">
+                <button
+                  class="icon-button"
+                  id="transport-reset"
+                  type="button"
+                  aria-label="回到起点"
+                  title="回到起点"
+                >
+                  <span class="rewind-icon"></span>
+                </button>
+                <button
+                  class="play-button"
+                  id="transport-play"
+                  type="button"
+                  aria-label="播放"
+                >
+                  <span class="play-icon"></span>
+                </button>
+                <button
+                  class="icon-button"
+                  id="transport-stop"
+                  type="button"
+                  aria-label="停止并清理"
+                  title="停止并清理全部节点"
+                >
+                  <span class="stop-icon"></span>
+                </button>
+              </div>
+              <div class="transport-readout">
+                <span class="mono transport-time" id="transport-time">00:00.0</span>
+                <span class="mono muted">/ 00:20.0</span>
+              </div>
+              <div class="transport-scrub">
+                <div class="timeline-ruler" id="timeline-ruler"></div>
+                <input
+                  id="timeline"
+                  class="timeline-input"
+                  type="range"
+                  min="0"
+                  max="20"
+                  step="0.05"
+                  value="0"
+                  aria-label="播放位置"
+                />
+                <div class="timeline-fill" id="timeline-fill"></div>
+                <div class="timeline-head" id="timeline-head"></div>
+              </div>
+              <div class="transport-mode">
+                <button class="mode-button active" id="loop-toggle" type="button">
+                  LOOP
+                </button>
+                <span class="mono muted" id="beat-readout">BEAT 001</span>
+              </div>
+            </div>
+            <div class="mixer-footnote">
+              <div class="footnote-chain" aria-label="通道信号链">
+                <span>INPUT</span><i></i><span>3-BAND EQ</span><i></i
+                ><span>PAN</span><i></i><span>FADER</span><i></i
+                ><span>BUS SEND</span>
+              </div>
+              <div class="footnote-facts">
+                <span>PEAK HOLD <b>900 ms</b></span>
+                <span>TAIL GATE <b>12 ms</b></span>
+                <span>SOLO <b>BUS BYPASS</b></span>
+              </div>
+              <p>独奏试听不经过总线压缩器，避免压缩状态影响单轨判断。</p>
+            </div>
+          </section>
+
+          <aside class="master-stack">
+            <section class="master-panel panel" aria-labelledby="master-title">
+              <div class="panel-heading master-heading">
+                <div>
+                  <p class="section-index">02 / MASTER BUS</p>
+                  <h2 id="master-title">总线压缩</h2>
+                </div>
+                <button
+                  class="bypass-switch"
+                  id="compressor-bypass"
+                  type="button"
+                  role="switch"
+                  aria-checked="false"
+                >
+                  <span class="bypass-led"></span>
+                  <span id="compressor-state">ACTIVE</span>
+                </button>
+              </div>
+
+              <div class="compressor-visual">
+                <div class="compressor-graph-wrap">
+                  <svg
+                    class="compressor-graph"
+                    viewBox="0 0 220 120"
+                    role="img"
+                    aria-label="压缩器传输曲线"
+                  >
+                    <g class="graph-grid">
+                      <path d="M20 20H200M20 60H200M20 100H200" />
+                      <path d="M20 20V100M80 20V100M140 20V100M200 20V100" />
+                    </g>
+                    <path class="graph-unity" d="M20 100L200 20" />
+                    <path class="graph-curve" id="compressor-curve" d="" />
+                    <circle class="graph-point" id="compressor-point" r="3.5" />
+                  </svg>
+                  <span class="graph-label graph-label-y">OUTPUT</span>
+                  <span class="graph-label graph-label-x">INPUT</span>
+                </div>
+                <div class="gain-reduction">
+                  <span class="meter-caption">GAIN REDUCTION</span>
+                  <div class="gr-meter">
+                    <span id="gr-fill"></span>
+                  </div>
+                  <strong class="mono" id="gr-readout">0.0 <small>dB</small></strong>
+                </div>
+              </div>
+
+              <div class="compressor-controls" id="compressor-controls"></div>
+            </section>
+
+            <section class="runtime-panel panel" aria-labelledby="runtime-title">
+              <div class="panel-heading compact">
+                <div>
+                  <p class="section-index">03 / RUNTIME</p>
+                  <h2 id="runtime-title">运行状态</h2>
+                </div>
+                <span class="health-badge" id="health-badge">HEALTHY</span>
+              </div>
+              <div class="runtime-grid">
+                <div class="runtime-stat">
+                  <span class="runtime-label">ACTIVE NODES</span>
+                  <strong class="mono" id="active-nodes">0</strong>
+                  <span class="runtime-detail" id="node-detail">0 个已释放</span>
+                </div>
+                <div class="runtime-stat">
+                  <span class="runtime-label">LISTENERS</span>
+                  <strong class="mono" id="listener-count">0</strong>
+                  <span class="runtime-detail">重复监听检测</span>
+                </div>
+                <div class="runtime-stat">
+                  <span class="runtime-label">AUDIO CONTEXT</span>
+                  <strong class="runtime-value" id="context-state">SUSPENDED</strong>
+                  <span class="runtime-detail" id="sample-rate">48.0 kHz</span>
+                </div>
+                <div class="runtime-stat">
+                  <span class="runtime-label">SCHEDULER</span>
+                  <strong class="runtime-value" id="scheduler-state">IDLE</strong>
+                  <span class="runtime-detail" id="scheduler-detail">0 次漏排</span>
+                </div>
+              </div>
+              <div class="chain-view" aria-label="播放链路">
+                <span class="chain-node">SOURCE</span>
+                <i></i>
+                <span class="chain-node">EQ</span>
+                <i></i>
+                <span class="chain-node">PAN</span>
+                <i></i>
+                <span class="chain-node chain-node-hot">BUS</span>
+                <i></i>
+                <span class="chain-node">OUT</span>
+                <span class="chain-state" id="chain-state">READY</span>
+              </div>
+              <p class="runtime-message" id="runtime-message">
+                按下播放以初始化音频上下文。
+              </p>
+            </section>
+          </aside>
+        </div>
+
+        <div class="analysis-grid">
+          <section class="analysis-panel panel" aria-labelledby="analysis-title">
+            <div class="panel-heading">
+              <div>
+                <p class="section-index">04 / OFFLINE ANALYSIS</p>
+                <h2 id="analysis-title">20 秒 A/B 核验</h2>
+              </div>
+              <button class="button button-outline" id="run-comparison" type="button">
+                重建对比
+              </button>
+            </div>
+            <p class="panel-note">
+              同一编曲分别通过旁路与总线压缩器离线渲染，测量真实峰值与
+              K 加权综合响度。
+            </p>
+            <div class="compare-table" role="table" aria-label="压缩前后对比">
+              <div class="compare-row compare-head" role="row">
+                <span role="columnheader">PATH</span>
+                <span role="columnheader">TRUE PEAK</span>
+                <span role="columnheader">LOUDNESS</span>
+                <span role="columnheader">GAIN REDUCTION</span>
+                <span role="columnheader">WAV DURATION</span>
+              </div>
+              <div class="compare-row" role="row">
+                <span class="path-name" role="cell"
+                  ><i class="legend-dot legend-a"></i>压缩旁路</span
+                >
+                <strong class="mono" id="bypass-peak" data-label="TRUE PEAK" role="cell">— dBFS</strong>
+                <strong class="mono" id="bypass-loudness" data-label="LOUDNESS" role="cell">— LUFS</strong>
+                <strong class="mono" data-label="GAIN REDUCTION" role="cell">0.0 dB</strong>
+                <strong class="mono" id="bypass-duration" data-label="WAV DURATION" role="cell">—</strong>
+              </div>
+              <div class="compare-row" role="row">
+                <span class="path-name" role="cell"
+                  ><i class="legend-dot legend-b"></i>总线压缩</span
+                >
+                <strong class="mono" id="compressed-peak" data-label="TRUE PEAK" role="cell">— dBFS</strong>
+                <strong class="mono" id="compressed-loudness" data-label="LOUDNESS" role="cell"
+                  >— LUFS</strong
+                >
+                <strong class="mono" id="compressed-gr" data-label="GAIN REDUCTION" role="cell">— dB</strong>
+                <strong class="mono" id="compressed-duration" data-label="WAV DURATION" role="cell">—</strong>
+              </div>
+            </div>
+            <div class="analysis-footer">
+              <div class="analysis-delta">
+                <span>PEAK Δ</span>
+                <strong class="mono" id="peak-delta">—</strong>
+              </div>
+              <div class="analysis-delta">
+                <span>LOUDNESS Δ</span>
+                <strong class="mono" id="loudness-delta">—</strong>
+              </div>
+              <div class="analysis-delta">
+                <span>ANALYSIS</span>
+                <strong class="mono" id="analysis-state">NOT RUN</strong>
+              </div>
+            </div>
+          </section>
+
+          <section class="validation-panel panel" aria-labelledby="validation-title">
+            <div class="panel-heading">
+              <div>
+                <p class="section-index">05 / STRESS LAB</p>
+                <h2 id="validation-title">生命周期自检</h2>
+              </div>
+              <button class="button button-signal" id="run-validation" type="button">
+                运行全部
+              </button>
+            </div>
+            <p class="panel-note">
+              验证输入中断、节点销毁与重复启动。每一项都必须以零尾音、零遗漏节点和稳定监听数结束。
+            </p>
+            <div class="validation-list" id="validation-list">
+              <div class="validation-item" data-test="interrupt">
+                <span class="validation-icon"></span>
+                <div>
+                  <strong>输入中断</strong>
+                  <p>切断输入后 120 ms 检查尾音与调度器</p>
+                </div>
+                <span class="test-state">WAITING</span>
+              </div>
+              <div class="validation-item" data-test="destruction">
+                <span class="validation-icon"></span>
+                <div>
+                  <strong>节点销毁</strong>
+                  <p>停止后核对活动节点与连接数归零</p>
+                </div>
+                <span class="test-state">WAITING</span>
+              </div>
+              <div class="validation-item" data-test="repeat">
+                <span class="validation-icon"></span>
+                <div>
+                  <strong>重复启动</strong>
+                  <p>连续启停三次，监听器数量保持不变</p>
+                </div>
+                <span class="test-state">WAITING</span>
+              </div>
+            </div>
+            <div class="validation-summary">
+              <div>
+                <span class="meter-caption">LAST RUN</span>
+                <strong class="mono" id="validation-result">NOT RUN</strong>
+              </div>
+              <div>
+                <span class="meter-caption">RESIDUAL TAIL</span>
+                <strong class="mono" id="tail-result">—</strong>
+              </div>
+              <button class="text-button" id="simulate-interrupt" type="button">
+                仅模拟输入中断 ↗
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <section class="snapshot-panel panel" aria-labelledby="snapshot-title">
+          <div class="snapshot-intro">
+            <p class="section-index">06 / SNAPSHOT</p>
+            <h2 id="snapshot-title">工程快照</h2>
+            <p>
+              保存全部通道与总线参数，再恢复一次。核对节拍点、声像、增益与导出时长。
+            </p>
+          </div>
+          <div class="snapshot-flow" aria-label="快照流程">
+            <div class="snapshot-step">
+              <span class="step-number">01</span>
+              <span>捕获参数</span>
+              <strong class="mono" id="snapshot-created">NOT SAVED</strong>
+            </div>
+            <span class="snapshot-arrow">→</span>
+            <div class="snapshot-step">
+              <span class="step-number">02</span>
+              <span>从快照恢复</span>
+              <strong class="mono" id="snapshot-status">IDLE</strong>
+            </div>
+            <span class="snapshot-arrow">→</span>
+            <div class="snapshot-step">
+              <span class="step-number">03</span>
+              <span>逐项比对</span>
+              <strong class="mono" id="snapshot-diff">0 MISMATCH</strong>
+            </div>
+          </div>
+          <div class="snapshot-actions">
+            <button class="button button-outline" id="capture-snapshot" type="button">
+              保存快照
+            </button>
+            <button class="button button-outline" id="restore-snapshot" type="button">
+              恢复并验证
+            </button>
+          </div>
+          <div class="snapshot-report" id="snapshot-report">
+            尚未捕获快照。参数恢复后会在此显示节拍点、声像、增益与文件时长的一致性。
+          </div>
+        </section>
+
+        <footer class="footer">
+          <span>MIX/04 · LOCAL AUDIO WORKSTATION</span>
+          <span class="mono">WEB AUDIO API / OFFLINE RENDER / 32-BIT FLOAT</span>
+          <span id="footer-clock">LAST ACTION —</span>
+        </footer>
+      </main>
+    </div>
+
+    <div class="toast-region" id="toast-region" aria-live="polite"></div>
+    <script src="audio-engine.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
