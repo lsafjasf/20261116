@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Web Audio 八键合成器</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>八键合成器 <small>纯 Web Audio</small></h1>
+    <div id="status" class="status"></div>
+  </header>
+
+  <main>
+    <section class="stage">
+      <canvas id="keyboard" width="760" height="180"></canvas>
+      <div class="hint">键盘演奏：A S D F G H J K（点击琴键亦可），数字 1-8 选择编辑目标键</div>
+      <canvas id="waveform" width="760" height="120"></canvas>
+      <canvas id="track" width="760" height="160"></canvas>
+      <div class="transport">
+        <button id="btn-record">● 录音</button>
+        <button id="btn-play">▶ 播放</button>
+        <button id="btn-pause">⏸ 暂停</button>
+        <button id="btn-stop">⏹ 停止</button>
+        <button id="btn-export">⬇ 导出 WAV</button>
+        <span id="transport-info"></span>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <h2>键参数 <span id="key-label"></span></h2>
+      <div class="row">
+        <label>波形</label>
+        <select id="p-waveform"></select>
+      </div>
+      <div class="row"><label>音高偏移</label><input id="p-pitch" type="range" min="-12" max="12" step="1" /><span></span></div>
+      <div class="row"><label>起音 A</label><input id="p-attack" type="range" min="0.001" max="1" step="0.001" /><span></span></div>
+      <div class="row"><label>衰减 D</label><input id="p-decay" type="range" min="0.001" max="1" step="0.001" /><span></span></div>
+      <div class="row"><label>延音 S</label><input id="p-sustain" type="range" min="0" max="1" step="0.01" /><span></span></div>
+      <div class="row"><label>释音 R</label><input id="p-release" type="range" min="0.005" max="2" step="0.005" /><span></span></div>
+      <div class="row">
+        <label>滤波类型</label>
+        <select id="p-filtertype">
+          <option value="lowpass">lowpass</option>
+          <option value="highpass">highpass</option>
+          <option value="bandpass">bandpass</option>
+        </select>
+      </div>
+      <div class="row"><label>滤波频率</label><input id="p-filterfreq" type="range" min="80" max="12000" step="1" /><span></span></div>
+      <div class="row"><label>滤波 Q</label><input id="p-filterq" type="range" min="0.1" max="18" step="0.1" /><span></span></div>
+      <div class="row"><label>滑音</label><input id="p-glide" type="range" min="0" max="1" step="0.01" /><span></span></div>
+      <div class="row"><label>声像</label><input id="p-pan" type="range" min="-1" max="1" step="0.01" /><span></span></div>
+      <div class="row"><label>增益</label><input id="p-gain" type="range" min="0" max="1" step="0.01" /><span></span></div>
+
+      <h2>预设</h2>
+      <div class="row presets" id="presets"></div>
+
+      <h2>工程快照</h2>
+      <div class="row">
+        <button id="btn-snap-save">保存快照</button>
+        <button id="btn-snap-load">恢复快照</button>
+      </div>
+      <div class="row">
+        <button id="btn-snap-file">下载工程</button>
+        <label class="file-label">载入工程<input id="file-project" type="file" accept=".json" /></label>
+      </div>
+      <div id="snap-info"></div>
+    </aside>
+  </main>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
