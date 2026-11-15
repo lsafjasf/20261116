@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="回声修复室：对损坏的模拟录音与影像进行判读、修复、归档与检索。"
+    />
+    <title>回声修复室 · SIGNAL RESTORATION UNIT 07</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23080a08'/%3E%3Ccircle cx='32' cy='32' r='21' fill='none' stroke='%23c8ff5a' stroke-width='2'/%3E%3Cpath d='M18 32h7l4-11 6 23 5-16 3 4h4' fill='none' stroke='%23c8ff5a' stroke-width='3'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <div class="noise-layer" aria-hidden="true"></div>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-block">
+          <div class="brand-mark" aria-hidden="true">
+            <span class="brand-ring"></span>
+            <span class="brand-core">SR</span>
+            <span class="brand-unit">07</span>
+          </div>
+          <div class="brand-copy">
+            <p class="eyebrow">SIGNAL RESTORATION UNIT</p>
+            <h1>回声修复室</h1>
+          </div>
+        </div>
+
+        <div class="mission-block">
+          <span class="section-label"><i></i> 当前目标</span>
+          <p id="current-goal">载入受损样本</p>
+          <div class="mission-meta">
+            <span id="current-case">RAIN-017 / 雨棚</span>
+            <span id="state-pill" class="state-pill">待修复</span>
+          </div>
+        </div>
+
+        <div class="resource-strip" aria-label="关键资源">
+          <div class="resource-item">
+            <span class="resource-head">算力余量 <b id="cpu-value">260</b></span>
+            <div class="resource-track"><i id="cpu-bar"></i></div>
+            <small>GOPS</small>
+          </div>
+          <div class="resource-item">
+            <span class="resource-head">工作缓存 <b id="memory-value">512</b></span>
+            <div class="resource-track"><i id="memory-bar"></i></div>
+            <small>MB</small>
+          </div>
+          <div class="resource-item integrity-resource">
+            <span class="resource-head">素材完整度 <b id="integrity-value">100%</b></span>
+            <div class="resource-track"><i id="integrity-bar"></i></div>
+            <small>READ-ONLY</small>
+          </div>
+        </div>
+
+        <div class="session-block">
+          <span class="section-label">SESSION CLOCK</span>
+          <strong id="session-clock">00:00:00.00</strong>
+          <div class="session-meta">
+            <span id="seed-label">SEED 17042</span>
+            <button id="reset-btn" class="text-button" type="button">重启</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="state-ribbon">
+        <div class="change-mark">
+          <span class="pulse-dot" id="state-pulse"></span>
+          <span class="change-code" id="change-code">SAMPLE READY</span>
+        </div>
+        <p id="last-change">
+          <strong>状态变化</strong>
+          <span id="last-change-text">样本已载入，等待损伤判读</span>
+        </p>
+        <div class="hash-readout">
+          <span>STATE HASH</span>
+          <code id="state-hash">—</code>
+        </div>
+      </div>
+
+      <main class="workspace">
+        <aside class="case-rail">
+          <div class="rail-heading">
+            <div>
+              <span class="section-label">EVIDENCE QUEUE</span>
+              <h2>受损样本 <sup>03</sup></h2>
+            </div>
+            <span class="queue-count" id="queue-count">3</span>
+          </div>
+          <div class="case-list" id="case-list"></div>
+
+          <div class="source-vault">
+            <div class="vault-head">
+              <span class="lock-icon" aria-hidden="true">⌾</span>
+              <div>
+                <span class="section-label">SOURCE VAULT</span>
+                <strong>原始素材只读</strong>
+              </div>
+              <span class="sealed-tag">SEALED</span>
+            </div>
+            <p id="source-description">
+              所有修复均在派生副本执行，原始字节不参与写入。
+            </p>
+            <dl class="vault-data">
+              <div><dt>SOURCE SHA</dt><dd id="source-hash">—</dd></div>
+              <div><dt>DERIVED SHA</dt><dd id="derived-hash">—</dd></div>
+              <div><dt>CODEC</dt><dd>PCM 24/48 · ProRes LT</dd></div>
+            </dl>
+          </div>
+
+          <button class="queue-footer" id="scroll-to-console" type="button">
+            <span><i></i> 修复台在线</span>
+            <span>CONSOLE READY →</span>
+          </button>
+        </aside>
+
+        <section class="stage">
+          <section class="monitor-shell" aria-label="音画监看器">
+            <header class="monitor-top">
+              <div class="monitor-id">
+                <span class="rec-dot"></span>
+                <strong id="monitor-code">RAIN-017</strong>
+                <span id="monitor-location">BLOCK 07 / CAM-B</span>
+              </div>
+              <div class="monitor-flags">
+                <span class="live-flag">DERIVED VIEW</span>
+                <span>25 FPS</span>
+                <span>REC.709</span>
+                <span>DUAL MONO</span>
+              </div>
+            </header>
+
+            <div class="signal-layout">
+              <div class="wave-wrap">
+                <div class="panel-label">
+                  <span>CH A · 音频波形</span>
+                  <span id="wave-state">UNAUDITED</span>
+                </div>
+                <canvas id="waveform-canvas"></canvas>
+                <div class="wave-grid" aria-hidden="true"></div>
+                <div class="wave-tags" id="wave-tags"></div>
+                <div class="wave-axis">
+                  <span>00:00</span><span>00:14</span><span>00:28</span><span>00:42</span>
+                </div>
+              </div>
+
+              <div class="preview-wrap">
+                <div class="panel-label">
+                  <span>FRAME · 监看</span>
+                  <span id="frame-counter">F 0001</span>
+                </div>
+                <canvas id="frame-canvas"></canvas>
+                <div class="preview-vignette" aria-hidden="true"></div>
+                <div class="preview-data">
+                  <span id="preview-timecode">00:00:00:00</span>
+                  <span id="preview-status">RAW DERIVATIVE</span>
+                </div>
+                <div class="corner corner-a"></div>
+                <div class="corner corner-b"></div>
+              </div>
+            </div>
+
+            <div class="filmstrip-wrap">
+              <div class="panel-label">
+                <span>FRAME STRIP · 前后帧连续性</span>
+                <span id="missing-label">—</span>
+              </div>
+              <canvas id="filmstrip-canvas"></canvas>
+              <div class="strip-playhead" id="strip-playhead"></div>
+            </div>
+
+            <div class="transport">
+              <button id="play-btn" class="transport-play" type="button" aria-label="播放">
+                <span id="play-icon">▶</span>
+              </button>
+              <span class="timecode" id="media-time">00:00:00:00</span>
+              <input
+                id="playhead-slider"
+                type="range"
+                min="0"
+                max="42"
+                step="0.01"
+                value="0"
+                aria-label="播放头"
+              />
+              <span class="timecode endpoint" id="media-duration">00:00:42:00</span>
+              <div class="level-meter" aria-hidden="true">
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span>
+              </div>
+              <span class="playback-state" id="playback-state">PAUSED</span>
+            </div>
+          </section>
+
+          <div class="workbench">
+            <section class="diagnosis-card">
+              <header class="card-head">
+                <div>
+                  <span class="section-label">DAMAGE READOUT</span>
+                  <h3>损伤判读</h3>
+                </div>
+                <span class="card-stat" id="diagnosis-stat">0 / 4</span>
+              </header>
+              <p class="card-intro">
+                对照波形与画面异常，标记实际存在的损伤。误判会触发保护锁。
+              </p>
+              <div class="damage-grid" id="damage-grid"></div>
+              <div class="clue-line">
+                <span>OBSERVED</span>
+                <p id="clue-copy">正在分析载入样本的异常通道…</p>
+              </div>
+            </section>
+
+            <section class="integrity-card">
+              <header class="card-head">
+                <div>
+                  <span class="section-label">DERIVATIVE WORKSPACE</span>
+                  <h3>快照与保全</h3>
+                </div>
+                <span class="snapshot-count" id="snapshot-count">0 快照</span>
+              </header>
+              <div class="integrity-grid">
+                <div>
+                  <span>原始素材</span>
+                  <strong class="ok">UNCHANGED</strong>
+                  <small id="vault-verify-hash">sha:—</small>
+                </div>
+                <div>
+                  <span>工作副本</span>
+                  <strong id="workspace-state">CLEAN</strong>
+                  <small id="workspace-repairs">0 工序</small>
+                </div>
+                <div>
+                  <span>随机序列</span>
+                  <strong id="rng-state">RNG 17042</strong>
+                  <small>FIXED STEP 1/30s</small>
+                </div>
+                <div>
+                  <span>可恢复点</span>
+                  <strong id="recovery-state">READY</strong>
+                  <small id="recovery-detail">等待首个工序</small>
+                </div>
+              </div>
+              <div class="snapshot-actions">
+                <button id="undo-btn" class="secondary-button" type="button">
+                  ↶ 撤销 / 恢复快照
+                </button>
+                <span>最后快照保留全部派生状态与资源</span>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <aside class="control-rail">
+          <header class="console-head">
+            <div>
+              <span class="section-label">REPAIR CONSOLE</span>
+              <h2>修复控制台</h2>
+            </div>
+            <span class="console-code">OP-07</span>
+          </header>
+
+          <div class="console-scroll">
+            <div class="sequence-line">
+              <span>修复序列</span>
+              <div id="sequence-dots"></div>
+              <span id="sequence-label">0 / 4</span>
+            </div>
+
+            <section class="tool-stack" id="tool-stack"></section>
+
+            <section class="parameter-card">
+              <header>
+                <div>
+                  <span class="section-label" id="param-domain">AUDIO TOOL</span>
+                  <h3 id="param-tool">频谱去噪</h3>
+                </div>
+                <span class="parameter-live">LIVE PARAM</span>
+              </header>
+              <p id="param-desc">锁定 50 Hz 谐波并重建被掩蔽的声场</p>
+              <div class="value-row">
+                <strong id="param-value">68</strong>
+                <span id="param-unit">%</span>
+                <button id="safe-preset" class="mini-button" type="button">
+                  安全值
+                </button>
+              </div>
+              <input
+                id="param-slider"
+                type="range"
+                min="0"
+                max="100"
+                value="68"
+                step="1"
+                aria-label="修复参数"
+              />
+              <div class="parameter-scale">
+                <span id="param-hard-min">0</span>
+                <span class="safe-window">
+                  安全区 <b id="param-safe-range">20–95%</b>
+                </span>
+                <span id="param-hard-max">100</span>
+              </div>
+              <div class="numeric-param">
+                <label for="param-number">精确输入</label>
+                <input id="param-number" type="number" value="68" />
+                <span id="param-number-unit">%</span>
+              </div>
+            </section>
+
+            <section class="process-card" id="process-card">
+              <div class="process-head">
+                <span class="process-spinner"></span>
+                <div>
+                  <span class="section-label" id="process-stage">PROCESSING</span>
+                  <strong id="process-title">正在重建派生副本</strong>
+                </div>
+                <b id="process-percent">0%</b>
+              </div>
+              <div class="process-track"><i id="process-bar"></i></div>
+              <div class="process-meta">
+                <span id="process-detail">镜像快照已写入</span>
+                <button id="process-toggle" type="button">暂停</button>
+              </div>
+            </section>
+
+            <section class="failure-card" id="failure-card">
+              <span class="failure-code" id="failure-code">PARAM_LIMIT</span>
+              <h3 id="failure-title">参数超出安全边界</h3>
+              <p id="failure-detail">请回滚快照后重新设置。</p>
+              <button id="recover-btn" class="recover-button" type="button">
+                恢复最近快照
+              </button>
+            </section>
+          </div>
+
+          <div class="primary-zone">
+            <p class="primary-hint" id="primary-hint">
+              判读全部损伤后开放修复。
+            </p>
+            <button id="primary-btn" class="primary-button" type="button">
+              <span id="primary-icon">◎</span>
+              <span id="primary-label">等待判读</span>
+              <kbd>ENTER</kbd>
+            </button>
+            <div class="primary-sub">
+              <span id="primary-cost">预算 38 GOPS · 36 MB</span>
+              <span id="primary-checksum">DV: —</span>
+            </div>
+          </div>
+        </aside>
+      </main>
+
+      <footer class="index-dock">
+        <div class="dock-log">
+          <span class="section-label">RECENT SIGNAL</span>
+          <p id="dock-log">等待操作</p>
+        </div>
+        <div class="quick-search">
+          <span aria-hidden="true">⌕</span>
+          <input
+            id="quick-search-input"
+            type="search"
+            placeholder="检索已归档片段：雨棚 / 同步 / 去噪…"
+            autocomplete="off"
+          />
+          <button id="quick-search-btn" type="button">检索</button>
+        </div>
+        <button id="index-btn" class="index-button" type="button">
+          <span>档案索引</span>
+          <b id="archive-count">0</b>
+        </button>
+        <button id="export-index-btn" class="dock-export" type="button">
+          导出 JSON
+        </button>
+      </footer>
+    </div>
+
+    <dialog id="summary-dialog" class="modal summary-modal">
+      <div class="modal-frame">
+        <button class="modal-close" data-close-dialog="summary-dialog" type="button">×</button>
+        <header class="summary-header">
+          <div class="seal-mark" aria-hidden="true"><span>✓</span></div>
+          <div>
+            <span class="section-label">ARCHIVE SEALED</span>
+            <h2>摘要已保存</h2>
+            <p id="summary-subtitle">RAIN-017 · 修复片段已写入只读索引</p>
+          </div>
+          <span class="archive-id" id="summary-archive-id">—</span>
+        </header>
+        <div class="summary-body">
+          <section class="summary-column">
+            <h3>归档摘要</h3>
+            <dl class="summary-list" id="summary-list"></dl>
+            <div class="chain-copy" id="chain-copy"></div>
+          </section>
+          <section class="summary-column fragment-column">
+            <h3>可检索片段 <span id="fragment-count">3</span></h3>
+            <div id="summary-fragments"></div>
+          </section>
+          <section class="summary-column determinism-column">
+            <h3>确定性校验</h3>
+            <div class="hash-box">
+              <span>FINAL STATE HASH</span>
+              <code id="summary-state-hash">—</code>
+            </div>
+            <div class="proof-row" id="replay-proof">
+              <span class="proof-dot"></span>
+              <p>同 seed 与输入记录尚未复跑</p>
+            </div>
+            <button id="replay-btn" class="secondary-button" type="button">
+              同 seed 复跑并校验
+            </button>
+            <button id="download-record-btn" class="text-link" type="button">
+              下载运行记录 JSON ↓
+            </button>
+          </section>
+        </div>
+        <div class="summary-search">
+          <div class="summary-search-head">
+            <span>INDEX SELF-CHECK</span>
+            <strong id="index-check">3 / 3 片段可检索</strong>
+          </div>
+          <div class="summary-search-row">
+            <input id="summary-search-input" type="search" value="雨棚" />
+            <button id="summary-search-btn" type="button">检索</button>
+          </div>
+          <div id="summary-search-results" class="search-results"></div>
+        </div>
+        <footer class="modal-actions">
+          <button id="download-summary-btn" class="secondary-button" type="button">
+            下载摘要 JSON
+          </button>
+          <button id="download-index-btn" class="primary-small-button" type="button">
+            导出完整索引
+          </button>
+        </footer>
+      </div>
+    </dialog>
+
+    <dialog id="index-dialog" class="modal index-modal">
+      <div class="modal-frame">
+        <button class="modal-close" data-close-dialog="index-dialog" type="button">×</button>
+        <header class="index-header">
+          <div>
+            <span class="section-label">SEARCHABLE ARCHIVE INDEX</span>
+            <h2>修复索引</h2>
+            <p>每个可检索片段均保留来源哈希、修复哈希与时间码。</p>
+          </div>
+          <div class="index-summary">
+            <strong id="index-fragment-total">0</strong>
+            <span>FRAGMENTS</span>
+          </div>
+        </header>
+        <div class="index-search-row large">
+          <span aria-hidden="true">⌕</span>
+          <input
+            id="index-search-input"
+            type="search"
+            placeholder="输入标题、片段号、工具或标签"
+            autocomplete="off"
+          />
+          <button id="index-search-btn" type="button">检索</button>
+        </div>
+        <div class="index-chips" id="index-chips"></div>
+        <div id="index-results" class="index-results"></div>
+        <footer class="modal-actions">
+          <span class="index-footnote">READ-ONLY INDEX · deterministic checksum attached</span>
+          <button id="download-index-btn-2" class="primary-small-button" type="button">
+            导出索引 JSON
+          </button>
+        </footer>
+      </div>
+    </dialog>
+
+    <dialog id="reset-dialog" class="modal reset-modal">
+      <div class="modal-frame compact">
+        <button class="modal-close" data-close-dialog="reset-dialog" type="button">×</button>
+        <span class="section-label">FULL SESSION RESET</span>
+        <h2>重启整场修复会话？</h2>
+        <p>
+          计时器、音画播放头、资源额度、快照、随机序列与本场索引将一起复位。下载过的档案不受影响。
+        </p>
+        <div class="reset-proof">
+          <span>将复位</span>
+          <b>00:00:00.00</b>
+          <b>RNG #{seed}</b>
+          <b>260 / 512 / 100</b>
+        </div>
+        <footer class="modal-actions">
+          <button class="secondary-button" data-close-dialog="reset-dialog" type="button">
+            取消
+          </button>
+          <button id="confirm-reset-btn" class="danger-button" type="button">
+            确认重启
+          </button>
+        </footer>
+      </div>
+    </dialog>
+
+    <div id="toast-stack" class="toast-stack" aria-live="polite"></div>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
