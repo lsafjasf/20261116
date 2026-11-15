@@ -1,0 +1,2 @@
+{"name":"two-player-camera-rig","version":"1.0.0","type":"module","private":true,
+"scripts":{"test":"node --test test/sim.test.js","start":"python3 -m http.server 8080"}}

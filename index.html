@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>双人摄影机协作 · 三拍任务</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>双人摄影机协作台</h1>
+    <div class="badges">
+      <span id="order-badge" class="badge">顺序: LR</span>
+      <span id="tick-badge" class="badge">tick 0/900</span>
+      <span id="progress" class="badge">照片 0/3 · 胶片 6 · 耐久 100%</span>
+    </div>
+  </header>
+
+  <main class="rig">
+    <section class="panel">
+      <h2>左侧玩家 · 云台方向</h2>
+      <canvas id="left-panel" width="380" height="360"></canvas>
+      <p class="keys">A/D 水平转向 · W/S 俯仰 · 快速转向产生运动模糊</p>
+    </section>
+
+    <section class="panel viewfinder">
+      <h2>共享取景器</h2>
+      <canvas id="stage" width="720" height="480"></canvas>
+      <p id="status" class="status">等待开始</p>
+    </section>
+
+    <section class="panel">
+      <h2>右侧玩家 · 镜头与曝光</h2>
+      <canvas id="right-panel" width="380" height="360"></canvas>
+      <p class="keys">I/K 对焦 · Q/E 变焦 · T/G 光圈 · R/F 快门速度 · 空格拍摄</p>
+    </section>
+  </main>
+
+  <section class="controls">
+    <div class="group">
+      <h3>录制</h3>
+      <button id="btn-demo-success">运行成功剧本</button>
+      <button id="btn-demo-fail">运行失败剧本</button>
+      <button id="btn-reset">复位</button>
+    </div>
+    <div class="group">
+      <h3>回放（暂停/单步/倍速不改变最终状态）</h3>
+      <button id="btn-replay">完整回放</button>
+      <button id="btn-play">播放/暂停</button>
+      <button id="btn-step">单步</button>
+      <label>倍速
+        <select id="sel-speed">
+          <option value="1">1x</option>
+          <option value="2">2x</option>
+          <option value="4" selected>4x</option>
+        </select>
+      </label>
+      <button id="btn-order">切换左右顺序</button>
+    </div>
+    <div class="group">
+      <h3>存档</h3>
+      <button id="btn-save">立即保存</button>
+      <button id="btn-clear">清除存档</button>
+    </div>
+  </section>
+
+  <section class="conflicts">
+    <h3>动作顺序冲突</h3>
+    <div id="conflict-list"><p class="muted">回放后显示具体冲突时刻与对象位置</p></div>
+  </section>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
