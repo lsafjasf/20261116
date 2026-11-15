@@ -1,0 +1,250 @@
+{
+  "generatedAt": "2026-11-15T18:47:09.965Z",
+  "iterations": 20,
+  "zoom": 3,
+  "queueMaximum": 8,
+  "verification": {
+    "ok": true,
+    "checked": 14,
+    "mismatches": [],
+    "cells": [
+      {
+        "slotId": "tile-0",
+        "timeMs": 0,
+        "timecode": "00:00.000",
+        "key": "neon-orbit|r1|t0|192x108|crop:16:9",
+        "hash": "9956cde3"
+      },
+      {
+        "slotId": "tile-1",
+        "timeMs": 3944,
+        "timecode": "00:03.944",
+        "key": "neon-orbit|r1|t3944|192x108|crop:16:9",
+        "hash": "b43f625d"
+      },
+      {
+        "slotId": "tile-2",
+        "timeMs": 7889,
+        "timecode": "00:07.889",
+        "key": "neon-orbit|r1|t7889|192x108|crop:16:9",
+        "hash": "5db3c92d"
+      },
+      {
+        "slotId": "tile-3",
+        "timeMs": 11833,
+        "timecode": "00:11.833",
+        "key": "neon-orbit|r1|t11833|192x108|crop:16:9",
+        "hash": "b406811e"
+      },
+      {
+        "slotId": "tile-4",
+        "timeMs": 15778,
+        "timecode": "00:15.778",
+        "key": "neon-orbit|r1|t15778|192x108|crop:16:9",
+        "hash": "e5b75fff"
+      },
+      {
+        "slotId": "tile-5",
+        "timeMs": 19722,
+        "timecode": "00:19.722",
+        "key": "neon-orbit|r1|t19722|192x108|crop:16:9",
+        "hash": "a90d4038"
+      },
+      {
+        "slotId": "tile-6",
+        "timeMs": 23667,
+        "timecode": "00:23.667",
+        "key": "neon-orbit|r1|t23667|192x108|crop:16:9",
+        "hash": "2e854f71"
+      },
+      {
+        "slotId": "tile-7",
+        "timeMs": 27611,
+        "timecode": "00:27.611",
+        "key": "neon-orbit|r1|t27611|192x108|crop:16:9",
+        "hash": "6a5e5840"
+      },
+      {
+        "slotId": "tile-8",
+        "timeMs": 31556,
+        "timecode": "00:31.556",
+        "key": "neon-orbit|r1|t31556|192x108|crop:16:9",
+        "hash": "f9952322"
+      },
+      {
+        "slotId": "tile-9",
+        "timeMs": 35500,
+        "timecode": "00:35.500",
+        "key": "neon-orbit|r1|t35500|192x108|crop:16:9",
+        "hash": "e807cf48"
+      },
+      {
+        "slotId": "tile-10",
+        "timeMs": 39444,
+        "timecode": "00:39.444",
+        "key": "neon-orbit|r1|t39444|192x108|crop:16:9",
+        "hash": "7641cbd7"
+      },
+      {
+        "slotId": "tile-11",
+        "timeMs": 43389,
+        "timecode": "00:43.389",
+        "key": "neon-orbit|r1|t43389|192x108|crop:16:9",
+        "hash": "d4c3b3f4"
+      },
+      {
+        "slotId": "tile-12",
+        "timeMs": 47333,
+        "timecode": "00:47.333",
+        "key": "neon-orbit|r1|t47333|192x108|crop:16:9",
+        "hash": "3c5a5a90"
+      },
+      {
+        "slotId": "tile-13",
+        "timeMs": 51278,
+        "timecode": "00:51.278",
+        "key": "neon-orbit|r1|t51278|192x108|crop:16:9",
+        "hash": "f591c951"
+      }
+    ],
+    "verifiedAt": "2026-11-15T18:47:09.957Z"
+  },
+  "allCellsLocked": true,
+  "cellCount": 14,
+  "metrics": {
+    "queueLength": 0,
+    "pending": 0,
+    "active": 0,
+    "staleDrops": 3,
+    "slots": 14,
+    "cache": {
+      "lookups": 114,
+      "hits": 91,
+      "misses": 23,
+      "deduped": 0,
+      "evictions": 0,
+      "invalidations": 0,
+      "failures": 0,
+      "rejected": 0,
+      "size": 23,
+      "capacity": 48,
+      "inflight": 0,
+      "hitRate": 0.7982456140350878,
+      "generation": 0
+    }
+  },
+  "tiles": [
+    {
+      "slotId": "tile-5",
+      "state": "ready",
+      "timeMs": 19722,
+      "frameTimeMs": 19722,
+      "frameKey": "neon-orbit|r1|t19722|192x108|crop:16:9",
+      "key": "neon-orbit|r1|t19722|192x108|crop:16:9"
+    },
+    {
+      "slotId": "tile-6",
+      "state": "ready",
+      "timeMs": 23667,
+      "frameTimeMs": 23667,
+      "frameKey": "neon-orbit|r1|t23667|192x108|crop:16:9",
+      "key": "neon-orbit|r1|t23667|192x108|crop:16:9"
+    },
+    {
+      "slotId": "tile-7",
+      "state": "ready",
+      "timeMs": 27611,
+      "frameTimeMs": 27611,
+      "frameKey": "neon-orbit|r1|t27611|192x108|crop:16:9",
+      "key": "neon-orbit|r1|t27611|192x108|crop:16:9"
+    },
+    {
+      "slotId": "tile-8",
+      "state": "ready",
+      "timeMs": 31556,
+      "frameTimeMs": 31556,
+      "frameKey": "neon-orbit|r1|t31556|192x108|crop:16:9",
+      "key": "neon-orbit|r1|t31556|192x108|crop:16:9"
+    },
+    {
+      "slotId": "tile-9",
+      "state": "ready",
+      "timeMs": 35500,
+      "frameTimeMs": 35500,
+      "frameKey": "neon-orbit|r1|t35500|192x108|crop:16:9",
+      "key": "neon-orbit|r1|t35500|192x108|crop:16:9"
+    },
+    {
+      "slotId": "tile-10",
+      "state": "ready",
+      "timeMs": 39444,
+      "frameTimeMs": 39444,
+      "frameKey": "neon-orbit|r1|t39444|192x108|crop:16:9",
+      "key": "neon-orbit|r1|t39444|192x108|crop:16:9"
+    },
+    {
+      "slotId": "tile-11",
+      "state": "ready",
+      "timeMs": 43389,
+      "frameTimeMs": 43389,
+      "frameKey": "neon-orbit|r1|t43389|192x108|crop:16:9",
+      "key": "neon-orbit|r1|t43389|192x108|crop:16:9"
+    },
+    {
+      "slotId": "tile-12",
+      "state": "ready",
+      "timeMs": 47333,
+      "frameTimeMs": 47333,
+      "frameKey": "neon-orbit|r1|t47333|192x108|crop:16:9",
+      "key": "neon-orbit|r1|t47333|192x108|crop:16:9"
+    },
+    {
+      "slotId": "tile-13",
+      "state": "ready",
+      "timeMs": 51278,
+      "frameTimeMs": 51278,
+      "frameKey": "neon-orbit|r1|t51278|192x108|crop:16:9",
+      "key": "neon-orbit|r1|t51278|192x108|crop:16:9"
+    },
+    {
+      "slotId": "tile-3",
+      "state": "ready",
+      "timeMs": 11833,
+      "frameTimeMs": 11833,
+      "frameKey": "neon-orbit|r1|t11833|192x108|crop:16:9",
+      "key": "neon-orbit|r1|t11833|192x108|crop:16:9"
+    },
+    {
+      "slotId": "tile-4",
+      "state": "ready",
+      "timeMs": 15778,
+      "frameTimeMs": 15778,
+      "frameKey": "neon-orbit|r1|t15778|192x108|crop:16:9",
+      "key": "neon-orbit|r1|t15778|192x108|crop:16:9"
+    },
+    {
+      "slotId": "tile-1",
+      "state": "ready",
+      "timeMs": 3944,
+      "frameTimeMs": 3944,
+      "frameKey": "neon-orbit|r1|t3944|192x108|crop:16:9",
+      "key": "neon-orbit|r1|t3944|192x108|crop:16:9"
+    },
+    {
+      "slotId": "tile-2",
+      "state": "ready",
+      "timeMs": 7889,
+      "frameTimeMs": 7889,
+      "frameKey": "neon-orbit|r1|t7889|192x108|crop:16:9",
+      "key": "neon-orbit|r1|t7889|192x108|crop:16:9"
+    },
+    {
+      "slotId": "tile-0",
+      "state": "ready",
+      "timeMs": 0,
+      "frameTimeMs": 0,
+      "frameKey": "neon-orbit|r1|t0|192x108|crop:16:9",
+      "key": "neon-orbit|r1|t0|192x108|crop:16:9"
+    }
+  ]
+}

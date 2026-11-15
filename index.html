@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <title>Frame Lock · 时间线缓存验证台</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <div>
+            <strong>FRAME LOCK</strong>
+            <span>时间线缩略帧一致性验证台</span>
+          </div>
+        </div>
+        <div class="project-title">
+          <span class="eyebrow">当前工程</span>
+          <strong id="projectName">霓虹轨道</strong>
+          <span id="projectRevision" class="revision">rev 1</span>
+        </div>
+        <div class="metrics" aria-label="缓存指标">
+          <div class="metric">
+            <span>命中率</span>
+            <strong id="hitRate">0.0%</strong>
+          </div>
+          <div class="metric">
+            <span>队列长度</span>
+            <strong id="queueLength">0</strong>
+          </div>
+          <div class="metric">
+            <span>缓存</span>
+            <strong id="cacheSize">0 / 48</strong>
+          </div>
+          <div class="metric">
+            <span>过期丢弃</span>
+            <strong id="staleDrops">0</strong>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button id="snapshotButton" class="button ghost" type="button">下载最近快照</button>
+          <button id="exportButton" class="button primary" type="button">导出 PNG + 快照</button>
+        </div>
+      </header>
+
+      <div id="notice" class="notice" role="status" aria-live="polite" hidden>
+        <span class="notice-icon" aria-hidden="true">!</span>
+        <span id="noticeText"></span>
+        <button id="dismissNotice" class="notice-close" type="button" aria-label="关闭提示">×</button>
+      </div>
+
+      <main class="workspace">
+        <section class="panel preview-panel" aria-labelledby="previewHeading">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">同源渲染预览</span>
+              <h1 id="previewHeading">画布检查器</h1>
+            </div>
+            <div class="preview-controls">
+              <label class="field">
+                <span>裁切比例</span>
+                <select id="cropSelect">
+                  <option value="16:9">16:9 · 横屏</option>
+                  <option value="9:16">9:16 · 竖屏</option>
+                  <option value="1:1">1:1 · 方形</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <div class="preview-stage" id="previewStage">
+            <canvas id="previewCanvas" width="960" height="540"></canvas>
+            <span class="render-tag">PREVIEW · SAME RENDERER</span>
+          </div>
+          <div class="transport">
+            <button id="playButton" class="transport-button" type="button" aria-label="播放">▶</button>
+            <code id="currentTimecode">00:00.000</code>
+            <input id="timeSlider" type="range" min="0" max="120000" step="10" value="0" aria-label="播放头" />
+            <span id="outputSize" class="size-label">960 × 540</span>
+          </div>
+        </section>
+
+        <aside class="panel inspector" aria-labelledby="inspectorHeading">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">工程结构</span>
+              <h2 id="inspectorHeading">图层与关键帧</h2>
+            </div>
+            <button id="addKeyframeButton" class="button small" type="button">+ 关键帧</button>
+          </div>
+          <div id="layerList" class="layer-list" aria-label="图层列表"></div>
+          <div class="layer-editor">
+            <div class="editor-header">
+              <strong id="selectedLayerName">未选择图层</strong>
+              <span id="selectedLayerId" class="mono-cell">—</span>
+            </div>
+            <div class="editor-grid">
+              <label class="field">
+                <span>X 坐标</span>
+                <input id="layerX" type="number" step="1" />
+              </label>
+              <label class="field">
+                <span>Y 坐标</span>
+                <input id="layerY" type="number" step="1" />
+              </label>
+              <label class="field">
+                <span>颜色</span>
+                <input id="layerColor" type="color" />
+              </label>
+              <label class="field">
+                <span>不透明度</span>
+                <input id="layerOpacity" type="number" min="0" max="1" step="0.05" />
+              </label>
+            </div>
+            <p id="keyframeInfo" class="keyframe-info">在播放头位置新增或更新关键帧。</p>
+          </div>
+        </aside>
+      </main>
+
+      <section class="panel timeline-panel" aria-labelledby="timelineHeading">
+        <div class="timeline-heading">
+          <div>
+            <span class="eyebrow">视频时间线 · 120 秒</span>
+            <h2 id="timelineHeading">缩略帧轨</h2>
+          </div>
+          <div class="timeline-status">
+            <span class="status-dot" id="timelineDot"></span>
+            <span id="timelineStatus">等待缩略帧</span>
+          </div>
+          <div class="timeline-actions">
+            <label class="zoom-control">
+              <span>缩放</span>
+              <input id="zoomSlider" type="range" min="0.5" max="4" step="0.1" value="1" />
+              <output id="zoomOutput">1.0×</output>
+            </label>
+            <button id="retryButton" class="button ghost small" type="button">重试失效帧</button>
+            <button id="invalidateButton" class="button danger small" type="button">模拟缓存失效</button>
+          </div>
+        </div>
+        <div id="timelineScroll" class="timeline-scroll" tabindex="0" aria-label="可拖动时间线">
+          <div id="timelineContent" class="timeline-content">
+            <div id="ruler" class="ruler" aria-hidden="true"></div>
+            <div id="thumbnailRow" class="thumbnail-row" aria-label="缩略帧"></div>
+            <div id="trackArea" class="track-area" aria-label="图层轨道"></div>
+            <div id="playhead" class="playhead" aria-hidden="true"></div>
+          </div>
+        </div>
+        <div class="timeline-footer">
+          <span>拖动时间线快速平移 · 缩略帧按“时间 + 分辨率 + 裁切”键控</span>
+          <span id="lastAction">相机已就绪</span>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <span id="exportStatus">导出会先冻结工程快照，再用预览同源渲染器逐像素校验。</span>
+        <span id="verificationStatus" class="verification">尚未执行缩略帧一致性验证</span>
+      </footer>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
