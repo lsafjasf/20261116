@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>无缝可平铺织物材质工作台</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>无缝可平铺织物材质工作台</h1>
+      <div class="top-actions">
+        <button id="btn-restore" type="button">一键恢复对照参数</button>
+        <button id="btn-export-png" type="button">导出 1024 PNG</button>
+        <button id="btn-export-json" type="button">导出参数 JSON</button>
+        <label class="file-btn">
+          导入 JSON
+          <input id="file-json" type="file" accept="application/json,.json" hidden />
+        </label>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="panel controls">
+        <h2>材质参数</h2>
+        <div class="control">
+          <label for="density">线密 threadDensity（仅 1024 约数）</label>
+          <input id="density" type="range" min="0" max="5" step="1" value="3" />
+          <output id="density-val">64</output>
+        </div>
+        <div class="control">
+          <label for="direction">纤维方向 fiberDirection（度）</label>
+          <input id="direction" type="range" min="-90" max="90" step="1" value="0" />
+          <output id="direction-val">0</output>
+        </div>
+        <div class="control">
+          <label for="wear">磨损程度 wearLevel</label>
+          <input id="wear" type="range" min="0" max="1" step="0.01" value="0.35" />
+          <output id="wear-val">0.35</output>
+        </div>
+        <div class="control">
+          <label for="crease">折痕强度 creaseStrength</label>
+          <input id="crease" type="range" min="0" max="1" step="0.01" value="0.4" />
+          <output id="crease-val">0.40</output>
+        </div>
+        <div class="control">
+          <label for="seed">种子 seed</label>
+          <input id="seed" type="text" value="fabric-001" />
+        </div>
+
+        <h2>预设对照</h2>
+        <div id="presets" class="presets"></div>
+
+        <h2>局部刷子（环面同步）</h2>
+        <div class="control row">
+          <label>笔刷半径</label>
+          <input id="brush-size" type="range" min="8" max="120" step="1" value="40" />
+          <output id="brush-size-val">40</output>
+        </div>
+        <div class="control row">
+          <button id="btn-brush" type="button" class="toggle on">刷子：开</button>
+          <button id="btn-clear-brush" type="button">清除刷子</button>
+        </div>
+        <p class="hint">在平面预览上拖动即绘制；跨越四边的笔画会自动出现在对侧。</p>
+      </section>
+
+      <section class="panel previews">
+        <div class="view">
+          <h2>平面预览（单 tile + 3×3 平铺）</h2>
+          <canvas id="flat-canvas" width="512" height="512"></canvas>
+          <canvas id="tile-canvas" width="320" height="320" title="3×3 平铺，用于目检接缝"></canvas>
+        </div>
+        <div class="view">
+          <h2>曲面预览（环绕圆柱，验证贴图不重复显形）</h2>
+          <canvas id="curved-canvas" width="512" height="320"></canvas>
+        </div>
+      </section>
+
+      <section class="panel metrics">
+        <h2>页面内测量</h2>
+        <div id="metric-grid" class="metric-grid"></div>
+
+        <h2>场景对象与增量更新</h2>
+        <div id="scene-grid" class="metric-grid"></div>
+
+        <h2>三类场景测试</h2>
+        <div class="test-actions">
+          <button id="btn-test-normal" type="button">普通场景</button>
+          <button id="btn-test-boundary" type="button">边界场景</button>
+          <button id="btn-test-failure" type="button">失败场景</button>
+          <button id="btn-test-all" type="button" class="primary">运行全部并对照</button>
+        </div>
+        <div id="test-results"></div>
+
+        <h2>算法状态摘要</h2>
+        <pre id="state-summary" class="summary"></pre>
+      </section>
+    </main>
+
+    <script type="module" src="js/ui/app.js"></script>
+  </body>
+</html>

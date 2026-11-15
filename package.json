@@ -1,0 +1,11 @@
+{
+  "name": "seamless-fabric-material",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Seamless tileable procedural fabric material (warp/weft, fuzz, wear, crease) with toroidal brush, incremental dirty-block updates and in-page measurement.",
+  "scripts": {
+    "test": "node tests/run.mjs && node tests/harness-node.mjs",
+    "smoke": "node tests/smoke.mjs"
+  }
+}
