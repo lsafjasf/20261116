@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" role="img" aria-label="角色与旧录音机设定图">
+  <rect width="320" height="240" fill="#eee9db"/>
+  <path d="M0 24h320M0 216h320M26 0v240M294 0v240" stroke="#c8c0ad"/>
+  <circle cx="92" cy="75" r="33" fill="#183b3a"/>
+  <path d="M65 74c5-35 50-42 57-4-12-8-16-16-16-16-3 13-25 20-41 20z" fill="#17201f"/>
+  <path d="M62 126c5-28 20-42 31-42 15 0 29 16 33 42l8 72H55z" fill="#a6462b"/>
+  <path d="M72 115c15 9 32 9 47 0" fill="none" stroke="#7d2819" stroke-width="4"/>
+  <circle cx="76" cy="78" r="2.5" fill="#17201f"/>
+  <circle cx="105" cy="78" r="2.5" fill="#17201f"/>
+  <path d="M84 93c5 3 9 3 14 0" fill="none" stroke="#17201f" stroke-width="2"/>
+  <rect x="184" y="89" width="83" height="61" rx="7" fill="#9fa6a1" stroke="#4c5753" stroke-width="2"/>
+  <rect x="194" y="99" width="63" height="25" rx="3" fill="#38423f"/>
+  <circle cx="204" cy="137" r="4" fill="#2f3735"/>
+  <circle cx="218" cy="137" r="4" fill="#2f3735"/>
+  <path d="M242 130h15v19h-15z" fill="#6d756f"/>
+  <path d="M177 164h96" stroke="#5a7f78" stroke-width="2"/>
+  <path d="M184 172h34M184 180h61" stroke="#9b9587"/>
+  <text x="184" y="76" fill="#4f625d" font-family="sans-serif" font-size="10">RECORDER / 02</text>
+</svg>

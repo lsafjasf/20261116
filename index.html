@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>同页 · 本地协作工作台</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%230b6b5d'/%3E%3Cpath d='M18 22h28v5H18zm0 11h19v5H18zm0 11h28v5H18z' fill='%23fffdf7'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#workspace">跳到编辑工作区</a>
+
+    <header class="app-header">
+      <div class="brand-block">
+        <span class="brand-mark" aria-hidden="true">同</span>
+        <div>
+          <p class="eyebrow">LOCAL-FIRST STUDIO</p>
+          <h1>同页 <span>协作工作台</span></h1>
+        </div>
+      </div>
+
+      <div class="sync-cluster">
+        <div id="syncBadge" class="status-chip status-ok" role="status" aria-live="polite">
+          <span class="status-symbol" aria-hidden="true">●</span>
+          <span id="syncBadgeText">正在连接本地存储…</span>
+        </div>
+        <div class="peer-chip" title="同一浏览器中正在编辑的标签页">
+          <span aria-hidden="true">◫</span>
+          <span id="peerCount">1 个标签页</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="undoButton" class="button button-quiet" type="button" title="撤销最近一次已提交修改（Alt+Z）" disabled>
+          撤销提交
+        </button>
+        <button id="exportButton" class="button button-primary" type="button" title="检查一致快照并导出（Alt+E）">
+          导出快照
+          <span class="key-hint">Alt E</span>
+        </button>
+      </div>
+    </header>
+
+    <div id="storageBanner" class="storage-banner" role="alert" hidden></div>
+
+    <main id="workspace" class="workspace" tabindex="-1">
+      <aside class="object-pane" aria-labelledby="objectsTitle">
+        <div class="pane-heading">
+          <div>
+            <p class="eyebrow">PROJECT / 雨夜手记</p>
+            <h2 id="objectsTitle">项目对象</h2>
+          </div>
+          <span id="objectCount" class="count-badge">0</span>
+        </div>
+
+        <label class="search-field" for="objectSearch">
+          <span>筛选对象</span>
+          <input id="objectSearch" type="search" placeholder="输入标题或负责人" autocomplete="off" />
+        </label>
+
+        <nav id="objectList" class="object-list" aria-label="项目对象列表"></nav>
+
+        <button id="addObjectButton" class="button button-dashed" type="button">＋ 新建场景</button>
+
+        <section class="tab-register" aria-labelledby="tabRegisterTitle">
+          <div class="section-title-row">
+            <h3 id="tabRegisterTitle">在线标签页</h3>
+            <span id="tabRegisterState" class="micro-status">正在登记</span>
+          </div>
+          <ul id="tabRegister" class="tab-register-list"></ul>
+          <p class="fine-print">关闭标签页只释放它的资源租约；其他标签页仍在使用的资源不会被删除。</p>
+        </section>
+      </aside>
+
+      <section class="editor-pane" aria-labelledby="editorTitle">
+        <div class="editor-topline">
+          <div>
+            <p class="eyebrow" id="objectBreadcrumb">SCENE / —</p>
+            <h2 id="editorTitle">选择一个对象</h2>
+          </div>
+          <div id="objectSaveState" class="status-chip status-muted" role="status">未选择</div>
+        </div>
+
+        <div id="conflictSpotlight" class="conflict-spotlight" role="alert" hidden>
+          <span class="conflict-icon" aria-hidden="true">!</span>
+          <div>
+            <strong id="conflictSpotlightTitle">检测到字段冲突</strong>
+            <p id="conflictSpotlightText">请先在下方核对两个版本。</p>
+          </div>
+          <a href="#conflictPanel">前往处理</a>
+        </div>
+
+        <form id="editorForm" novalidate>
+          <div id="validationSummary" class="validation-summary" role="alert" tabindex="-1" hidden></div>
+
+          <div class="form-grid">
+            <div class="field field-wide">
+              <div class="label-row">
+                <label for="fieldTitle">场景标题</label>
+                <span id="titleDraftState" class="field-state">已同步</span>
+              </div>
+              <input id="fieldTitle" data-field="title" type="text" maxlength="80" autocomplete="off" aria-describedby="titleHelp titleError" />
+              <p id="titleHelp" class="field-help">字段级版本会随每次提交递增，用于发现跨标签页覆盖。</p>
+              <p id="titleError" class="field-error" hidden></p>
+            </div>
+
+            <div class="field">
+              <div class="label-row">
+                <label for="fieldOwner">负责人</label>
+                <span id="ownerDraftState" class="field-state">已同步</span>
+              </div>
+              <input id="fieldOwner" data-field="owner" type="text" maxlength="40" autocomplete="off" aria-describedby="ownerError" />
+              <p id="ownerError" class="field-error" hidden></p>
+            </div>
+
+            <div class="field">
+              <div class="label-row">
+                <label for="fieldType">对象类型</label>
+                <span id="typeDraftState" class="field-state">已同步</span>
+              </div>
+              <select id="fieldType" data-field="type" aria-describedby="typeError">
+                <option value="scene">场景</option>
+                <option value="character">角色</option>
+                <option value="prop">道具</option>
+              </select>
+              <p id="typeError" class="field-error" hidden></p>
+            </div>
+
+            <div class="field field-wide">
+              <div class="label-row">
+                <label for="fieldNote">场景说明</label>
+                <span id="noteDraftState" class="field-state">已同步</span>
+              </div>
+              <textarea id="fieldNote" data-field="note" rows="7" maxlength="500" aria-describedby="noteHelp noteError"></textarea>
+              <div class="field-help-row">
+                <p id="noteHelp" class="field-help">修改会先进入当前标签页的会话草稿，提交后才写入共享项目。</p>
+                <span id="noteCounter" class="char-counter">0 / 500</span>
+              </div>
+              <p id="noteError" class="field-error" hidden></p>
+            </div>
+          </div>
+
+          <div class="form-meta" id="fieldVersions" aria-label="当前字段版本"></div>
+
+          <div class="form-actions">
+            <button id="saveButton" class="button button-primary" type="submit" title="提交当前对象（Ctrl+S）">
+              提交修改
+              <span class="key-hint">Ctrl S</span>
+            </button>
+            <button id="revertButton" class="button button-quiet" type="button" disabled>放弃草稿</button>
+            <span id="draftHint" class="form-hint">没有未提交修改</span>
+          </div>
+        </form>
+
+        <section id="conflictPanel" class="panel conflict-panel" aria-labelledby="conflictTitle">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">FIELD TRACE</p>
+              <h2 id="conflictTitle">冲突与字段轨迹</h2>
+            </div>
+            <span id="conflictCount" class="count-badge count-warn">0</span>
+          </div>
+          <div id="conflictList" class="conflict-list"></div>
+        </section>
+
+        <section class="panel snapshot-panel" aria-labelledby="snapshotTitle">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">CONSISTENT EXPORT</p>
+              <h2 id="snapshotTitle">一致快照</h2>
+            </div>
+            <span id="snapshotState" class="status-chip status-muted">待检查</span>
+          </div>
+          <div id="snapshotReasons" class="check-list" role="status" aria-live="polite"></div>
+          <dl class="snapshot-stats">
+            <div><dt>项目修订</dt><dd id="snapshotRevision">—</dd></div>
+            <div><dt>内容指纹</dt><dd id="snapshotHash">—</dd></div>
+            <div><dt>对象</dt><dd id="snapshotObjects">—</dd></div>
+            <div><dt>最近导出</dt><dd id="snapshotLastExport">尚未导出</dd></div>
+          </dl>
+        </section>
+
+        <section class="panel resource-panel" aria-labelledby="resourceTitle">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">RESOURCE LEASES</p>
+              <h2 id="resourceTitle">共享资源</h2>
+            </div>
+            <button id="verifyResourcesButton" class="button button-quiet button-small" type="button">检查资源</button>
+          </div>
+          <div id="resourceList" class="resource-list"></div>
+        </section>
+      </section>
+
+      <aside class="inspect-pane" aria-labelledby="inspectTitle">
+        <div class="inspect-heading">
+          <div>
+            <p class="eyebrow">LIVE STATE</p>
+            <h2 id="inspectTitle">状态核对</h2>
+          </div>
+          <span id="inspectPulse" class="pulse" aria-hidden="true"></span>
+        </div>
+        <p class="inspect-intro">同一屏核对输入、会话草稿、共享存储与当前渲染。绿色表示四者处于同一修订。</p>
+        <dl class="inspect-list">
+          <div><dt>当前输入</dt><dd id="inspectInput">—</dd></div>
+          <div><dt>草稿</dt><dd id="inspectDrafts">0 个字段</dd></div>
+          <div><dt>共享存储</dt><dd id="inspectStore">—</dd></div>
+          <div><dt>当前渲染</dt><dd id="inspectRender">—</dd></div>
+          <div><dt>同步结论</dt><dd id="inspectSync">等待初始化</dd></div>
+          <div><dt>焦点元素</dt><dd id="inspectFocus">—</dd></div>
+          <div><dt>滚动位置</dt><dd id="inspectScroll">0 px</dd></div>
+          <div><dt>本页标签</dt><dd id="inspectTab">—</dd></div>
+        </dl>
+        <pre id="inspectJson" class="inspect-json" aria-label="状态核对 JSON"></pre>
+        <div class="keyboard-guide">
+          <h3>键盘任务</h3>
+          <p><kbd>Tab</kbd> 顺序浏览，<kbd>Alt</kbd> + <kbd>↑↓</kbd> 切换对象，<kbd>Ctrl</kbd> + <kbd>S</kbd> 提交，<kbd>Alt</kbd> + <kbd>E</kbd> 导出，<kbd>Alt</kbd> + <kbd>Z</kbd> 撤销，<kbd>Esc</kbd> 关闭弹窗。</p>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="app-footer">
+      <span id="footerStatus" role="status" aria-live="polite">正在载入共享项目…</span>
+      <span>BroadcastChannel · Web Locks · localStorage</span>
+    </footer>
+
+    <dialog id="exportDialog" class="modal" aria-labelledby="exportDialogTitle" aria-describedby="exportDialogDescription">
+      <form method="dialog" class="modal-card">
+        <div class="modal-heading">
+          <div>
+            <p class="eyebrow">PINNED SNAPSHOT</p>
+            <h2 id="exportDialogTitle">导出一致快照</h2>
+          </div>
+          <button id="closeExportButton" class="icon-button" value="cancel" aria-label="关闭导出弹窗">×</button>
+        </div>
+        <p id="exportDialogDescription" class="modal-description">只有所有活动标签页处于同一修订、没有未提交草稿且没有未决冲突时，才会生成快照。</p>
+        <div id="exportReadiness" class="export-readiness" role="status" aria-live="polite"></div>
+        <dl class="modal-stats">
+          <div><dt>修订</dt><dd id="exportRevision">—</dd></div>
+          <div><dt>指纹</dt><dd id="exportHash">—</dd></div>
+          <div><dt>活动标签</dt><dd id="exportPeers">—</dd></div>
+        </dl>
+        <div class="modal-actions">
+          <button id="confirmExportButton" class="button button-primary" type="button">生成并下载 JSON</button>
+          <button class="button button-quiet" value="cancel">返回编辑</button>
+        </div>
+        <p id="exportFailure" class="field-error" role="alert" hidden></p>
+      </form>
+    </dialog>
+
+    <div id="toastRegion" class="toast-region" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
