@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080b10">
+  <title>PRISM / 03 · 实时折射实验</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23080b10' d='M0 0h32v32H0z'/%3E%3Cpath fill='%2350e6dc' d='m16 3 11 6v13l-11 7-11-7V9z'/%3E%3Cpath fill='%23080b10' d='m16 8 6 4v8l-6 4-6-4v-8z'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./fonts.css">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <div>
+          <p class="eyebrow">OPTICAL SYSTEMS LAB</p>
+          <h1>PRISM <span>/ 03</span></h1>
+        </div>
+      </div>
+      <div class="topbar-meta">
+        <span class="live-dot"></span>
+        <span id="render-status">WEBGL2 · LIVE</span>
+        <span class="meta-separator"></span>
+        <span id="frame-time">-- ms</span>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="stage-panel" aria-label="折射场景">
+        <div class="stage-frame" id="stage-frame">
+          <canvas id="scene" aria-label="三块玻璃、雾层和两盏彩色灯的实时折射场景"></canvas>
+          <div class="stage-vignette" aria-hidden="true"></div>
+          <div class="view-label view-label-a">
+            <span class="view-index">A</span>
+            <span><b>FRONT</b><small>主视角 · 67°</small></span>
+          </div>
+          <div class="view-label view-label-b">
+            <span class="view-index">B</span>
+            <span><b>SIDE</b><small>对照视角 · 112°</small></span>
+          </div>
+          <div class="split-line" aria-hidden="true"></div>
+          <div class="stage-readout">
+            <span class="readout-chip"><i></i> ANALYTIC OBB</span>
+            <span class="readout-chip" id="ray-chip">EVENT SLOTS 12</span>
+            <span class="readout-chip" id="tile-chip">FULL PASS</span>
+          </div>
+          <div class="stage-hint">拖动旋转视角 · 滚轮缩放</div>
+        </div>
+        <div class="stage-caption">
+          <p>透射场 <span>TRANSMISSION FIELD</span></p>
+          <p class="caption-note">排序后的解析交点 / 单像素合成 / 无纹理</p>
+        </div>
+      </section>
+
+      <aside class="control-rail" aria-label="场景参数">
+        <div class="rail-heading">
+          <div>
+            <p class="eyebrow">PARAMETERS</p>
+            <h2>光学控制台</h2>
+          </div>
+          <span class="rail-badge">LIVE</span>
+        </div>
+
+        <section class="control-section">
+          <div class="section-title">
+            <span>01 / 视角</span>
+            <button class="text-button" id="reset-view" type="button">复位</button>
+          </div>
+          <label class="range-row" for="view-yaw">
+            <span>环绕</span>
+            <output id="view-yaw-output">42°</output>
+            <input id="view-yaw" type="range" min="-80" max="80" value="42" step="1">
+          </label>
+          <label class="range-row" for="view-pitch">
+            <span>俯仰</span>
+            <output id="view-pitch-output">18°</output>
+            <input id="view-pitch" type="range" min="2" max="38" value="18" step="1">
+          </label>
+          <label class="range-row" for="view-zoom">
+            <span>距离</span>
+            <output id="view-zoom-output">7.2</output>
+            <input id="view-zoom" type="range" min="5.4" max="10" value="7.2" step="0.1">
+          </label>
+        </section>
+
+        <section class="control-section">
+          <div class="section-title">
+            <span>02 / 玻璃厚度</span>
+            <span class="section-unit">mm</span>
+          </div>
+          <div class="glass-control" data-glass="0">
+            <div class="glass-meta"><span class="glass-swatch amber"></span><b>琥珀</b><span>6 mm</span></div>
+            <input id="glass-0" type="range" min="2" max="30" value="6" step="1">
+          </div>
+          <div class="glass-control" data-glass="1">
+            <div class="glass-meta"><span class="glass-swatch cyan"></span><b>青蓝</b><span>14 mm</span></div>
+            <input id="glass-1" type="range" min="2" max="30" value="14" step="1">
+          </div>
+          <div class="glass-control" data-glass="2">
+            <div class="glass-meta"><span class="glass-swatch coral"></span><b>珊瑚</b><span>28 mm</span></div>
+            <input id="glass-2" type="range" min="2" max="30" value="28" step="1">
+          </div>
+        </section>
+
+        <section class="control-section">
+          <div class="section-title">
+            <span>03 / 雾层</span>
+            <output id="fog-output">0.42</output>
+          </div>
+          <label class="range-row" for="fog">
+            <span>密度</span>
+            <output id="fog-inline-output">0.42</output>
+            <input id="fog" type="range" min="0" max="1" value="0.42" step="0.01">
+          </label>
+          <label class="range-row" for="fog-height">
+            <span>层高</span>
+            <output id="fog-height-output">0.52</output>
+            <input id="fog-height" type="range" min="0.12" max="0.9" value="0.52" step="0.01">
+          </label>
+        </section>
+
+        <section class="control-section lamps-section">
+          <div class="section-title">
+            <span>04 / 彩色光源</span>
+            <span class="section-unit">ORBIT</span>
+          </div>
+          <div class="lamp-card" data-lamp="0">
+            <div class="lamp-head">
+              <span class="lamp-swatch lamp-a"></span>
+              <div><b>L1 · CYAN</b><small>冷色主光</small></div>
+              <output id="lamp-0-angle-output">-34°</output>
+            </div>
+            <label class="compact-range" for="lamp-0-angle">
+              <span>角度</span><input id="lamp-0-angle" type="range" min="-180" max="180" value="-34" step="1">
+            </label>
+            <label class="compact-range" for="lamp-0-height">
+              <span>高度</span><input id="lamp-0-height" type="range" min="0.2" max="3.2" value="1.5" step="0.05">
+            </label>
+          </div>
+          <div class="lamp-card" data-lamp="1">
+            <div class="lamp-head">
+              <span class="lamp-swatch lamp-b"></span>
+              <div><b>L2 · CORAL</b><small>暖色辅光</small></div>
+              <output id="lamp-1-angle-output">68°</output>
+            </div>
+            <label class="compact-range" for="lamp-1-angle">
+              <span>角度</span><input id="lamp-1-angle" type="range" min="-180" max="180" value="68" step="1">
+            </label>
+            <label class="compact-range" for="lamp-1-height">
+              <span>高度</span><input id="lamp-1-height" type="range" min="0.2" max="3.2" value="0.7" step="0.05">
+            </label>
+          </div>
+          <button class="wide-button" id="behind-preset" type="button">
+            <span>将 L2 移到玻璃后方</span><kbd>B</kbd>
+          </button>
+        </section>
+      </aside>
+    </main>
+
+    <section class="snapshot-strip" aria-label="对照快照与算法状态">
+      <div class="snapshot-intro">
+        <p class="eyebrow">REFERENCE SET / 01</p>
+        <h2>灯后对照</h2>
+        <p>保存视角 A/B、三块玻璃与 L2 背光位置，一键回到同一光学状态。</p>
+      </div>
+      <div class="snapshot-params" id="snapshot-params"></div>
+      <div class="algorithm-summary" id="algorithm-summary"></div>
+      <div class="snapshot-actions">
+        <button class="accent-button" id="restore-snapshot" type="button">一键恢复对照</button>
+        <div class="button-row">
+          <button class="ghost-button" id="save-params" type="button">保存参数</button>
+          <button class="ghost-button" id="download-shot" type="button">下载截图</button>
+        </div>
+        <p class="save-status" id="save-status">快照已就绪 · 本地持久化</p>
+      </div>
+    </section>
+
+    <section class="lab-section" aria-label="测量结果">
+      <div class="lab-heading">
+        <div>
+          <p class="eyebrow">VERIFICATION / LIVE DATA</p>
+          <h2>增量重算测量台</h2>
+        </div>
+        <div class="lab-actions">
+          <span class="lab-status idle" id="test-status">READY</span>
+          <button class="accent-button compact" id="run-tests" type="button">运行三类测试</button>
+        </div>
+      </div>
+      <p class="lab-lead">每次测试先冻结基线，再修改参数并只重绘脏瓦片；哈希、对象数量和截图均来自同一画布帧。</p>
+      <div class="metric-grid" id="metric-grid">
+        <article class="metric-card"><span>：</span><b>—</b><small>等待测试</small></article>
+      </div>
+      <div class="test-grid" id="test-grid"></div>
+      <div class="consistency-panel">
+        <div>
+          <p class="eyebrow">VISUAL / DATA CONSISTENCY</p>
+          <h3 id="consistency-title">尚未执行测量</h3>
+        </div>
+        <p id="consistency-copy">运行测试后，将画面中的颜色变化、遮挡顺序与哈希/像素指标对照说明。</p>
+        <div class="view-evidence" id="two-view-evidence"></div>
+      </div>
+      <div class="event-log" id="event-log" aria-live="polite"></div>
+    </section>
+
+    <footer class="footer">
+      <span>PRISM / 03 — TRANSPARENCY WITHOUT DEPTH SORT ERRORS</span>
+      <span>ANALYTIC RAY COMPOSITING · NO TEXTURES · WEBGL2</span>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
