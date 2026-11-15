@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>冷库除霜调度仿真</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d1420; color: #cfe3f5; font-family: "Microsoft YaHei", sans-serif; padding: 12px; }
+  h1 { font-size: 18px; margin-bottom: 8px; color: #7fd4ff; }
+  #main { display: flex; gap: 12px; flex-wrap: wrap; }
+  #canvasWrap { flex: 1 1 640px; min-width: 480px; }
+  canvas { width: 100%; background: #101b2c; border: 1px solid #2a4a6a; border-radius: 6px; display: block; }
+  #panel { flex: 0 0 300px; display: flex; flex-direction: column; gap: 8px; }
+  .card { background: #142136; border: 1px solid #2a4a6a; border-radius: 6px; padding: 10px; }
+  .card h2 { font-size: 13px; color: #7fd4ff; margin-bottom: 6px; }
+  button { background: #1e3a5c; color: #cfe3f5; border: 1px solid #3a6a9a; border-radius: 4px;
+           padding: 5px 9px; margin: 2px; cursor: pointer; font-size: 12px; }
+  button:hover { background: #2a4f7c; }
+  button.active { background: #2c7a4b; border-color: #4caf7d; }
+  button.warn { background: #7a4b2c; border-color: #af7d4c; }
+  #log { height: 180px; overflow-y: auto; font-size: 11px; line-height: 1.5; font-family: Consolas, monospace; }
+  #log div { padding: 1px 4px; border-radius: 3px; }
+  .k-action { color: #9fd8ff; } .k-env { color: #ffd88a; } .k-device { color: #9ff0c0; }
+  .k-alarm, .k-fault, .k-fail { color: #ff9a8a; font-weight: bold; }
+  .k-success { color: #8affc1; font-weight: bold; } .k-system { color: #aaa; }
+  #status { font-size: 12px; line-height: 1.7; }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; }
+</style>
+</head>
+<body>
+<h1>冷库除霜调度仿真 —— 保持药品温控（2~8°C），一小时内完成三组蒸发器除霜</h1>
+<div id="main">
+  <div id="canvasWrap"><canvas id="cv" width="900" height="520"></canvas></div>
+  <div id="panel">
+    <div class="card"><h2>仿真时钟</h2>
+      <div class="row">
+        <button id="btnPause">暂停</button>
+        <button id="btnStep">单步 +1s</button>
+        <button id="btnSpeed">速度 10x</button>
+        <button id="btnReplay" class="warn">失败回放</button>
+        <button id="btnReset">重置</button>
+      </div>
+      <div id="status"></div>
+    </div>
+    <div class="card"><h2>设备操作</h2>
+      <div class="row" id="zoneBtns"></div>
+      <div class="row">
+        <button id="btnBackup">备用制冷</button>
+        <button id="btnDoor">开/关库门</button>
+        <button id="btnAudio">启用声音</button>
+      </div>
+    </div>
+    <div class="card" style="flex:1"><h2>统一时钟事件日志（设备 / 环境 / 操作）</h2>
+      <div id="log"></div>
+    </div>
+  </div>
+</div>
+<script src="sim.js"></script>
+<script src="scenarios.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
