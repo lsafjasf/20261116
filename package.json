@@ -1,0 +1,13 @@
+{
+  "name": "logistics-canvas-sim",
+  "version": "1.0.0",
+  "private": true,
+  "description": "区域地图货物流守恒模拟、断供改道验证与运行表导出",
+  "scripts": {
+    "test": "node tests/run-tests.js",
+    "test:browser": "node tests/browser-e2e.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.1"
+  }
+}

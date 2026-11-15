@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>区域物流守恒模拟看板</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">区域物流守恒模拟</div>
+    <div class="meta" id="metaBar"></div>
+  </header>
+
+  <section class="toolbar">
+    <label>样例
+      <select id="sampleSelect">
+        <option value="A">样例A · 干净基线</option>
+        <option value="B">样例B · 脏数据+断供改道</option>
+      </select>
+    </label>
+    <label><input type="checkbox" id="interventionToggle" checked /> 应用改道干预</label>
+    <label>节点类型
+      <select id="nodeTypeFilter">
+        <option value="all">全部</option>
+        <option value="factory">工厂</option>
+        <option value="warehouse">仓库</option>
+        <option value="store">商店</option>
+      </select>
+    </label>
+    <label>线路
+      <select id="edgeFilter"><option value="all">全部线路</option></select>
+    </label>
+    <label><input type="checkbox" id="shortageFilter" /> 仅看缺货节点</label>
+    <span class="spacer"></span>
+    <button id="audioBtn">🔇 音效关</button>
+  </section>
+
+  <main class="layout">
+    <section class="map-panel">
+      <canvas id="mapCanvas" width="960" height="560"></canvas>
+      <div class="playback">
+        <button id="playBtn">▶ 播放</button>
+        <button id="stepBtn">⏭ 单步</button>
+        <button id="resetBtn">⟲ 复位</button>
+        <label>速度
+          <select id="speedSelect">
+            <option value="0.5">0.5x</option>
+            <option value="1" selected>1x</option>
+            <option value="2">2x</option>
+          </select>
+        </label>
+        <input type="range" id="tickSlider" min="0" max="0" value="0" />
+        <span id="tickLabel">tick 0</span>
+      </div>
+      <div class="kpis" id="kpiBar"></div>
+    </section>
+
+    <aside class="side-panel">
+      <h3>线路容量 / 优先级</h3>
+      <p class="hint">点击地图上的线路或在下方选择，调整后立即重算。</p>
+      <label>选中线路
+        <select id="edgeSelect"></select>
+      </label>
+      <label>容量 <input type="number" id="capInput" min="1" step="1" /></label>
+      <label>优先级 <input type="number" id="prioInput" min="1" max="99" step="1" /></label>
+      <div class="btn-row">
+        <button id="applyEdgeBtn">应用并重算</button>
+        <button id="resetEdgeBtn" class="ghost">恢复默认</button>
+      </div>
+      <div id="interventionInfo" class="info-box"></div>
+
+      <h3>数据清洗台账</h3>
+      <div id="quarantineSummary"></div>
+      <div class="scrollbox" id="quarantineList"></div>
+    </aside>
+  </main>
+
+  <section class="tables">
+    <div>
+      <h3>节点运行表（当前 tick）</h3>
+      <div class="scrollbox tall">
+        <table id="nodeTable"><thead></thead><tbody></tbody></table>
+      </div>
+    </div>
+    <div>
+      <h3>线路运行表（当前 tick）</h3>
+      <div class="scrollbox tall">
+        <table id="edgeTable"><thead></thead><tbody></tbody></table>
+      </div>
+    </div>
+  </section>
+
+  <section class="debug">
+    <h3>调试面板 · 中间计算状态</h3>
+    <div class="debug-grid">
+      <div>
+        <h4>逐 tick 守恒/汇总</h4>
+        <div class="scrollbox tall">
+          <table id="debugTable"><thead></thead><tbody></tbody></table>
+        </div>
+      </div>
+      <div>
+        <h4>引擎中间态</h4>
+        <pre id="debugDetail" class="scrollbox tall"></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="export-panel">
+    <h3>导出与工程存档</h3>
+    <div class="btn-row wrap">
+      <button id="exportNodeCsv">导出节点 CSV</button>
+      <button id="exportEdgeCsv">导出线路 CSV</button>
+      <button id="exportMeta">导出口径 JSON</button>
+      <button id="saveProjectBtn">保存工程 JSON</button>
+      <label class="file-btn">载入工程
+        <input type="file" id="loadProjectInput" accept="application/json" hidden />
+      </label>
+    </div>
+    <div id="exportSpec" class="info-box"></div>
+    <div class="scrollbox" id="exportLog"></div>
+  </section>
+
+  <script src="js/samples.js"></script>
+  <script src="js/ingest.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/canvas-map.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/app-state.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
