@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c1716">
+  <title>山脊哨兵 · 山谷公路滑坡预警仿真</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+        <div>
+          <p class="eyebrow">RIDGE SENTINEL / 02H DRILL</p>
+          <h1>山脊哨兵 <small>山谷公路滑坡预警仿真</small></h1>
+        </div>
+      </div>
+
+      <div class="scenario-switch" role="group" aria-label="演练场景">
+        <button class="scenario-btn is-active" data-scenario="normal">
+          <span>01</span> 正常流程
+        </button>
+        <button class="scenario-btn" data-scenario="device">
+          <span>02</span> 设备故障
+        </button>
+        <button class="scenario-btn" data-scenario="parameter">
+          <span>03</span> 参数越限
+        </button>
+      </div>
+
+      <div class="clock-cluster">
+        <div class="sim-clock">
+          <span class="clock-kicker">仿真时钟</span>
+          <strong id="simClock">00:00:00</strong>
+          <span id="clockState" class="clock-state">待启动</span>
+        </div>
+        <div class="transport">
+          <button id="playBtn" class="icon-btn primary" title="暂停 / 继续" aria-label="暂停或继续">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+          <button id="stepBtn" class="icon-btn" title="单步推进 1 分钟" aria-label="单步推进一分钟">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18l8.5-6L6 6v12zm10-12v12h2V6h-2z"/></svg>
+          </button>
+          <div class="speed-seg" role="group" aria-label="仿真速度">
+            <button data-speed="1" class="is-active">1×</button>
+            <button data-speed="2">2×</button>
+            <button data-speed="4">4×</button>
+          </div>
+          <button id="soundBtn" class="icon-btn" title="警报声音" aria-label="开关警报声音" aria-pressed="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4zm12.5 3a4.5 4.5 0 0 0-2-3.74v7.48A4.5 4.5 0 0 0 16.5 12z"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="visual-column">
+        <div class="stage-card">
+          <div class="stage-head">
+            <div>
+              <p class="eyebrow">K12+460 / EAST FACE</p>
+              <h2>东侧边坡 · 实时态势</h2>
+            </div>
+            <div class="stage-badges">
+              <span id="weatherBadge" class="badge weather">小雨 0.4 mm/h</span>
+              <span id="alertBadge" class="badge alert-level-0">常态监测</span>
+              <span id="qualityBadge" class="badge">传感器 1 / 6</span>
+            </div>
+          </div>
+
+          <div class="canvas-wrap" id="canvasWrap">
+            <canvas id="scene" aria-label="山谷公路、边坡、雨量、传感器与车流实时场景"></canvas>
+            <div class="canvas-grid" aria-hidden="true"></div>
+            <div class="stage-overlay top-left">
+              <span class="coord">N 30°41′22″</span>
+              <span class="coord">E 103°58′51″</span>
+            </div>
+            <div class="stage-overlay bottom-left">
+              <span class="legend-dot normal"></span>在线
+              <span class="legend-dot warn"></span>异常
+              <span class="legend-dot danger"></span>离线
+              <span class="legend-line"></span>裂缝
+            </div>
+            <div id="placementHint" class="placement-hint" hidden>
+              <span class="hint-pulse"></span>
+              点击坡面标记点安装 <strong id="placementType">位移计</strong>
+              <kbd>Esc</kbd> 取消
+            </div>
+            <div id="sceneNotice" class="scene-notice" hidden>
+              <strong id="noticeTitle"></strong>
+              <span id="noticeText"></span>
+            </div>
+            <div id="replayFlag" class="replay-flag" hidden>
+              <span class="replay-dot"></span> 失败回放中
+              <button id="exitReplayBtn">退出</button>
+            </div>
+          </div>
+
+          <div class="stage-foot">
+            <div class="metric" data-metric="displacement">
+              <span class="metric-label">坡体位移</span>
+              <strong><b id="dispValue">--</b><em>mm</em></strong>
+              <div class="metric-track"><i id="dispBar"></i></div>
+              <span id="dispTrend" class="metric-note">等待传感器</span>
+            </div>
+            <div class="metric" data-metric="rain">
+              <span class="metric-label">小时雨强</span>
+              <strong><b id="rainValue">--</b><em>mm/h</em></strong>
+              <div class="metric-track"><i id="rainBar"></i></div>
+              <span id="rainTrend" class="metric-note">累计 -- mm</span>
+            </div>
+            <div class="metric" data-metric="pore">
+              <span class="metric-label">地下水位压</span>
+              <strong><b id="poreValue">--</b><em>kPa</em></strong>
+              <div class="metric-track"><i id="poreBar"></i></div>
+              <span id="poreTrend" class="metric-note">等待传感器</span>
+            </div>
+            <div class="metric stability" data-metric="margin">
+              <span class="metric-label">安全余量</span>
+              <strong><b id="marginValue">--</b><em>%</em></strong>
+              <div class="metric-track"><i id="marginBar"></i></div>
+              <span id="ttfValue" class="metric-note">预计稳定时间 --</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-card">
+          <div class="timeline-head">
+            <span>两小时事件轴</span>
+            <span id="timelineStatus">操作与故障将固定写入仿真时钟</span>
+          </div>
+          <div class="timeline">
+            <div class="timeline-rail"></div>
+            <div id="timelineProgress" class="timeline-progress"></div>
+            <div class="timeline-marks">
+              <span style="left:0%">00:00</span>
+              <span style="left:25%">00:30</span>
+              <span style="left:50%">01:00</span>
+              <span style="left:75%">01:30</span>
+              <span style="left:100%">02:00</span>
+            </div>
+            <div id="timelineEvents" class="timeline-events"></div>
+            <div id="timelineCursor" class="timeline-cursor"></div>
+          </div>
+          <div class="rescue-strip">
+            <span class="rescue-label">救援车窗口</span>
+            <span class="rescue-time" data-rescue="35">00:35</span>
+            <span class="rescue-time" data-rescue="58">00:58</span>
+            <span class="rescue-time" data-rescue="82">01:22</span>
+            <span class="rescue-note">全幅封路会截断救援通道</span>
+          </div>
+        </div>
+      </section>
+
+      <aside class="control-column">
+        <section class="panel alert-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">DECISION SUPPORT</p>
+              <h3>预警研判</h3>
+            </div>
+            <span id="riskPill" class="risk-pill level-0">低风险</span>
+          </div>
+          <div class="alert-readout">
+            <div class="alert-orbit" id="alertOrbit">
+              <span class="orbit-ring"></span>
+              <span class="orbit-ring"></span>
+              <span class="orbit-core"><b id="riskScore">0</b><small>/100</small></span>
+            </div>
+            <div class="alert-copy">
+              <strong id="alertTitle">建立监测基线</strong>
+              <p id="alertDescription">部署位移计与孔压计后，系统会融合雨量、位移和地下水数据给出研判。</p>
+              <span id="alertReason" class="alert-reason">尚无有效传感器数据</span>
+            </div>
+          </div>
+          <button id="warningBtn" class="wide-btn warning-btn">发布橙色预警</button>
+          <p class="microcopy" id="warningMeta">预警会写入决策记录；发布后仍可调整交通管制。</p>
+        </section>
+
+        <section class="panel sensor-panel">
+          <div class="panel-heading compact">
+            <div>
+              <p class="eyebrow">SENSOR GRID</p>
+              <h3>边坡传感器</h3>
+            </div>
+            <span id="sensorCount" class="count-badge">1 / 6</span>
+          </div>
+          <div class="sensor-palette">
+            <button class="sensor-tool" data-sensor="displacement">
+              <span class="tool-icon disp-icon"></span>
+              <span><b>位移计</b><small>后缘 / 裂缝</small></span>
+            </button>
+            <button class="sensor-tool" data-sensor="pore">
+              <span class="tool-icon pore-icon"></span>
+              <span><b>孔压计</b><small>坡脚 / 渗流带</small></span>
+            </button>
+            <button class="sensor-tool" data-sensor="rain">
+              <span class="tool-icon rain-icon"></span>
+              <span><b>雨量计</b><small>坡顶开阔处</small></span>
+            </button>
+          </div>
+          <div id="sensorList" class="sensor-list"></div>
+          <p class="microcopy">点位与传感器类型不匹配会放大噪声，并提高误报率。</p>
+        </section>
+
+        <section class="panel action-panel">
+          <div class="panel-heading compact">
+            <div>
+              <p class="eyebrow">FIELD ACTION</p>
+              <h3>现场处置</h3>
+            </div>
+            <span id="roadPill" class="road-pill open">社会车辆通行</span>
+          </div>
+          <div class="action-grid">
+            <button id="controlBtn" class="action-btn">
+              <span class="action-symbol">Ⅰ</span>
+              <span><b>应急管制</b><small>封闭社会车辆 · 保留救援车道</small></span>
+            </button>
+            <button id="reinforceBtn" class="action-btn">
+              <span class="action-symbol">△</span>
+              <span><b>坡面加固</b><small>削坡反压 · 恢复安全余量</small></span>
+            </button>
+            <button id="openBtn" class="action-btn ghost">
+              <span class="action-symbol">R</span>
+              <span><b>恢复通行</b><small>仅在下一次复核确认后进行</small></span>
+            </button>
+            <button id="closeBtn" class="action-btn danger">
+              <span class="action-symbol">×</span>
+              <span><b>全幅封路</b><small>阻断救援通道 · 仅极端情况使用</small></span>
+            </button>
+          </div>
+          <div id="repairBox" class="repair-box" hidden>
+            <div class="repair-copy">
+              <span class="repair-icon">!</span>
+              <span><b id="repairTitle">设备异常</b><small id="repairText">等待处置</small></span>
+            </div>
+            <button id="repairBtn" class="compact-btn">检修 / 复位</button>
+          </div>
+          <div id="observationBox" class="observation-box" hidden>
+            <div class="observation-head">
+              <span>恢复后稳定观察</span>
+              <strong id="observationClock">10:00</strong>
+            </div>
+            <div class="observation-track"><i id="observationBar"></i></div>
+            <p id="observationText">持续观察设备状态与警戒等级跳变。</p>
+          </div>
+        </section>
+
+        <section class="panel log-panel">
+          <div class="panel-heading compact">
+            <div>
+              <p class="eyebrow">EVENT LEDGER</p>
+              <h3>决策记录</h3>
+            </div>
+            <span id="eventCount" class="count-badge">0 条</span>
+          </div>
+          <div id="eventLog" class="event-log" aria-live="polite"></div>
+        </section>
+
+        <div class="utility-row">
+          <button id="testBtn" class="utility-btn">可靠性自检</button>
+          <button id="replayBtn" class="utility-btn" disabled>失败回放</button>
+          <button id="exportBtn" class="utility-btn primary">导出记录</button>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <div id="toastRegion" class="toast-region" aria-live="polite"></div>
+
+  <dialog id="exportDialog" class="modal">
+    <div class="modal-head">
+      <div>
+        <p class="eyebrow">MISSION REPORT</p>
+        <h2>决策记录导出</h2>
+      </div>
+      <button class="modal-close" data-close="exportDialog" aria-label="关闭">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="exportSummary" class="export-summary"></div>
+      <pre id="exportPreview" class="export-preview"></pre>
+    </div>
+    <div class="modal-actions">
+      <button id="copyReportBtn" class="utility-btn">复制 Markdown</button>
+      <button id="downloadMarkdownBtn" class="utility-btn">下载 .md</button>
+      <button id="downloadJsonBtn" class="utility-btn primary">下载 .json</button>
+    </div>
+  </dialog>
+
+  <dialog id="testDialog" class="modal test-modal">
+    <div class="modal-head">
+      <div>
+        <p class="eyebrow">DETERMINISTIC CHECK</p>
+        <h2>可靠性自检</h2>
+      </div>
+      <button class="modal-close" data-close="testDialog" aria-label="关闭">×</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-intro">三个用例共享固定步长时钟与同一随机种子规则。检查正常预警、设备掉线、参数越限，以及恢复到安全状态后的固定观察期。</p>
+      <div id="testResults" class="test-results"></div>
+    </div>
+    <div class="modal-actions">
+      <button id="runTestsBtn" class="utility-btn primary">运行三组自检</button>
+    </div>
+  </dialog>
+
+  <div id="outcomeOverlay" class="outcome-overlay" hidden>
+    <div class="outcome-card">
+      <p id="outcomeKicker" class="eyebrow">SIMULATION COMPLETE</p>
+      <h2 id="outcomeTitle">演练完成</h2>
+      <p id="outcomeText"></p>
+      <div id="outcomeStats" class="outcome-stats"></div>
+      <div class="outcome-actions">
+        <button id="outcomeReplayBtn" class="utility-btn" hidden>回放失败过程</button>
+        <button id="outcomeExportBtn" class="utility-btn primary">导出决策记录</button>
+        <button id="outcomeAgainBtn" class="utility-btn">重新演练</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/core.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
