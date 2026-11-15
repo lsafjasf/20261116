@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>临时轨道桥运输仿真 · 统一时钟</title>
+<style>
+  :root {
+    --bg: #0e1622; --panel: #162233; --line: #26364d;
+    --text: #dce6f2; --muted: #8aa0ba; --accent: #4fc3f7;
+    --good: #66bb6a; --warn: #ffa726; --bad: #ef5350;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 14px/1.5 "PingFang SC", "Microsoft YaHei", sans-serif; }
+  header { padding: 12px 18px; border-bottom: 1px solid var(--line);
+    display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+  header h1 { font-size: 17px; margin: 0; }
+  header .clock { font-variant-numeric: tabular-nums; color: var(--accent);
+    font-weight: 600; }
+  .layout { display: grid; grid-template-columns: 1fr 330px; gap: 12px;
+    padding: 12px 18px; }
+  .panel { background: var(--panel); border: 1px solid var(--line);
+    border-radius: 10px; padding: 12px; }
+  canvas { width: 100%; height: 420px; display: block; border-radius: 8px;
+    background: linear-gradient(#101d2e, #14263b); }
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  button, select, input { background: #0d1726; color: var(--text);
+    border: 1px solid var(--line); border-radius: 7px; padding: 7px 11px;
+    font-size: 13px; cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  .row { display: flex; align-items: center; gap: 8px; margin: 8px 0;
+    flex-wrap: wrap; }
+  .row label { color: var(--muted); min-width: 74px; }
+  .row input[type=number] { width: 90px; }
+  h2 { font-size: 14px; margin: 4px 0 8px; color: var(--accent); }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px;
+    font-variant-numeric: tabular-nums; }
+  .stats b { color: var(--text); }
+  #log { height: 260px; overflow-y: auto; font-size: 12px;
+    font-family: ui-monospace, Menlo, Consolas, monospace; background: #0b1420;
+    border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
+  #log .e { margin: 2px 0; }
+  #log .t { color: var(--muted); margin-right: 6px; }
+  .tag { padding: 1px 7px; border-radius: 10px; font-size: 11px; }
+  .tag.fault, .tag.nodefail, .tag.reject, .tag.overload { background: #441a1f;
+    color: #ff9a97; }
+  .tag.reinforce, .tag.repair, .tag.end { background: #14361c;
+    color: #97e09b; }
+  .tag.command, .tag.move, .tag.enter, .tag.exit, .tag.faultclear,
+  .tag.tail { background: #133047; color: #9ad4ff; }
+  .status-pill { padding: 3px 10px; border-radius: 12px; font-size: 12px;
+    font-weight: 600; }
+  .status-running { background: #133047; color: #9ad4ff; }
+  .status-success { background: #14361c; color: #97e09b; }
+  .status-failed { background: #441a1f; color: #ff9a97; }
+  .hint { color: var(--muted); font-size: 12px; margin-top: 6px; }
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px;
+    color: var(--muted); margin-top: 6px; }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px;
+    margin-right: 4px; vertical-align: -1px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>临时轨道桥运输仿真</h1>
+  <span class="clock">仿真时钟 t=<span id="clock">0.0</span>s · 步 <span id="step">0</span></span>
+  <span id="statusPill" class="status-pill status-running">运行中</span>
+  <span style="color:var(--muted)">固定步长 0.1s · 确定性 RNG</span>
+</header>
+<div class="layout">
+  <div>
+    <div class="panel">
+      <canvas id="scene" width="980" height="420"></canvas>
+      <div class="legend">
+        <span><i style="background:#3a7bd5"></i>低应力</span>
+        <span><i style="background:#ffa726"></i>高应力</span>
+        <span><i style="background:#ef5350"></i>过载/失稳</span>
+        <span><i style="background:#29b6f6"></i>水位</span>
+        <span><i style="background:#ffd54f"></i>加固节点</span>
+      </div>
+      <div class="controls">
+        <button id="btnPause">暂停</button>
+        <button id="btnStep">单步</button>
+        <button id="btnResume">恢复</button>
+        <button id="btnReplay">失败回放</button>
+        <button id="btnReset">重置</button>
+        <label style="color:var(--muted)">速度
+          <input id="rate" type="range" min="0.25" max="3" step="0.25" value="1">
+          <span id="rateVal">1.0×</span></label>
+        <label style="color:var(--muted)"><input id="mute" type="checkbox"> 静音</label>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:12px">
+      <h2>操作面板（同一仿真时钟）</h2>
+      <div class="row">
+        <label>剧本</label>
+        <select id="scenario">
+          <option value="normal">正常流程（正确加固）</option>
+          <option value="fault">设备故障（P5 泵故障+修复）</option>
+          <option value="overlimit">参数越限（命令被拒绝）</option>
+          <option value="wrongReinforce" selected>错误加固（连锁失败）</option>
+        </select>
+        <button id="btnLoad">载入剧本</button>
+      </div>
+      <div class="row">
+        <label>加固节点</label>
+        <input id="rfNode" type="number" min="0" max="10" value="1">
+        <button id="btnReinforce">加固（限 2 处，t≤40s）</button>
+        <span id="rfLeft" style="color:var(--muted)">剩余 2 处</span>
+      </div>
+      <div class="row">
+        <label>车辆间隔</label>
+        <input id="gap" type="number" min="8" max="60" value="14">
+        <label style="min-width:auto">速度</label>
+        <input id="speed" type="number" min="2" max="10" value="7">
+        <button id="btnParams">应用参数</button>
+      </div>
+      <div class="row">
+        <label>桥墩移动</label>
+        <select id="pierId"><option>P3</option><option>P5</option><option>P7</option></select>
+        <label style="min-width:auto">到节点</label>
+        <input id="pierNode" type="number" min="1" max="9" value="4">
+        <button id="btnMove">移动（限 2 次）</button>
+      </div>
+      <p class="hint">所有操作以命令形式进入同一队列，在固定步长边界生效；越限命令会被拒绝并写入事件日志，保证回放逐帧一致。</p>
+    </div>
+  </div>
+  <div>
+    <div class="panel">
+      <h2>设备与环境状态</h2>
+      <div class="stats">
+        <span>水位</span><b id="stWater">0.0 m</b>
+        <span>P5 桥墩健康</span><b id="stHealth">1.00</b>
+        <span>最小余量</span><b id="stMargin">1.00</b>
+        <span>峰值应力比</span><b id="stPeak">0.00</b>
+        <span>残余应力</span><b id="stResidual">—</b>
+        <span>失稳节点</span><b id="stFailed">无</b>
+        <span>当前故障</span><b id="stFault">无</b>
+        <span>加固名额</span><b id="stRf">2</b>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:12px">
+      <h2>操作与事件记录</h2>
+      <div id="log"></div>
+    </div>
+  </div>
+</div>
+<script src="engine.js"></script>
+<script src="scenarios.js"></script>
+<script src="audio.js"></script>
+<script src="renderer.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
