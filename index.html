@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>除冰调度仿真</title>
+<style>
+  body { margin: 0; background: #1b2430; color: #dde6f0; font-family: "Microsoft YaHei", sans-serif; }
+  #wrap { display: flex; gap: 10px; padding: 10px; }
+  canvas { background: #2c3a4a; border: 1px solid #456; border-radius: 6px; }
+  #panel { width: 300px; font-size: 13px; }
+  #panel h3 { margin: 6px 0; font-size: 14px; color: #9fc5ff; }
+  button { margin: 2px 4px 2px 0; padding: 5px 10px; background: #34506e; color: #dde6f0;
+           border: 1px solid #56789a; border-radius: 4px; cursor: pointer; font-size: 13px; }
+  button:hover { background: #40608a; }
+  button:disabled { opacity: 0.4; cursor: default; }
+  select, input[type=range] { width: 100%; margin: 2px 0 6px; }
+  #log { height: 220px; overflow-y: auto; background: #10161e; border: 1px solid #345;
+         border-radius: 4px; padding: 4px 6px; font-size: 12px; line-height: 1.5; }
+  #log .warn { color: #ffcc66; } #log .err { color: #ff7777; } #log .ok { color: #7fe08a; }
+  .bar { height: 10px; background: #10161e; border: 1px solid #345; border-radius: 3px; margin: 2px 0 6px; }
+  .bar > div { height: 100%; border-radius: 3px; }
+  #status { font-weight: bold; margin: 4px 0; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="cv" width="900" height="560"></canvas>
+  <div id="panel">
+    <h3>仿真控制</h3>
+    <div>
+      <button id="btnPause">暂停</button>
+      <button id="btnStep">单步</button>
+      <button id="btnResume">恢复</button>
+      <button id="btnReplay" disabled>失败回放</button>
+    </div>
+    <div>
+      速度:
+      <button class="spd" data-s="1">1x</button>
+      <button class="spd" data-s="2">2x</button>
+      <button class="spd" data-s="4">4x</button>
+    </div>
+    <div>
+      场景:
+      <select id="scenario">
+        <option value="normal">正常流程</option>
+        <option value="pump">设备故障:泵失效(t=30s)</option>
+        <option value="gust">环境突变:阵风 14m/s(t=20s)</option>
+      </select>
+      <button id="btnRestart" style="width:100%">重新开始</button>
+    </div>
+    <h3>状态</h3>
+    <div id="status">运行中</div>
+    <div>时钟 t=<span id="clock">0.0</span>s(tick <span id="tick">0</span>)</div>
+    <div>除冰液 <span id="tankTxt"></span></div><div class="bar"><div id="tankBar" style="background:#4da3ff"></div></div>
+    <div>排水污染 <span id="polTxt"></span></div><div class="bar"><div id="polBar" style="background:#e0a040"></div></div>
+    <div>风 <span id="windTxt"></span> 降雪 <span id="snowTxt"></span></div>
+    <h3>操作(先点选飞机)</h3>
+    <div>
+      <button id="btnGoto">派车前往</button>
+      <button id="btnSpray">开始喷洒</button>
+      <button id="btnTakeoff">允许起飞</button>
+      <button id="btnRepair">维修泵</button>
+    </div>
+    <div>喷酒量: <span id="amtTxt">45</span>L
+      <input type="range" id="amt" min="5" max="120" value="45">
+    </div>
+    <h3>事件日志</h3>
+    <div id="log"></div>
+  </div>
+</div>
+<script src="sim.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
