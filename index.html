@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>图像处理链：色阶 / 模糊 / 噪点 / 色调映射</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+  <h1>节点式图像处理链</h1>
+  <span class="hint">拖拽或 ↑↓ 重排节点 · 顺序真实影响像素 · 分块计算不阻塞交互</span>
+</header>
+
+<main>
+  <aside id="controls">
+    <section>
+      <h2>图像</h2>
+      <select id="image-select">
+        <option value="gradient">A · 渐变+圆形</option>
+        <option value="checker">B · 棋盘+硬边</option>
+        <option value="radial">C · 径向高光</option>
+      </select>
+    </section>
+
+    <section>
+      <h2>处理节点（可重排）</h2>
+      <div id="node-list"></div>
+    </section>
+
+    <section>
+      <h2>预设</h2>
+      <div class="row">
+        <input id="preset-name" type="text" placeholder="预设名">
+        <button id="btn-save-preset">保存</button>
+      </div>
+      <div class="row">
+        <select id="preset-list"></select>
+        <button id="btn-load-preset">加载</button>
+        <button id="btn-delete-preset">删除</button>
+      </div>
+      <div class="row">
+        <button id="btn-reset">重置默认</button>
+        <button id="btn-restore-a">一键恢复·对照A</button>
+        <button id="btn-restore-b">一键恢复·对照B</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>导出与测试</h2>
+      <div class="row">
+        <button id="btn-export">导出 PNG</button>
+        <button id="btn-run-tests">运行测试套件</button>
+      </div>
+    </section>
+  </aside>
+
+  <section id="stage">
+    <div class="canvases">
+      <figure>
+        <figcaption>原图</figcaption>
+        <canvas id="canvas-original"></canvas>
+      </figure>
+      <figure>
+        <figcaption>结果</figcaption>
+        <canvas id="canvas-result"></canvas>
+      </figure>
+    </div>
+    <div id="progress"><div id="progress-bar"></div></div>
+
+    <div class="panels">
+      <div class="panel">
+        <h3>一致性</h3>
+        <p>预览哈希: <code id="hash-preview">—</code></p>
+        <p>导出哈希: <code id="hash-export">—</code> <span id="export-match"></span></p>
+        <p>最终画面与数据: <span id="consistency">—</span></p>
+      </div>
+      <div class="panel">
+        <h3>测量</h3>
+        <pre id="measurements">—</pre>
+      </div>
+      <div class="panel">
+        <h3>算法状态摘要</h3>
+        <pre id="state-summary">—</pre>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>测试结果 <span id="test-summary"></span></h3>
+      <div id="test-results"></div>
+    </div>
+
+    <div class="panel">
+      <h3>日志</h3>
+      <div id="log"></div>
+    </div>
+  </section>
+</main>
+
+<script src="js/pipeline.js"></script>
+<script src="js/images.js"></script>
+<script src="js/app.js"></script>
+<script src="js/tests.js"></script>
+</body>
+</html>
