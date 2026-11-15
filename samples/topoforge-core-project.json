@@ -1,0 +1,365 @@
+{
+  "kind": "topoforge-project",
+  "formatVersion": "2.1",
+  "projectId": "tf-sample-a-mwi4cmbt",
+  "name": "核心园区 · 双活链路",
+  "description": "11 个有效节点、14 条有效链路，含空名称 / 空坐标、重复节点与重复链路、负延迟和超限容量。",
+  "sourceSampleId": "sample-a",
+  "sampleCode": "A",
+  "dataVersion": 1,
+  "savedAt": "2026-11-15T17:39:03.305Z",
+  "nodes": [
+    {
+      "id": "GW-EDGE-01",
+      "type": "gateway",
+      "name": "园区边缘网关",
+      "x": 105,
+      "y": 380,
+      "zone": "边界区",
+      "status": "up",
+      "model": "GW-4200",
+      "ip": "10.16.0.1"
+    },
+    {
+      "id": "RT-CORE-A",
+      "type": "router",
+      "name": "核心路由 A",
+      "x": 330,
+      "y": 245,
+      "zone": "核心区",
+      "status": "up",
+      "model": "CR-9800",
+      "ip": "10.16.1.1"
+    },
+    {
+      "id": "RT-CORE-B",
+      "type": "router",
+      "name": "核心路由 B",
+      "x": 330,
+      "y": 515,
+      "zone": "核心区",
+      "status": "up",
+      "model": "CR-9800",
+      "ip": "10.16.1.2"
+    },
+    {
+      "id": "RT-AGG-A",
+      "type": "router",
+      "name": "汇聚路由 A",
+      "x": 580,
+      "y": 145,
+      "zone": "汇聚区",
+      "status": "up",
+      "model": "AR-7600",
+      "ip": "10.16.2.1"
+    },
+    {
+      "id": "RT-AGG-B",
+      "type": "router",
+      "name": "汇聚路由 B",
+      "x": 580,
+      "y": 380,
+      "zone": "汇聚区",
+      "status": "up",
+      "model": "AR-7600",
+      "ip": "10.16.2.2"
+    },
+    {
+      "id": "RT-AGG-C",
+      "type": "router",
+      "name": "汇聚路由 C",
+      "x": 580,
+      "y": 615,
+      "zone": "汇聚区",
+      "status": "degraded",
+      "model": "AR-7600",
+      "ip": "10.16.2.3"
+    },
+    {
+      "id": "RT-EDGE-A",
+      "type": "router",
+      "name": "接入路由 A",
+      "x": 825,
+      "y": 245,
+      "zone": "接入区",
+      "status": "up",
+      "model": "ER-3200",
+      "ip": "10.16.3.1"
+    },
+    {
+      "id": "RT-EDGE-B",
+      "type": "router",
+      "name": "接入路由 B",
+      "x": 825,
+      "y": 515,
+      "zone": "接入区",
+      "status": "up",
+      "model": "ER-3200",
+      "ip": "10.16.3.2"
+    },
+    {
+      "id": "TERM-IOT-07",
+      "type": "terminal",
+      "name": "IoT 采集器 07",
+      "x": 1005,
+      "y": 540,
+      "zone": "终端区",
+      "status": "up",
+      "model": "EDGE-IOT",
+      "ip": "10.16.8.17"
+    },
+    {
+      "id": "TERM-API-01",
+      "type": "terminal",
+      "name": "业务 API 集群",
+      "x": 1050,
+      "y": 380,
+      "zone": "终端区",
+      "status": "up",
+      "model": "API-NODE",
+      "ip": "10.16.9.11"
+    },
+    {
+      "id": "TERM-HMI-02",
+      "type": "terminal",
+      "name": "终端设备 02",
+      "x": 1130,
+      "y": 58,
+      "zone": "终端区",
+      "status": "up",
+      "model": "HMI-PANEL",
+      "ip": "未上报"
+    }
+  ],
+  "links": [
+    {
+      "id": "L-GW-CORE-A",
+      "source": "GW-EDGE-01",
+      "target": "RT-CORE-A",
+      "capacityMbps": 10000,
+      "latencyMs": 0.6,
+      "status": "up"
+    },
+    {
+      "id": "L-GW-CORE-B",
+      "source": "GW-EDGE-01",
+      "target": "RT-CORE-B",
+      "capacityMbps": 10000,
+      "latencyMs": 0.7,
+      "status": "up"
+    },
+    {
+      "id": "L-CORE-A-AGG-A",
+      "source": "RT-CORE-A",
+      "target": "RT-AGG-A",
+      "capacityMbps": 25000,
+      "latencyMs": 0.4,
+      "status": "up"
+    },
+    {
+      "id": "L-CORE-A-AGG-B",
+      "source": "RT-CORE-A",
+      "target": "RT-AGG-B",
+      "capacityMbps": 25000,
+      "latencyMs": 0.5,
+      "status": "up"
+    },
+    {
+      "id": "L-CORE-B-AGG-B",
+      "source": "RT-CORE-B",
+      "target": "RT-AGG-B",
+      "capacityMbps": 25000,
+      "latencyMs": 0.6,
+      "status": "up"
+    },
+    {
+      "id": "L-CORE-B-AGG-C",
+      "source": "RT-CORE-B",
+      "target": "RT-AGG-C",
+      "capacityMbps": 10000,
+      "latencyMs": 0.8,
+      "status": "up"
+    },
+    {
+      "id": "L-AGG-A-EDGE-A",
+      "source": "RT-AGG-A",
+      "target": "RT-EDGE-A",
+      "capacityMbps": 10000,
+      "latencyMs": 1.1,
+      "status": "up"
+    },
+    {
+      "id": "L-AGG-B-EDGE-A",
+      "source": "RT-AGG-B",
+      "target": "RT-EDGE-A",
+      "capacityMbps": 10000,
+      "latencyMs": 0.7,
+      "status": "up"
+    },
+    {
+      "id": "L-AGG-B-EDGE-B",
+      "source": "RT-AGG-B",
+      "target": "RT-EDGE-B",
+      "capacityMbps": 10000,
+      "latencyMs": 0.9,
+      "status": "up"
+    },
+    {
+      "id": "L-AGG-C-EDGE-B",
+      "source": "RT-AGG-C",
+      "target": "RT-EDGE-B",
+      "capacityMbps": 10000,
+      "latencyMs": 0.1,
+      "status": "up"
+    },
+    {
+      "id": "L-EDGE-A-IOT",
+      "source": "RT-EDGE-A",
+      "target": "TERM-IOT-07",
+      "capacityMbps": 1000,
+      "latencyMs": 2.8,
+      "status": "up"
+    },
+    {
+      "id": "L-EDGE-A-API",
+      "source": "RT-EDGE-A",
+      "target": "TERM-API-01",
+      "capacityMbps": 1000,
+      "latencyMs": 1.9,
+      "status": "up"
+    },
+    {
+      "id": "L-EDGE-B-API",
+      "source": "RT-EDGE-B",
+      "target": "TERM-API-01",
+      "capacityMbps": 1000,
+      "latencyMs": 2.4,
+      "status": "up"
+    },
+    {
+      "id": "L-EDGE-B-HMI",
+      "source": "RT-EDGE-B",
+      "target": "TERM-HMI-02",
+      "capacityMbps": 100000,
+      "latencyMs": 2.6,
+      "status": "up"
+    }
+  ],
+  "routes": [
+    {
+      "id": "route-primary",
+      "name": "生产主路径",
+      "kind": "primary",
+      "nodeIds": [
+        "GW-EDGE-01",
+        "RT-CORE-A",
+        "RT-AGG-B",
+        "RT-EDGE-A",
+        "TERM-API-01"
+      ]
+    },
+    {
+      "id": "route-backup-a",
+      "name": "备用路径 A",
+      "kind": "backup",
+      "nodeIds": [
+        "GW-EDGE-01",
+        "RT-CORE-B",
+        "RT-AGG-B",
+        "RT-EDGE-A",
+        "TERM-API-01"
+      ]
+    },
+    {
+      "id": "route-backup-b",
+      "name": "备用路径 B",
+      "kind": "backup",
+      "nodeIds": [
+        "GW-EDGE-01",
+        "RT-CORE-A",
+        "RT-AGG-A",
+        "RT-EDGE-A",
+        "TERM-API-01"
+      ]
+    }
+  ],
+  "quality": {
+    "rawNodes": 12,
+    "rawLinks": 17,
+    "duplicateNodes": 1,
+    "duplicateLinks": 1,
+    "invalidLinks": 2,
+    "nullFields": 5,
+    "anomalies": 4,
+    "droppedRecords": 4,
+    "clampedRecords": 4
+  },
+  "qualityLogs": [
+    {
+      "level": "ok",
+      "code": "INGEST",
+      "text": "A 样例读取 12 节点 / 17 链路；中位数基线 10000 Mbps / 0.9 ms"
+    },
+    {
+      "level": "warn",
+      "code": "DEDUP",
+      "text": "RT-AGG-B · 重复节点记录已忽略，保留首次出现"
+    },
+    {
+      "level": "info",
+      "code": "NODE",
+      "text": "TERM-IOT-07 · missing-position → IoT 采集器 07, 1005,540"
+    },
+    {
+      "level": "warn",
+      "code": "NODE",
+      "text": "TERM-HMI-02 · null-name, position-clamped, null-ip → 终端设备 02, 1130,58"
+    },
+    {
+      "level": "warn",
+      "code": "LINK",
+      "text": "L-GW-CORE-B · 容量空值→中位数 10000"
+    },
+    {
+      "level": "warn",
+      "code": "DEDUP",
+      "text": "L-AGG-A-EDGE-A · 重复链路记录已忽略"
+    },
+    {
+      "level": "warn",
+      "code": "LINK",
+      "text": "L-AGG-C-EDGE-B · 延迟为负或过小→0.1 ms"
+    },
+    {
+      "level": "warn",
+      "code": "LINK",
+      "text": "L-EDGE-B-HMI · 容量超限→100 Gbps"
+    },
+    {
+      "level": "err",
+      "code": "LINK",
+      "text": "L-ORPHAN-01 · 端点无效 (RT-CORE-A → MISSING-NODE-99)，整条记录已丢弃"
+    },
+    {
+      "level": "err",
+      "code": "LINK",
+      "text": "L-SELF-LOOP · 端点无效 (RT-CORE-B → RT-CORE-B)，整条记录已丢弃"
+    },
+    {
+      "level": "ok",
+      "code": "CLEAN",
+      "text": "有效 11 节点 / 14 链路 · 丢弃 4 · 空值 5 · 异常 4"
+    }
+  ],
+  "capacityFallback": 10000,
+  "latencyFallback": 0.9,
+  "filter": {
+    "query": "",
+    "types": {
+      "gateway": true,
+      "router": true,
+      "terminal": true
+    },
+    "minCapacity": 0
+  }
+}

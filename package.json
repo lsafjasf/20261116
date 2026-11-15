@@ -1,0 +1,13 @@
+{
+  "name": "topoforge-workbench",
+  "version": "2.4.0",
+  "private": true,
+  "description": "可编辑、自动避障、可审计的网络拓扑工作台",
+  "scripts": {
+    "start": "python3 -m http.server 45879 --bind 127.0.0.1",
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1"
+  }
+}

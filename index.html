@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TopoForge 网络拓扑工作台：可编辑、避障、可审计的网络拓扑编辑器">
+  <title>TopoForge · 网络拓扑工作台</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none">
+            <path d="M8 9.5 16 5l8 4.5v9L16 23l-8-4.5v-9Z" stroke="currentColor" stroke-width="1.8"/>
+            <circle cx="16" cy="14" r="3" fill="currentColor"/>
+            <path d="M16 11V6.5M13.4 15.5 9.5 18M18.6 15.5l3.9 2.5" stroke="currentColor" stroke-width="1.6"/>
+          </svg>
+        </div>
+        <div class="brand-copy">
+          <div class="brand-line"><span>TopoForge</span><span class="edition">WORKBENCH 2.4</span></div>
+          <div class="brand-sub">网络拓扑 · 可编辑运行图</div>
+        </div>
+      </div>
+
+      <div class="header-context">
+        <span class="env-dot"></span>
+        <span>PROD-SIM</span>
+        <span class="slash">/</span>
+        <span id="headerProjectName">核心园区 · 双活链路</span>
+        <span class="version-pill">v<span id="headerVersion">1</span></span>
+      </div>
+
+      <div class="header-actions">
+        <div class="autosave" id="autosaveState"><span class="autosave-dot"></span><span>自动保存</span></div>
+        <button class="button button-quiet" id="saveProjectBtn" type="button" title="保存可重新载入的工程文件">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 3.5h9l3 3v10H4v-13Z"/><path d="M7 3.5v5h6v-5M7 13h6"/></svg>
+          保存工程
+        </button>
+        <label class="button button-quiet file-button" title="载入工程或拓扑 JSON">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 13V3m0 0L6.5 6.5M10 3l3.5 3.5"/><path d="M3.5 11.5v5h13v-5"/></svg>
+          载入
+          <input type="file" id="projectFileInput" accept=".json,application/json">
+        </label>
+        <button class="button button-primary" id="exportMenuBtn" type="button" aria-expanded="false">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v10m0 0 3.5-3.5M10 13 6.5 9.5"/><path d="M3.5 12.5v4h13v-4"/></svg>
+          导出
+          <svg class="chevron" viewBox="0 0 12 12" aria-hidden="true"><path d="m3 4.5 3 3 3-3"/></svg>
+        </button>
+        <div class="export-menu" id="exportMenu" hidden>
+          <button type="button" data-export="json">
+            <span class="export-icon">{ }</span>
+            <span><strong>拓扑 JSON</strong><small>节点、链路、路径及审计字段</small></span>
+          </button>
+          <button type="button" data-export="svg">
+            <span class="export-icon svg-icon">S</span>
+            <span><strong>拓扑 SVG</strong><small>1200 × 760 · 可无损缩放</small></span>
+          </button>
+          <button type="button" data-export="project">
+            <span class="export-icon">◈</span>
+            <span><strong>工程文件</strong><small>可重新载入并继续编辑</small></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <aside class="side-panel left-panel">
+        <section class="panel-section route-section">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">ROUTE SET</span>
+              <h2>路径与备用</h2>
+            </div>
+            <span class="count-badge" id="routeCountBadge">3</span>
+          </div>
+          <p class="section-copy">点击任意路径，沿路高亮节点并计算端到端延迟。</p>
+          <div class="route-list" id="routeList"></div>
+        </section>
+
+        <section class="panel-section filter-section">
+          <div class="section-heading compact">
+            <div>
+              <span class="eyebrow">VISIBLE SET</span>
+              <h2>视图筛选</h2>
+            </div>
+            <button class="text-button" id="resetFilterBtn" type="button">重置</button>
+          </div>
+          <label class="search-box">
+            <svg viewBox="0 0 18 18" aria-hidden="true"><circle cx="7.5" cy="7.5" r="4.5"/><path d="m11 11 3.5 3.5"/></svg>
+            <input id="searchInput" type="search" placeholder="搜索名称、ID 或区域" autocomplete="off">
+            <kbd>/</kbd>
+          </label>
+          <div class="type-filter" id="typeFilter">
+            <button class="type-chip gateway active" type="button" data-type="gateway">
+              <span class="type-swatch"></span>网关
+            </button>
+            <button class="type-chip router active" type="button" data-type="router">
+              <span class="type-swatch"></span>路由器
+            </button>
+            <button class="type-chip terminal active" type="button" data-type="terminal">
+              <span class="type-swatch"></span>终端
+            </button>
+          </div>
+          <div class="range-row">
+            <div class="range-label"><span>最小链路容量</span><strong id="capacityFilterLabel">不限</strong></div>
+            <input id="capacityFilter" type="range" min="0" max="40000" step="1000" value="0">
+            <div class="range-scale"><span>不限</span><span>10G</span><span>40G</span></div>
+          </div>
+          <div class="filter-readout">
+            <span class="status-dot"></span>
+            <span>当前筛选：</span>
+            <strong id="filterSummary">全部节点 · 全部链路</strong>
+          </div>
+        </section>
+
+        <section class="panel-section sample-section">
+          <div class="section-heading compact">
+            <div>
+              <span class="eyebrow">DATA SOURCE</span>
+              <h2>固定样例</h2>
+            </div>
+            <span class="sample-status" id="sampleStatus">A</span>
+          </div>
+          <label class="select-wrap">
+            <select id="sampleSelect" aria-label="选择固定样例"></select>
+            <svg viewBox="0 0 12 12" aria-hidden="true"><path d="m3 4.5 3 3 3-3"/></svg>
+          </label>
+          <div class="quality-mini" id="qualityMini"></div>
+        </section>
+      </aside>
+
+      <section class="stage-column">
+        <div class="stage-toolbar">
+          <div class="tool-group">
+            <button class="icon-button active" id="selectToolBtn" type="button" title="选择 / 拖动">
+              <svg viewBox="0 0 18 18"><path d="m4 2.5 10 7-4.3 1.1L7.5 15 4 2.5Z"/></svg>
+            </button>
+            <span class="tool-divider"></span>
+            <button class="icon-button" id="undoBtn" type="button" title="撤销 (⌘Z)">
+              <svg viewBox="0 0 18 18"><path d="M6.5 5 3 8.5 6.5 12"/><path d="M3.5 8.5h6a4 4 0 0 1 0 8H8"/></svg>
+            </button>
+            <button class="icon-button" id="redoBtn" type="button" title="重做 (⇧⌘Z)">
+              <svg viewBox="0 0 18 18"><path d="m11.5 5 3.5 3.5L11.5 12"/><path d="M14.5 8.5h-6a4 4 0 0 0 0 8H10"/></svg>
+            </button>
+            <button class="text-tool" id="autoLayoutBtn" type="button">
+              <svg viewBox="0 0 18 18"><rect x="2.5" y="2.5" width="4" height="4" rx="1"/><rect x="11.5" y="2.5" width="4" height="4" rx="1"/><rect x="7" y="11.5" width="4" height="4" rx="1"/><path d="M4.5 6.5v2h9v-2M9 8.5v3"/></svg>
+              自动整理
+            </button>
+          </div>
+          <div class="stage-meta">
+            <span class="sync-badge"><span></span>视图已同步</span>
+            <span class="meta-sep"></span>
+            <span id="stageObjectCount">10 节点 · 13 链路</span>
+          </div>
+          <div class="tool-group zoom-group">
+            <button class="icon-button" id="zoomOutBtn" type="button" title="缩小">−</button>
+            <button class="zoom-value" id="zoomValue" type="button" title="恢复 100%">100%</button>
+            <button class="icon-button" id="zoomInBtn" type="button" title="放大">+</button>
+            <button class="icon-button" id="fitBtn" type="button" title="适应画布">
+              <svg viewBox="0 0 18 18"><path d="M3 7V3h4M11 3h4v4M15 11v4h-4M7 15H3v-4"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="canvas-shell" id="canvasShell">
+          <div class="canvas-grid-glow"></div>
+          <svg id="topologySvg" viewBox="0 0 1200 760" role="img" aria-label="网络拓扑画布" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="minorGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                <path d="M20 0H0V20" fill="none" stroke="#273646" stroke-width="0.55" opacity="0.34"/>
+              </pattern>
+              <pattern id="majorGrid" width="100" height="100" patternUnits="userSpaceOnUse">
+                <rect width="100" height="100" fill="url(#minorGrid)"/>
+                <path d="M100 0H0V100" fill="none" stroke="#33475c" stroke-width="0.8" opacity="0.42"/>
+              </pattern>
+              <filter id="nodeShadow" x="-40%" y="-50%" width="180%" height="200%">
+                <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#02070c" flood-opacity="0.56"/>
+              </filter>
+              <filter id="routeGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="5" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+              <marker id="arrowHead" viewBox="0 0 6 6" refX="3" refY="3" markerWidth="6" markerHeight="6" orient="auto">
+                <circle cx="3" cy="3" r="2" fill="#87a1ba"/>
+              </marker>
+            </defs>
+            <rect width="1200" height="760" fill="url(#majorGrid)"/>
+            <g id="zoneLayer"></g>
+            <g id="edgeLayer"></g>
+            <g id="nodeLayer"></g>
+            <g id="overlayLayer"></g>
+          </svg>
+          <div class="canvas-breadcrumb">
+            <span class="canvas-live"><i></i>LIVE</span>
+            <span>拓扑 / 园区主视图</span>
+            <span class="canvas-hint">拖动节点 · 链路自动绕开障碍</span>
+          </div>
+          <div class="selection-toolbar" id="selectionToolbar" hidden>
+            <div class="selection-info"><span id="selectionKind">节点</span><strong id="selectionName"></strong></div>
+            <button id="deleteSelectionBtn" class="danger-button" type="button">
+              <svg viewBox="0 0 18 18"><path d="M3 5h12M7 2.5h4M5 5l.7 10.5h6.6L13 5M7.5 8v4.5M10.5 8v4.5"/></svg>
+              删除
+            </button>
+          </div>
+          <div class="canvas-legend">
+            <span><i class="legend-node gateway"></i>网关</span>
+            <span><i class="legend-node router"></i>路由器</span>
+            <span><i class="legend-node terminal"></i>终端</span>
+            <span class="legend-sep"></span>
+            <span><i class="legend-line"></i>链路</span>
+            <span><i class="legend-line route"></i>选中路径</span>
+          </div>
+          <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+        </div>
+
+        <section class="debug-panel" id="debugPanel">
+          <div class="debug-head">
+            <div class="debug-title">
+              <span class="terminal-icon">&gt;_</span>
+              <strong>调试面板</strong>
+              <span class="debug-live"><i></i>LIVE</span>
+              <span class="debug-hint">中间计算状态</span>
+            </div>
+            <div class="debug-tabs" role="tablist">
+              <button class="active" type="button" data-debug-tab="events">事件流 <span id="eventCount">0</span></button>
+              <button type="button" data-debug-tab="quality">数据清洗 <span id="qualityCount">0</span></button>
+              <button type="button" data-debug-tab="verify">自检 <span id="verifyCount">0</span></button>
+            </div>
+            <div class="debug-actions">
+              <button class="run-check-btn" id="runVerificationBtn" type="button">
+                <svg viewBox="0 0 18 18"><path d="M9 2.5 15 5v4c0 3.6-2.6 5.8-6 6.8C5.6 14.8 3 12.6 3 9V5l6-2.5Z"/><path d="m6.5 9 1.7 1.7 3.4-3.4"/></svg>
+                运行完整性验证
+              </button>
+              <button class="debug-collapse" id="debugCollapseBtn" type="button" title="折叠调试面板">
+                <svg viewBox="0 0 16 16"><path d="m4 10 4-4 4 4"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="debug-body" id="debugBody">
+            <div class="debug-view active" id="debug-events"></div>
+            <div class="debug-view" id="debug-quality"></div>
+            <div class="debug-view" id="debug-verify"></div>
+          </div>
+          <div class="debug-foot">
+            <span id="debugFootText">trace · ready</span>
+            <span>避障 A* · 拐点惩罚 0.35</span>
+            <span id="debugHash">sha · —</span>
+          </div>
+        </section>
+      </section>
+
+      <aside class="side-panel right-panel">
+        <section class="panel-section inspector-section">
+          <div class="section-heading compact">
+            <div>
+              <span class="eyebrow">INSPECTOR</span>
+              <h2>选中对象</h2>
+            </div>
+            <span class="context-chip" id="contextChip">未选择</span>
+          </div>
+          <div id="inspectorContent" class="inspector-empty">
+            <div class="empty-orbit"><span></span><i></i></div>
+            <p>选择节点或链路查看详情</p>
+            <small>Delete 删除节点及其相连链路</small>
+          </div>
+        </section>
+
+        <section class="panel-section path-analysis-section">
+          <div class="section-heading compact">
+            <div>
+              <span class="eyebrow">PATH ANALYSIS</span>
+              <h2>路径分析</h2>
+            </div>
+            <span class="live-chip" id="pathLiveChip"><i></i>READY</span>
+          </div>
+          <div id="pathAnalysis" class="path-analysis-empty">
+            <div class="path-prompt">
+              <svg viewBox="0 0 40 40"><circle cx="8" cy="20" r="4"/><circle cx="32" cy="20" r="4"/><path d="M12 20h8m0-5 5 5-5 5m0-5h8"/></svg>
+              <span>从左侧选择一条路径</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel-section contract-section">
+          <div class="section-heading compact">
+            <div>
+              <span class="eyebrow">DATA CONTRACT</span>
+              <h2>版本与导出口径</h2>
+            </div>
+            <span class="contract-check">CHECKED</span>
+          </div>
+          <dl class="contract-list">
+            <div><dt>数据版本</dt><dd id="contractVersion">v1</dd></div>
+            <div><dt>当前筛选</dt><dd id="contractFilter">全部对象</dd></div>
+            <div><dt>导出口径</dt><dd>筛选后全拓扑</dd></div>
+            <div><dt>数值精度</dt><dd>容量整数 · 延迟 1 位</dd></div>
+            <div><dt>SVG 画布</dt><dd>1200 × 760</dd></div>
+          </dl>
+          <div class="audit-strip">
+            <div><strong id="auditNodes">10</strong><span>节点</span></div>
+            <div><strong id="auditLinks">13</strong><span>链路</span></div>
+            <div><strong id="auditDegrees">26</strong><span>端点</span></div>
+            <div><strong id="auditHash">—</strong><span>指纹</span></div>
+          </div>
+        </section>
+
+        <section class="panel-section sync-section">
+          <div class="sync-title"><span class="sync-ring"></span><strong>单一数据源</strong><span>SYNCED</span></div>
+          <p>画布、路径、筛选、审计和导出均从同一份规范化状态计算。</p>
+          <div class="sync-rows">
+            <div><span>画布</span><i class="sync-dot"></i></div>
+            <div><span>路径</span><i class="sync-dot"></i></div>
+            <div><span>审计</span><i class="sync-dot"></i></div>
+            <div><span>导出</span><i class="sync-dot"></i></div>
+          </div>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <script src="js/samples.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
