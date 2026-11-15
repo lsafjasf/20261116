@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>628 Atlas Lab · 稳定增量图集</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">628</span>
+        <div>
+          <h1>Atlas Lab</h1>
+          <p>稳定增量打包 · 可回载快照工作台</p>
+        </div>
+      </div>
+      <div class="live-metrics" aria-label="图集实时指标">
+        <div><span>帧</span><strong id="metric-frames">100</strong></div>
+        <div><span>尺寸</span><strong id="metric-size">512²</strong></div>
+        <div><span>利用率</span><strong id="metric-util">66.8%</strong></div>
+        <div><span>重叠</span><strong id="metric-overlap" class="ok">0</strong></div>
+      </div>
+      <div class="top-actions">
+        <button id="reset-btn" class="button ghost">重置 100 帧</button>
+        <button id="run-rounds-btn" class="button secondary">运行三轮增量</button>
+        <button id="export-btn" class="button primary">导出 PNG + JSON</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="panel controls">
+        <div class="panel-heading">
+          <div><span class="eyebrow">PARAMETERS</span><h2>打包参数</h2></div>
+          <span id="param-state" class="badge">默认</span>
+        </div>
+        <div class="field-grid">
+          <label>图集宽<input id="param-width" type="number" min="1" max="4096" value="512" /></label>
+          <label>图集高<input id="param-height" type="number" min="1" max="4096" value="512" /></label>
+          <label>帧间距<input id="param-padding" type="number" min="0" max="32" value="2" /></label>
+          <label>利用率下限<input id="param-floor" type="number" min="0.1" max="1" step="0.01" value="0.36" /></label>
+        </div>
+        <div class="switch-row">
+          <label class="switch"><input id="param-rotate" type="checkbox" checked /><span>允许旋转</span></label>
+          <label class="switch"><input id="param-trim" type="checkbox" checked /><span>透明裁边</span></label>
+          <label class="switch"><input id="param-compact" type="checkbox" checked /><span>利用率保护</span></label>
+        </div>
+        <div class="button-row">
+          <button id="apply-params-btn" class="button secondary compact">应用并重排</button>
+          <button id="preset-default-btn" class="button ghost compact">默认组</button>
+        </div>
+
+        <div class="divider"></div>
+        <div class="panel-heading tight">
+          <div><span class="eyebrow">INCREMENTAL</span><h2>单步修改</h2></div>
+          <span id="round-counter" class="badge">0 / 3</span>
+        </div>
+        <p class="hint">每步只处理新增、删除、修改帧；未受影响帧保持原坐标。</p>
+        <div class="operation-grid">
+          <button class="operation" data-op="add"><b>＋</b><span>新增 2 帧</span></button>
+          <button class="operation" data-op="modify"><b>↻</b><span>修改 2 帧</span></button>
+          <button class="operation" data-op="delete"><b>−</b><span>删除 1 帧</span></button>
+        </div>
+        <button id="next-round-btn" class="button secondary wide">执行下一轮固定场景</button>
+
+        <div class="divider"></div>
+        <div class="panel-heading tight">
+          <div><span class="eyebrow">RESILIENCE</span><h2>失效演练</h2></div>
+        </div>
+        <div class="failure-grid">
+          <button class="failure" data-failure="cache">缓存失效</button>
+          <button class="failure" data-failure="thumbnail">缩略图失败</button>
+          <button class="failure" data-failure="timeout">异步超时</button>
+        </div>
+      </aside>
+
+      <section class="stage">
+        <div id="fallback-banner" class="fallback-banner" hidden>
+          <span class="pulse"></span>
+          <div><strong>已自动回退</strong><p id="fallback-message"></p></div>
+          <button id="dismiss-fallback" class="icon-button" aria-label="关闭">×</button>
+        </div>
+
+        <article class="canvas-card">
+          <div class="card-heading">
+            <div><span class="eyebrow">EXPORT SOURCE</span><h2>图集屏幕预览</h2></div>
+            <div class="legend">
+              <span><i class="swatch hot"></i>本轮变更</span>
+              <span><i class="swatch line"></i>切片边界</span>
+            </div>
+          </div>
+          <div class="canvas-frame atlas-frame">
+            <canvas id="atlas-canvas" width="512" height="512"></canvas>
+            <div id="atlas-empty" class="empty-state" hidden>正在从工程源重建图集…</div>
+          </div>
+          <div class="canvas-footer">
+            <span id="atlas-caption">直接由导出 RGBA 缓冲绘制</span>
+            <span id="atlas-hash" class="mono">hash —</span>
+          </div>
+        </article>
+
+        <article class="canvas-card">
+          <div class="card-heading">
+            <div><span class="eyebrow">KEYFRAME PREVIEW</span><h2>关键帧合成</h2></div>
+            <select id="keyframe-select" aria-label="关键帧"></select>
+          </div>
+          <div class="animation-row">
+            <div class="canvas-frame animation-frame">
+              <canvas id="animation-canvas" width="512" height="300"></canvas>
+            </div>
+            <div class="keyframe-meta">
+              <div id="keyframe-name" class="big-label">待机</div>
+              <dl id="layer-list" class="layer-list"></dl>
+              <button id="compare-export-btn" class="button ghost compact">校验预览 = 导出</button>
+              <p id="compare-result" class="check-note">尚未执行像素比对</p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <aside class="panel inspector">
+        <div class="panel-heading">
+          <div><span class="eyebrow">INSPECTOR</span><h2>切片检查</h2></div>
+          <span id="slice-badge" class="badge">rotated + trimmed</span>
+        </div>
+        <div class="thumbnail-grid" id="thumbnail-grid"></div>
+        <dl class="stats-list" id="slice-stats"></dl>
+        <div class="divider"></div>
+        <div class="panel-heading tight">
+          <div><span class="eyebrow">ROUND TRIP</span><h2>导出与回载</h2></div>
+        </div>
+        <button id="reload-export-btn" class="button secondary wide" disabled>重新载入上次导出</button>
+        <label class="file-button">
+          <input id="import-file" type="file" accept="application/json,.json" />
+          <span>载入外部 atlas.json</span>
+        </label>
+        <div id="reload-result" class="result-box quiet">等待导出或载入</div>
+        <div class="divider"></div>
+        <div class="panel-heading tight">
+          <div><span class="eyebrow">SNAPSHOTS</span><h2>导出前工程快照</h2></div>
+          <span id="snapshot-count" class="badge">0</span>
+        </div>
+        <div id="snapshot-list" class="snapshot-list">
+          <p class="hint">导出时自动保留当前工程、坐标、颜色与图集像素。</p>
+        </div>
+      </aside>
+    </main>
+
+    <section class="lower-grid">
+      <article class="panel round-panel">
+        <div class="panel-heading">
+          <div><span class="eyebrow">100 FRAME BENCHMARK</span><h2>三轮增量对比</h2></div>
+          <button id="show-report-btn" class="button ghost compact">生成完整报告</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>轮次</th><th>图集</th><th>利用率</th><th>重排区域</th>
+                <th>未受影响位移</th><th>导出哈希</th><th>快照/回载</th>
+              </tr>
+            </thead>
+            <tbody id="round-table">
+              <tr class="placeholder-row"><td colspan="7">运行固定场景后显示三轮数据</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="panel diagnostics-panel">
+        <div class="panel-heading">
+          <div><span class="eyebrow">REPEATABLE TESTS</span><h2>默认 · 边界 · 异常</h2></div>
+          <button id="run-diagnostics-btn" class="button secondary compact">运行三组测试</button>
+        </div>
+        <div id="diagnostics-results" class="diagnostics-results">
+          <p class="hint">固定 seed 628，可在 Node 端用 <code>npm test</code> 重复执行。</p>
+        </div>
+      </article>
+    </section>
+
+    <div id="toast-stack" class="toast-stack" aria-live="polite"></div>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
