@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>现场录音工作台 · 三麦克风模拟</title>
+<link rel="stylesheet" href="src/style.css" />
+</head>
+<body>
+<header class="topbar">
+  <h1>现场录音工作台</h1>
+  <div id="statusPill" class="status idle">空闲</div>
+  <div class="stats">
+    <span>活动节点 <b id="nodeCount">0</b></span>
+    <span>监听器 <b id="listenerCount">0</b></span>
+    <span>采样率 <b id="sampleRate">-</b></span>
+    <span>缓冲 <b id="bufferStatus">无</b></span>
+  </div>
+</header>
+
+<main class="layout">
+  <section class="room-wrap">
+    <canvas id="room" width="720" height="460"></canvas>
+    <div class="room-hint">拖拽麦克风或声源调整位置 · 滚轮在悬停麦克风上调整增益</div>
+  </section>
+
+  <aside class="panel">
+    <h2>麦克风与增益</h2>
+    <div id="micControls"></div>
+
+    <h2>声源</h2>
+    <div class="row"><label><input type="checkbox" id="srcRain" checked /> 雨声（环境）</label></div>
+    <div class="row"><label><input type="checkbox" id="srcWind" checked /> 风声（起伏）</label></div>
+    <div class="row"><label><input type="checkbox" id="srcVoice" checked /> 人声（节拍点）</label></div>
+
+    <h2>耳机监听</h2>
+    <div class="row"><label>主音量 <input type="range" id="monitorGain" min="0" max="1" step="0.01" value="0.8" /></label></div>
+    <div class="row pan-readout">左/右声像：<span id="panReadout">-</span></div>
+
+    <h2>走带控制</h2>
+    <div class="buttons">
+      <button id="btnStart">开始/录音</button>
+      <button id="btnStop" disabled>停止</button>
+      <button id="btnClear" disabled>清空缓冲</button>
+      <button id="btnExport" disabled>导出立体声 WAV</button>
+    </div>
+
+    <h2>快照</h2>
+    <div class="buttons">
+      <button id="btnSnapshot">保存参数快照</button>
+      <button id="btnRestore">从快照恢复</button>
+    </div>
+
+    <h2>节拍点 / 日志</h2>
+    <ol id="beatList" class="beats"></ol>
+    <pre id="log" class="log"></pre>
+  </aside>
+</main>
+
+<canvas id="meter" width="720" height="90"></canvas>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

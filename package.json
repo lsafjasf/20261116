@@ -1,0 +1,31 @@
+{
+  "name": "uid573",
+  "version": "1.0.0",
+  "description": "三麦克风现场录音模拟工作台（Web Audio + Canvas + WAV 导出）",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "playwright test --config=playwright.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lsafjasf/20261116.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/lsafjasf/20261116/issues"
+  },
+  "homepage": "https://github.com/lsafjasf/20261116#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "playwright": "^1.49.1"
+  },
+  "engines": {
+    "node": ">=22 <24"
+  }
+}
