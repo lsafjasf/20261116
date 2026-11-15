@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>二十秒声景编辑器</title>
+    <link rel="stylesheet" href="src/css/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>二十秒声景 · 雨声 / 机器声 / 远处人声</h1>
+      <div class="status" id="statusPanel">
+        <span class="badge" id="engineState">状态：未启动</span>
+        <span class="badge" id="activeNodes">活动节点：0</span>
+        <span class="badge" id="frameListeners">帧监听：0</span>
+        <span class="badge" id="playheadBadge">播放头：0.00s</span>
+      </div>
+    </header>
+
+    <section class="transport">
+      <button id="playBtn" type="button">播放</button>
+      <button id="pauseBtn" type="button">暂停</button>
+      <button id="stopBtn" type="button">停止</button>
+      <button id="restartBtn" type="button">重复启动</button>
+      <button id="destroyBtn" type="button">销毁引擎</button>
+      <label>主增益
+        <input id="masterGain" type="range" min="-24" max="6" step="0.5" value="0" />
+        <span id="masterGainValue">0 dB</span>
+      </label>
+      <label>BPM
+        <input id="bpm" type="number" min="40" max="200" step="1" value="96" />
+      </label>
+    </section>
+
+    <main class="layout">
+      <section class="timeline-panel">
+        <div class="ruler" id="ruler">
+          <canvas id="rulerCanvas" width="980" height="28"></canvas>
+        </div>
+        <div class="tracks" id="tracks"></div>
+        <div class="automation-panel">
+          <h2>自动化（雨声轨道，两个点）</h2>
+          <canvas id="automationCanvas" width="980" height="140"></canvas>
+        </div>
+      </section>
+
+      <aside class="inspector" id="inspector">
+        <h2>片段检查器</h2>
+        <p class="hint">在时间线上拖动片段移动位置；拖动两端调整交叉淡化。</p>
+        <div id="inspectorFields"></div>
+      </aside>
+    </main>
+
+    <section class="io-bar">
+      <button id="saveBtn" type="button">保存工程</button>
+      <button id="restoreBtn" type="button">从快照恢复</button>
+      <button id="exportBtn" type="button">导出 WAV</button>
+      <span id="ioMessage" class="io-message"></span>
+    </section>
+
+    <script type="module" src="src/js/app.js"></script>
+  </body>
+</html>
