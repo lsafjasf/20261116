@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#081016" />
+    <title>TANDEM 07 · 狭窄装配台</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <header class="topbar">
+        <div class="brand-block">
+          <div class="brand-mark" aria-hidden="true"><span></span><b>07</b></div>
+          <div>
+            <p class="eyebrow">TANDEM ASSEMBLY CELL</p>
+            <h1>狭窄装配台</h1>
+          </div>
+        </div>
+
+        <div class="mission-block" aria-label="任务进度">
+          <div class="mission-copy">
+            <span>任务进度</span>
+            <strong id="missionCount">0 / 3</strong>
+          </div>
+          <div class="kit-rail" id="kitRail">
+            <span class="kit-node" data-kit="0"><i></i><em>01</em></span>
+            <span class="kit-link"></span>
+            <span class="kit-node" data-kit="1"><i></i><em>02</em></span>
+            <span class="kit-link"></span>
+            <span class="kit-node" data-kit="2"><i></i><em>03</em></span>
+            <span class="kit-node spare" data-kit="3"><i></i><em>备件</em></span>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <div class="status-chip" id="statusChip"><i></i><span>现场恢复</span></div>
+          <button class="icon-button" id="soundButton" type="button" aria-label="切换声音">
+            <span class="sound-bars"><i></i><i></i><i></i></span>
+            <span class="button-label">声音</span>
+          </button>
+          <button class="icon-button danger" id="resetButton" type="button">
+            <span class="reset-icon">↺</span>
+            <span class="button-label">重置工位</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="operator-panel operator-left">
+          <div class="operator-heading">
+            <span class="operator-number">L</span>
+            <div>
+              <p>PLAYER 01</p>
+              <h2>左侧 · 固定底座</h2>
+            </div>
+          </div>
+
+          <div class="key-module">
+            <kbd>A</kbd>
+            <div>
+              <strong>按住夹紧</strong>
+              <span>松开即漂移</span>
+            </div>
+            <i class="key-state" id="leftKeyState"></i>
+          </div>
+
+          <div class="gauge-card">
+            <div class="gauge-title">
+              <span>底座偏移</span>
+              <strong id="offsetValue">44.0</strong>
+              <em>mm</em>
+            </div>
+            <div class="meter-track offset-track">
+              <span class="safe-marker"></span>
+              <span class="meter-fill" id="offsetFill"></span>
+              <span class="meter-cursor" id="offsetCursor"></span>
+            </div>
+            <div class="meter-legend"><span>0</span><span class="safe-label">安全 ≤ 18</span><span>100</span></div>
+          </div>
+
+          <div class="gauge-card">
+            <div class="gauge-title">
+              <span>夹持稳定度</span>
+              <strong id="gripValue">56</strong>
+              <em>%</em>
+            </div>
+            <div class="meter-track grip-track">
+              <span class="meter-fill" id="gripFill"></span>
+            </div>
+            <p class="metric-note" id="leftNote">底座尚未锁定</p>
+          </div>
+
+          <div class="instruction-card">
+            <span class="instruction-index">01</span>
+            <p>先按住 <b>A</b>，让底座偏移进入绿色安全区。右侧开始动作后不要松手。</p>
+          </div>
+        </aside>
+
+        <section class="stage-column">
+          <div class="stage-frame">
+            <div class="stage-label top-left">
+              <span>LIVE CELL</span>
+              <b id="stageClock">T+ 00:00.000</b>
+            </div>
+            <div class="stage-label top-right">
+              <span>窗口</span>
+              <b id="windowValue">8.0s</b>
+            </div>
+            <canvas id="stageCanvas" width="1180" height="620" aria-label="狭窄装配台实时画面"></canvas>
+            <div class="stage-vignette"></div>
+            <div class="phase-banner" id="phaseBanner">
+              <small id="phaseEyebrow">READY</small>
+              <strong id="phaseTitle">两侧同时进入安全带</strong>
+              <span id="phaseDetail">保持 1.2 秒完成同步锁定</span>
+            </div>
+            <div class="start-overlay" id="startOverlay">
+              <p class="eyebrow">TWO-PLAYER INTERLOCK</p>
+              <h2>两人就位，分别守住 A 与 L</h2>
+              <p>左侧持续夹紧，右侧控制压力。同步保持 1.2 秒才会锁定，三组完成后必须留下最后一件备件。</p>
+              <button id="startButton" type="button">装载第一组 <span>→</span></button>
+              <small>单人只按一侧无法完成装配</small>
+            </div>
+            <div class="alignment-readout" id="alignmentReadout">
+              <span>OFFSET</span><b id="canvasOffset">44.0</b>
+              <i></i>
+              <span>PRESSURE</span><b id="canvasPressure">34.0</b>
+            </div>
+          </div>
+
+          <div class="sync-strip">
+            <div class="sync-copy">
+              <span>同步保持</span>
+              <strong id="syncValue">0%</strong>
+            </div>
+            <div class="sync-track">
+              <span id="syncFill"></span>
+              <i class="sync-threshold"></i>
+            </div>
+            <p id="constraintText">左侧先夹紧，右侧脉冲加压</p>
+          </div>
+        </section>
+
+        <aside class="operator-panel operator-right">
+          <div class="operator-heading">
+            <span class="operator-number">R</span>
+            <div>
+              <p>PLAYER 02</p>
+              <h2>右侧 · 安装模块</h2>
+            </div>
+          </div>
+
+          <div class="key-module">
+            <kbd>L</kbd>
+            <div>
+              <strong>按住加压</strong>
+              <span>松开即泄压</span>
+            </div>
+            <i class="key-state" id="rightKeyState"></i>
+          </div>
+
+          <div class="gauge-card">
+            <div class="gauge-title">
+              <span>安装压力</span>
+              <strong id="pressureValue">34.0</strong>
+              <em>%</em>
+            </div>
+            <div class="meter-track pressure-track">
+              <span class="safe-marker low"></span>
+              <span class="safe-marker high"></span>
+              <span class="meter-fill" id="pressureFill"></span>
+              <span class="meter-cursor" id="pressureCursor"></span>
+            </div>
+            <div class="meter-legend"><span>0</span><span class="safe-label">安全 42–74</span><span>100</span></div>
+          </div>
+
+          <div class="gauge-card durability-card">
+            <div class="gauge-title">
+              <span>垫圈耐久</span>
+              <strong id="durabilityValue">100</strong>
+              <em>%</em>
+            </div>
+            <div class="meter-track durability-track">
+              <span class="meter-fill" id="durabilityFill"></span>
+            </div>
+            <p class="metric-note" id="rightNote">压力到达 92% 将压溃垫圈</p>
+          </div>
+
+          <div class="instruction-card">
+            <span class="instruction-index">02</span>
+            <p>在底座稳定后按住 <b>L</b> 加压。压力接近 <b>74%</b> 时松开，保留安全余量。</p>
+          </div>
+        </aside>
+      </main>
+
+      <footer class="timeline-console">
+        <div class="transport-row">
+          <div class="transport-title">
+            <span class="record-dot"></span>
+            <div><strong>共享时间线</strong><small id="timelineMode">LIVE · 固定步长 16ms</small></div>
+          </div>
+          <div class="transport-buttons">
+            <button class="transport-button primary" id="demoButton" type="button">
+              <span>▶</span> 示范回放
+            </button>
+            <button class="transport-button" id="failureDemoButton" type="button">
+              <span>×</span> 失败样本
+            </button>
+            <button class="transport-button" id="currentReplayButton" type="button" disabled>
+              <span>↺</span> 本次回放
+            </button>
+            <span class="transport-separator"></span>
+            <button class="square-button" id="pauseButton" type="button" aria-label="暂停回放" disabled>Ⅱ</button>
+            <button class="square-button" id="stepButton" type="button" aria-label="单步回放" disabled>▸|</button>
+            <div class="speed-group" aria-label="回放倍速">
+              <button type="button" data-speed="0.5" disabled>0.5×</button>
+              <button type="button" data-speed="1" class="active" disabled>1×</button>
+              <button type="button" data-speed="2" disabled>2×</button>
+              <button type="button" data-speed="4" disabled>4×</button>
+            </div>
+            <button class="transport-button subtle" id="exitReplayButton" type="button" disabled>退出回放</button>
+          </div>
+          <div class="replay-verdict" id="replayVerdict"><span>●</span> 实时记录中</div>
+        </div>
+
+        <div class="timeline-body">
+          <div class="scrub-row">
+            <span id="scrubTime">00:00.000</span>
+            <input id="scrubber" type="range" min="0" max="1000" value="0" step="1" disabled aria-label="回放进度" />
+            <span id="scrubDuration">00:00.000</span>
+          </div>
+          <div class="timeline-ruler">
+            <div class="track-row left-row"><span class="track-name">L 固定</span><div class="event-lane" id="leftLane"></div></div>
+            <div class="track-row right-row"><span class="track-name">R 安装</span><div class="event-lane" id="rightLane"></div></div>
+            <div class="track-row collision-row"><span class="track-name">碰撞</span><div class="event-lane" id="collisionLane"></div></div>
+          </div>
+        </div>
+
+        <div class="conflict-strip">
+          <div class="conflict-heading">
+            <span>冲突 / 结果</span>
+            <b id="conflictCount">0 条冲突</b>
+          </div>
+          <div class="conflict-list" id="conflictList">
+            <p class="empty-log">时间线将记录两侧输入、共享状态与碰撞结果。</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
