@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>品牌色板检查器</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>品牌色板检查器</h1>
+    <nav id="scheme-tabs" class="tabs" aria-label="方案切换"></nav>
+    <label class="vision-picker">
+      视觉模式
+      <select id="vision-mode">
+        <option value="normal">普通视觉</option>
+        <option value="protan">红色弱（Protan）</option>
+        <option value="deutan">绿色弱（Deutan）</option>
+        <option value="tritan">蓝黄色弱（Tritan）</option>
+      </select>
+    </label>
+  </header>
+
+  <div id="notices" class="notices" role="status" aria-live="polite"></div>
+
+  <main class="layout">
+    <section class="panel">
+      <h2>色板</h2>
+      <ul id="swatch-list" class="swatch-list"></ul>
+      <div class="actions">
+        <button id="btn-regen" type="button">重新生成未锁定颜色</button>
+        <button id="btn-export" type="button">导出 CSS 变量</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>实时预览 <span id="preview-mode-tag" class="tag"></span></h2>
+      <div id="preview-stage" class="preview-stage"></div>
+      <div id="thumb-wrap" class="thumb-wrap"></div>
+    </section>
+
+    <section class="panel wide">
+      <h2>配对评估 <span class="hint">小字 ≥ 4.5 · 按钮 ≥ 3.0 · 图表 ΔE ≥ 12（任一视觉模式不达标即警告）</span></h2>
+      <table id="pair-table" class="pair-table">
+        <thead>
+          <tr><th>组合</th><th>对比度</th><th>ΔE</th><th>小字</th><th>按钮</th><th>图表系列</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <h3>警告</h3>
+      <ul id="warning-list" class="warning-list"></ul>
+    </section>
+
+    <section class="panel wide">
+      <h2>工程快照（导出前自动保存）</h2>
+      <ul id="snapshot-list" class="snapshot-list"></ul>
+    </section>
+  </main>
+
+  <dialog id="export-dialog">
+    <h2>CSS 变量</h2>
+    <textarea id="export-output" readonly rows="10" cols="50"></textarea>
+    <div class="actions">
+      <button id="btn-download-css" type="button">下载 .css</button>
+      <button id="btn-download-snapshot" type="button">下载工程快照 .json</button>
+      <button id="btn-close-export" type="button">关闭</button>
+    </div>
+  </dialog>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
