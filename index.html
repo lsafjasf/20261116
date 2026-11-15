@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="程序化地形、坡度坡向与 D8 汇流风险分析工作台"
+    />
+    <title>Terrain Flow Lab · 地形汇流风险台</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231d2927'/%3E%3Cpath d='M5 23l7-12 5 8 3-4 7 8' fill='none' stroke='%23f6f2e8' stroke-width='2'/%3E%3Ccircle cx='12' cy='11' r='2' fill='%23d96842'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Terrain Flow Lab 首页">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 42 42" role="img">
+              <path d="M4 30c7-5 9-10 16-10s9 5 18-1" />
+              <path d="M4 36c7-5 10-9 17-9s10 4 17-1" />
+              <path d="M7 23 18 8l7 12 4-5 7 8" />
+              <circle cx="18" cy="8" r="2.2" />
+            </svg>
+          </span>
+          <span class="brand-copy">
+            <strong>TERRAIN / FLOW</strong>
+            <small>地形汇流风险实验室</small>
+          </span>
+        </a>
+        <div class="topbar-meta">
+          <span class="live-chip"><i></i>本地计算</span>
+          <span class="meta-separator"></span>
+          <span>算法 <b id="algorithmVersion">r3</b></span>
+          <span>数据版本 <b id="headerVersion">—</b></span>
+        </div>
+      </header>
+
+      <section class="context-bar" aria-label="当前分析上下文">
+        <div class="context-item">
+          <span class="context-icon">FIL</span>
+          <span><em>当前筛选</em><b id="currentFilter">—</b></span>
+        </div>
+        <div class="context-item">
+          <span class="context-icon">VER</span>
+          <span><em>数据版本</em><b id="currentVersion">—</b></span>
+        </div>
+        <div class="context-item context-wide">
+          <span class="context-icon">EXP</span>
+          <span
+            ><em>导出口径</em
+            ><b id="exportMethod"
+              >风险指数 = log₁₊(汇流格−1) / log₁₊(最大汇流−1) × 100%</b
+            ></span
+          >
+        </div>
+      </section>
+
+      <main class="workspace">
+        <div class="main-column">
+          <section class="card map-card" aria-labelledby="mapTitle">
+            <div class="map-header">
+              <div class="map-title-group">
+                <div class="eyebrow"><span>DEM / D8</span><i></i>540 CELLS</div>
+                <h1 id="mapTitle">汇流风险地形台</h1>
+              </div>
+              <div class="sample-switch" role="group" aria-label="固定样例">
+                <button class="sample-btn is-active" data-sample="north-ridge">
+                  <span>A</span><b>北岭沟谷</b>
+                </button>
+                <button class="sample-btn" data-sample="south-terrace">
+                  <span>B</span><b>南坡台地</b>
+                </button>
+              </div>
+            </div>
+
+            <div class="map-toolbar">
+              <div class="layer-tabs" role="group" aria-label="显示图层">
+                <button class="layer-btn" data-layer="terrain">地形</button>
+                <button class="layer-btn" data-layer="slope">坡度</button>
+                <button class="layer-btn" data-layer="aspect">坡向</button>
+                <button class="layer-btn is-active" data-layer="flow">汇流风险</button>
+              </div>
+              <div class="display-options">
+                <label class="check-control">
+                  <input id="toggleArrows" type="checkbox" checked />
+                  <span class="check-box"></span>
+                  流向箭头
+                </label>
+                <label class="check-control">
+                  <input id="toggleGrid" type="checkbox" checked />
+                  <span class="check-box"></span>
+                  网格
+                </label>
+              </div>
+            </div>
+
+            <div class="canvas-frame">
+              <canvas
+                id="terrainCanvas"
+                width="1000"
+                height="560"
+                aria-label="地形网格画布，可点击读取高程与排水路径"
+              ></canvas>
+              <div class="north-arrow" aria-hidden="true">
+                <span>N</span>
+                <i></i>
+              </div>
+              <div class="canvas-scale" aria-hidden="true">
+                <span></span><b>500 m</b>
+              </div>
+              <div id="hoverReadout" class="hover-readout">移动到网格查看读数</div>
+            </div>
+
+            <div class="map-footer">
+              <div id="mapLegend" class="map-legend" aria-label="图例"></div>
+              <div class="cursor-status">
+                <span class="status-dot"></span>
+                <span id="cursorStatus">R— / C—</span>
+                <span class="instruction">点击网格锁定排水路径</span>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <aside class="side-column">
+          <section class="card threshold-card" aria-labelledby="thresholdTitle">
+            <div class="card-heading">
+              <div>
+                <span class="eyebrow">THRESHOLD COMPARE</span>
+                <h2 id="thresholdTitle">双阈值对照</h2>
+              </div>
+              <span class="risk-pill" id="riskPill">风险筛选</span>
+            </div>
+
+            <div class="threshold-control threshold-a">
+              <div class="threshold-label">
+                <span><i></i>阈值 A · 高风险</span>
+                <output id="thresholdAValue" for="thresholdA">62%</output>
+              </div>
+              <input
+                id="thresholdA"
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+                value="62"
+                aria-label="高风险阈值 A"
+              />
+              <div class="range-scale"><span>0%</span><span>100%</span></div>
+            </div>
+
+            <div class="threshold-control threshold-b">
+              <div class="threshold-label">
+                <span><i></i>阈值 B · 对照</span>
+                <output id="thresholdBValue" for="thresholdB">45%</output>
+              </div>
+              <input
+                id="thresholdB"
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+                value="45"
+                aria-label="对照阈值 B"
+              />
+              <div class="range-scale"><span>0%</span><span>100%</span></div>
+            </div>
+
+            <div class="threshold-compare">
+              <div class="compare-row">
+                <span>命中网格</span>
+                <strong><b id="countA">—</b><i>vs</i><b id="countB">—</b></strong>
+              </div>
+              <div class="compare-track" aria-hidden="true">
+                <span id="barA" class="bar-a"></span>
+                <span id="barB" class="bar-b"></span>
+              </div>
+              <p id="compareNote">正在计算阈值差异…</p>
+            </div>
+          </section>
+
+          <section class="card inspect-card" aria-labelledby="inspectTitle">
+            <div class="card-heading">
+              <div>
+                <span class="eyebrow">CELL INSPECTOR</span>
+                <h2 id="inspectTitle">网格读数</h2>
+              </div>
+              <span class="cell-tag" id="selectedCellTag">未选中</span>
+            </div>
+
+            <div id="emptySelection" class="empty-selection">
+              <span class="target-glyph"><i></i></span>
+              <p>点击地形网格<br /><small>读取高程、坡度与排水路径</small></p>
+            </div>
+
+            <div id="selectionContent" class="selection-content" hidden>
+              <div class="selection-primary">
+                <span>高程</span>
+                <strong id="selectedElevation">—</strong>
+                <small>m · <span id="selectedElevationRaw">—</span></small>
+              </div>
+              <div class="metric-grid">
+                <div><span>坡度</span><strong id="selectedSlope">—</strong><small>°</small></div>
+                <div>
+                  <span>坡向</span><strong id="selectedAspect">—</strong><small
+                    ><b id="selectedAspectLabel">—</b> · 方位角</small
+                  >
+                </div>
+                <div>
+                  <span>汇流方向</span><strong id="selectedFlow">—</strong
+                  ><small><b id="selectedFlowLabel">—</b> · D8</small>
+                </div>
+                <div>
+                  <span>累积汇流</span><strong id="selectedAccum">—</strong
+                  ><small>格</small>
+                </div>
+              </div>
+              <div class="risk-readout">
+                <span>风险指数</span>
+                <strong id="selectedRisk">—</strong>
+                <em id="selectedRiskState">—</em>
+              </div>
+              <div class="path-readout">
+                <div>
+                  <span>排水路径</span>
+                  <b id="pathSummary">—</b>
+                </div>
+                <p id="pathChain">—</p>
+              </div>
+              <p class="source-line" id="cellSource">—</p>
+            </div>
+          </section>
+
+          <section class="card action-card" aria-labelledby="actionTitle">
+            <div class="action-heading">
+              <div>
+                <span class="eyebrow">PROJECT / OUTPUT</span>
+                <h2 id="actionTitle">工程与导出</h2>
+              </div>
+              <span id="auditBadge" class="audit-badge">待审计</span>
+            </div>
+            <button id="exportButton" class="primary-button" type="button">
+              <svg viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M10 2v10m0 0 4-4m-4 4L6 8M3 14v3h14v-3" />
+              </svg>
+              导出 PNG（含图例）
+            </button>
+            <div class="secondary-actions">
+              <button id="saveProjectButton" class="secondary-button" type="button">
+                保存工程
+              </button>
+              <button id="openProjectButton" class="secondary-button" type="button">
+                载入工程
+              </button>
+              <input id="projectFileInput" type="file" accept=".json,application/json" hidden />
+            </div>
+            <p class="audit-copy" id="auditCopy">
+              导出会固定当前筛选与版本，并比对导出前后的对象数量和关键数值。
+            </p>
+          </section>
+        </aside>
+      </main>
+
+      <section class="debug-panel" aria-labelledby="debugTitle">
+        <div class="debug-header">
+          <div>
+            <span class="eyebrow"><i class="pulse-dot"></i> LIVE PIPELINE</span>
+            <h2 id="debugTitle">计算调试台</h2>
+          </div>
+          <div class="debug-header-actions">
+            <span id="debugStatus">已同步</span>
+            <button id="runChecksButton" class="debug-button" type="button">
+              运行内置校验
+            </button>
+          </div>
+        </div>
+        <div class="debug-stats">
+          <div><span>网格对象</span><b id="debugGridCount">—</b><small>cells</small></div>
+          <div><span>原始记录</span><b id="debugRawCount">—</b><small>records</small></div>
+          <div><span>重复剔除</span><b id="debugDuplicates">—</b><small>dedupe</small></div>
+          <div><span>空值填补</span><b id="debugNulls">—</b><small>impute</small></div>
+          <div><span>异常截断</span><b id="debugOutliers">—</b><small>clamp</small></div>
+          <div><span>汇流校验</span><b id="debugFlow">—</b><small>D8</small></div>
+        </div>
+        <div class="debug-body">
+          <div class="pipeline-block">
+            <div class="debug-section-title">
+              <span>数据管线</span><b id="fixtureLabel">—</b>
+            </div>
+            <div class="pipeline-flow" id="pipelineFlow"></div>
+            <pre id="debugLog" class="debug-log" aria-live="polite"></pre>
+          </div>
+          <div class="checks-block">
+            <div class="debug-section-title">
+              <span>可复核证据</span><b id="checksSummary">未运行</b>
+            </div>
+            <ul id="selfChecks" class="self-checks"></ul>
+            <div class="audit-detail" id="auditDetail">
+              <span>EXPORT AUDIT</span>
+              <b id="auditObjects">—</b>
+              <code id="auditHash">—</code>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="page-footer">
+        <span>Terrain Flow Lab · 本地确定性计算</span>
+        <span id="footerContext">—</span>
+      </footer>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
