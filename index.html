@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>泄洪调度仿真 · 大坝与下游城镇保卫战</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>泄洪调度仿真</h1>
+  <div id="clockPanel">
+    <span id="clock">00:00:00</span>
+    <span id="statusBadge" class="badge running">运行中</span>
+  </div>
+</header>
+
+<main>
+  <section id="stage">
+    <canvas id="cv" width="960" height="520"></canvas>
+    <div id="metrics">
+      <div>库水位 <b id="mLevel">--</b> m <span id="mLevelMargin" class="margin"></span></div>
+      <div>入库 <b id="mQin">--</b> m³/s</div>
+      <div>出库 <b id="mQout">--</b> m³/s <span id="mFlowMargin" class="margin"></span></div>
+      <div>冲刷累积 <b id="mScour">0</b></div>
+      <div id="mForecast">降雨预报：--</div>
+    </div>
+  </section>
+
+  <aside id="panel">
+    <fieldset>
+      <legend>仿真控制</legend>
+      <div class="row">
+        <button id="btnPause">暂停</button>
+        <button id="btnStep">单步</button>
+        <button id="btnResume">恢复</button>
+      </div>
+      <div class="row">
+        <label>速度 <input type="range" id="speed" min="1" max="6" value="3"></label>
+        <label><input type="checkbox" id="audioOn"> 水流声</label>
+      </div>
+      <div class="row">
+        <select id="scenario">
+          <option value="normal">正常调度</option>
+          <option value="gateFault">设备故障：2 号闸门卡涩</option>
+          <option value="extremeFlood">参数越限：超标准洪水</option>
+        </select>
+        <button id="btnRestart">重新开始</button>
+      </div>
+      <div class="row">
+        <button id="btnReplayFail" disabled>失败回放</button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>闸门与泄洪道</legend>
+      <div class="gate" data-gate="0">
+        <label>1 号闸门 <span class="gv">0%</span></label>
+        <input type="range" min="0" max="100" value="0">
+        <button class="repair" disabled>修复</button>
+      </div>
+      <div class="gate" data-gate="1">
+        <label>2 号闸门 <span class="gv">0%</span></label>
+        <input type="range" min="0" max="100" value="0">
+        <button class="repair" disabled>修复</button>
+      </div>
+      <div class="gate" data-gate="2">
+        <label>3 号闸门 <span class="gv">0%</span></label>
+        <input type="range" min="0" max="100" value="0">
+        <button class="repair" disabled>修复</button>
+      </div>
+      <div class="gate" data-gate="spill">
+        <label>泄洪道 <span class="gv">0%</span></label>
+        <input type="range" min="0" max="100" value="0">
+      </div>
+      <p class="hint">提示：闸门全开约 50s，泄洪道约 100s。先开闸门削峰，再视水位缓开泄洪道；叠加流量超过下游安全线会冲刷河岸。</p>
+    </fieldset>
+
+    <fieldset id="logBox">
+      <legend>操作与事件记录（仿真时钟）</legend>
+      <div id="log"></div>
+    </fieldset>
+  </aside>
+</main>
+
+<script type="module" src="js/ui.js"></script>
+</body>
+</html>

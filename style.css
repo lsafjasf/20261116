@@ -1,0 +1,58 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0; font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #0e1620; color: #dfe8f0;
+}
+header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 20px; background: #152232; border-bottom: 1px solid #26394f;
+}
+header h1 { font-size: 18px; margin: 0; }
+#clockPanel { display: flex; gap: 12px; align-items: center; }
+#clock { font-size: 22px; font-variant-numeric: tabular-nums; color: #7fd4ff; }
+.badge { padding: 3px 10px; border-radius: 10px; font-size: 12px; }
+.badge.running { background: #1c4d2e; color: #7fe6a2; }
+.badge.paused { background: #5a4a1c; color: #ffd97f; }
+.badge.success { background: #1c4d2e; color: #7fe6a2; }
+.badge.failed { background: #5a1c1c; color: #ff9f7f; }
+
+main { display: flex; gap: 14px; padding: 14px 20px; align-items: flex-start; }
+#stage { flex: 1; min-width: 0; }
+#cv { width: 100%; background: #0a121c; border: 1px solid #26394f; border-radius: 6px; }
+#metrics {
+  display: flex; gap: 18px; flex-wrap: wrap; margin-top: 8px;
+  font-size: 14px; background: #152232; padding: 8px 12px; border-radius: 6px;
+}
+#metrics b { color: #7fd4ff; font-variant-numeric: tabular-nums; }
+.margin { font-size: 12px; margin-left: 4px; }
+.margin.ok { color: #7fe6a2; }
+.margin.bad { color: #ff9f7f; }
+
+#panel { width: 340px; display: flex; flex-direction: column; gap: 10px; }
+fieldset { border: 1px solid #26394f; border-radius: 6px; background: #111c2a; }
+legend { font-size: 13px; color: #9fb8cc; padding: 0 6px; }
+.row { display: flex; gap: 8px; margin: 6px 0; align-items: center; flex-wrap: wrap; }
+button {
+  background: #1e3acc; color: #fff; border: none; border-radius: 4px;
+  padding: 6px 14px; cursor: pointer; font-size: 13px;
+}
+button:disabled { background: #33415a; color: #7d8fa3; cursor: not-allowed; }
+select, input[type="range"] { accent-color: #3a6ee0; }
+select { background: #0e1620; color: #dfe8f0; border: 1px solid #26394f; padding: 5px; border-radius: 4px; }
+
+.gate { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
+.gate label { width: 90px; font-size: 13px; }
+.gate input[type="range"] { flex: 1; }
+.gate .repair { padding: 3px 8px; font-size: 12px; background: #8a5a1c; }
+.gate.stuck label { color: #ff9f7f; }
+.hint { font-size: 12px; color: #8ba3b8; margin: 6px 0 2px; }
+
+#log {
+  height: 180px; overflow-y: auto; font-size: 12px;
+  font-family: ui-monospace, monospace; padding: 4px;
+}
+#log div { padding: 1px 4px; border-radius: 3px; }
+#log .op { color: #9fd0ff; }
+#log .fault, #log .failure { color: #ff9f7f; background: #2a1616; }
+#log .recover, #log .success { color: #7fe6a2; }
+#log .alarm_clear, #log .op_rejected { color: #ffd97f; }
