@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>矿井救援升降机仿真</title>
+<style>
+  body { background:#0d1117; color:#d7dee6; font-family:monospace; margin:0; padding:12px; }
+  h1 { font-size:18px; margin:4px 0 10px; }
+  .wrap { display:flex; gap:16px; align-items:flex-start; }
+  canvas { background:#14181d; border:1px solid #333; }
+  .panel { width:430px; font-size:12px; }
+  .panel section { margin-bottom:10px; border:1px solid #2a313a; padding:8px; border-radius:4px; }
+  .panel h2 { font-size:13px; margin:0 0 6px; color:#9fb3c8; }
+  button { background:#212a33; color:#d7dee6; border:1px solid #3a4550;
+           padding:3px 8px; margin:2px; cursor:pointer; font-family:monospace; }
+  button:hover { background:#2c3844; }
+  .bar { display:flex; align-items:center; gap:6px; margin:2px 0; }
+  .bar span { width:60px; }
+  .bar b { width:40px; text-align:right; }
+  .track { flex:1; height:10px; background:#222a33; }
+  .fill { height:100%; }
+  #log { height:170px; overflow-y:auto; background:#10151b; padding:4px; }
+  .log-fault { color:#ff7070; } .log-env { color:#e0c060; }
+  .log-op { color:#7fc7ff; } .log-dev { color:#9fe08a; }
+  ul { margin:4px 0; padding-left:18px; }
+  #faults li { color:#ff9090; margin-bottom:4px; }
+</style>
+</head>
+<body>
+<h1>矿井停电救援 — 备用升降机仿真</h1>
+<div class="wrap">
+  <canvas id="cv" width="420" height="640"></canvas>
+  <div class="panel">
+    <section>
+      <h2>仿真时钟</h2>
+      <div id="clock"></div>
+      <button id="btnPause">恢复</button>
+      <button id="btnStep">单步</button>
+      <button id="btnReset">重置</button>
+      <button id="btnReplay">失败回放</button>
+      速度 <select id="speed">
+        <option value="1">1x</option><option value="4" selected>4x</option>
+        <option value="16">16x</option><option value="64">64x</option>
+      </select>
+    </section>
+    <section><h2>设备状态</h2><div id="status"></div></section>
+    <section>
+      <h2>任务队列(可重排)</h2>
+      <div id="actors"></div>
+      <button id="btnOverload">⚠ 强制超载(当前层)</button>
+      <ul id="queue"></ul>
+    </section>
+    <section><h2>故障记录(时刻/余量/响应)</h2><ul id="faults"></ul></section>
+    <section><h2>统一日志</h2><div id="log"></div></section>
+  </div>
+</div>
+<script src="js/sim.js"></script>
+<script src="js/render.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

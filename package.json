@@ -1,0 +1,9 @@
+{
+  "name": "mine-hoist-sim",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node test/scenarios.js && node test/smoke.js",
+    "serve": "python3 -m http.server 8000"
+  }
+}
