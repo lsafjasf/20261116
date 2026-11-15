@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>体积雾山谷 · WebGL2 可观测演示</title>
+<link rel="stylesheet" href="src/styles.css" />
+</head>
+<body>
+<header>
+  <h1>体积雾山谷 <small>WebGL2 raymarching · 风速 / 湿度 / 太阳方向驱动</small></h1>
+  <div class="status-line" id="engine-status">引擎初始化中…</div>
+</header>
+
+<main>
+  <section class="stage">
+    <canvas id="gl" width="960" height="600"></canvas>
+    <div class="canvas-hud">
+      <span id="hud-quality">quality: -</span>
+      <span id="hud-time">t = 0.00s</span>
+      <span id="hud-frame">frame 0</span>
+      <span id="hud-ms">gpu 0.0ms</span>
+    </div>
+  </section>
+
+  <aside class="panel">
+    <h2>控制台</h2>
+    <div class="btn-row">
+      <button id="btn-pause">暂停</button>
+      <button id="btn-export">导出当前帧 PNG</button>
+      <button id="btn-save">保存快照</button>
+      <button id="btn-restore">一键恢复</button>
+    </div>
+
+    <div class="btn-row">
+      <label class="quality-toggle">
+        质量档
+        <select id="sel-quality">
+          <option value="high">高质量 (96 雾步 / 全分辨率)</option>
+          <option value="low">低质量 (24 雾步 / 0.6× 内部分辨率)</option>
+        </select>
+      </label>
+    </div>
+
+    <h3>天气预设（三组对照参数）</h3>
+    <div class="btn-row" id="preset-btns"></div>
+
+    <h3>环境参数</h3>
+    <label>风速 <span id="val-wind">3</span> m/s
+      <input type="range" id="rng-wind" min="0" max="30" step="0.5" value="3" /></label>
+    <label>风向 <span id="val-winddir">35</span>°
+      <input type="range" id="rng-winddir" min="0" max="360" step="1" value="35" /></label>
+    <label>湿度 <span id="val-hum">0.14</span>
+      <input type="range" id="rng-hum" min="0" max="1" step="0.01" value="0.14" /></label>
+    <label>太阳方位角 <span id="val-sunaz">130</span>°
+      <input type="range" id="rng-sunaz" min="0" max="360" step="1" value="130" /></label>
+    <label>太阳高度角 <span id="val-sunel">42</span>°
+      <input type="range" id="rng-sunel" min="1" max="89" step="1" value="42" /></label>
+
+    <h3>观察角度</h3>
+    <label>相机方位 <span id="val-camaz">0</span>°
+      <input type="range" id="rng-camaz" min="-75" max="75" step="1" value="0" /></label>
+    <label>相机俯仰 <span id="val-camel">12</span>°
+      <input type="range" id="rng-camel" min="-8" max="30" step="1" value="12" /></label>
+  </aside>
+</main>
+
+<section class="metrics">
+  <h2>测量结果（页面内直出）</h2>
+  <div class="btn-row">
+    <button id="btn-test" class="primary">运行自动化测试（普通/边界/失败）</button>
+    <span id="test-progress"></span>
+  </div>
+  <div id="test-summary" class="summary-cards"></div>
+  <table id="test-table">
+    <thead><tr><th>类别</th><th>用例</th><th>结果</th><th>测量数据</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <h3>三组天气参数对照 + 暂停截图</h3>
+  <table id="preset-table">
+    <thead><tr>
+      <th>预设</th><th>风速</th><th>风向</th><th>湿度</th>
+      <th>太阳方位/高度</th><th>画面哈希(暂停)</th><th>遮挡掩码哈希</th><th>截图</th>
+    </tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <h3>算法状态摘要</h3>
+  <pre id="state-dump" class="state-dump"></pre>
+
+  <h3>增量更新日志（仅受影响区域）</h3>
+  <table id="region-table">
+    <thead><tr><th>#</th><th>来源</th><th>变更键</th><th>受影响区域</th><th>是否全量重建</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <p class="verdict" id="verdict"></p>
+</section>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
