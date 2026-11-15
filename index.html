@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>港区危险货柜装船仿真</title>
+<style>
+  body { margin:0; background:#0d1b2a; color:#e0e6ed; font-family:"Microsoft YaHei",sans-serif; }
+  #wrap { display:flex; gap:12px; padding:12px; }
+  canvas { background:#123; border:1px solid #2a4a6b; border-radius:6px; }
+  #side { width:300px; display:flex; flex-direction:column; gap:8px; }
+  .panel { background:#16283d; border:1px solid #2a4a6b; border-radius:6px; padding:8px; }
+  .panel h3 { margin:0 0 6px; font-size:14px; color:#8fc1e9; }
+  button { background:#1f6fb2; color:#fff; border:0; border-radius:4px; padding:6px 10px;
+           margin:2px; cursor:pointer; font-size:13px; }
+  button:hover { background:#2a8ad4; }
+  button:disabled { background:#3a4a5a; cursor:not-allowed; }
+  button.warn { background:#b25a1f; }
+  #log { flex:1; overflow-y:auto; max-height:340px; font-size:12px; line-height:1.5; }
+  #log div { border-bottom:1px solid #22374e; padding:2px 0; }
+  .EVAC,.FAULT,.FAIL { color:#ff7b7b; } .ALARM,.ABORT { color:#ffb84d; }
+  .WIN,.LOAD,.RECOVER,.OK { color:#7be495; } .ENV,.PLUME,.LEAK { color:#7fc8ff; }
+  #status { font-size:13px; white-space:pre-line; }
+  #hint { font-size:12px; color:#9db4c8; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="cv" width="900" height="600"></canvas>
+  <div id="side">
+    <div class="panel"><h3>仿真时钟控制</h3>
+      <button id="btnPause">暂停</button>
+      <button id="btnStep">单步</button>
+      <button id="btnResume">恢复</button>
+      <button id="btnReplay" class="warn">失败回放</button>
+      <button id="btnReset">重开一局</button>
+      <div id="clock"></div>
+    </div>
+    <div class="panel"><h3>操作</h3>
+      <button id="btnCurtain">开/关 防火水幕</button>
+      <button id="btnRepair">修复吊机</button>
+      <div id="hint">点击货柜选中 → 点击空槽位堆存, 或点击右侧船舶装船。注意危险等级隔离距离、风向与水幕吊装窗口。</div>
+    </div>
+    <div class="panel"><h3>设备 / 环境状态</h3><div id="status"></div></div>
+    <div class="panel" style="flex:1;display:flex;flex-direction:column"><h3>事件日志</h3><div id="log"></div></div>
+  </div>
+</div>
+<script src="sim.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
