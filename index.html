@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8" />
+  <title>Big Map Renderer</title>
+  <style>
+    body { margin: 0; background: #111; color: #eee; font: 12px monospace; }
+    #hud { position: fixed; top: 8px; left: 8px; background: #000a; padding: 8px; white-space: pre; }
+    #notice { position: fixed; bottom: 8px; left: 8px; background: #300a; color: #fc8; padding: 6px; max-width: 60ch; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <canvas id="map"></canvas>
+  <div id="hud"></div>
+  <div id="notice"></div>
+  <script type="module" src="web/main.js"></script>
+</body>
+</html>

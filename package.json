@@ -1,0 +1,13 @@
+{
+  "name": "big-map-renderer",
+  "version": "1.0.0",
+  "description": "Viewport-driven tiled map renderer with LOD, cache, fallback and export/import fidelity",
+  "type": "module",
+  "scripts": {
+    "test": "node --test \"tests/*.test.js\"",
+    "test:default": "node --test tests/default.test.js",
+    "test:boundary": "node --test tests/boundary.test.js",
+    "test:exception": "node --test tests/exception.test.js",
+    "test:roundtrip": "node --test tests/roundtrip.test.js"
+  }
+}
