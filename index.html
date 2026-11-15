@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>多面灯塔 · 双人协作</title>
+  <style>
+    body {
+      margin: 0;
+      background: #020617;
+      color: #e2e8f0;
+      font-family: system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .wrap { max-width: 940px; margin: 0 auto; padding: 14px; }
+    h1 { font-size: 20px; margin: 6px 0 10px; }
+    .hud {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 4px;
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+    .hud .goal { color: #fcd34d; font-weight: 600; }
+    .hud .hash { color: #64748b; font-family: ui-monospace, monospace; }
+    canvas {
+      width: 100%;
+      max-width: 900px;
+      border-radius: 12px;
+      border: 1px solid #1e293b;
+      background: #061226;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      align-items: center;
+    }
+    button {
+      background: #1d4ed8;
+      color: #fff;
+      border: 0;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    button:hover { background: #2563eb; }
+    input[type="number"] {
+      width: 84px;
+      background: #0f172a;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 7px;
+    }
+    textarea {
+      width: 100%;
+      height: 70px;
+      margin-top: 8px;
+      background: #0f172a;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      font-family: ui-monospace, monospace;
+      font-size: 11px;
+    }
+    .help {
+      color: #94a3b8;
+      font-size: 12px;
+      margin-top: 8px;
+      line-height: 1.7;
+    }
+    kbd {
+      background: #1e293b;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-family: ui-monospace, monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>多面灯塔 · 双人协作夜航</h1>
+    <div class="hud">
+      <div class="goal" id="hudGoal">目标加载中…</div>
+      <div id="hudResources"></div>
+      <div id="hudChange"></div>
+      <div class="hash" id="hudHash"></div>
+    </div>
+    <canvas id="canvas"></canvas>
+    <div class="controls">
+      <button id="btnStart">开始</button>
+      <button id="btnPause">暂停/继续 (Space)</button>
+      <button id="btnReplay">保存并回放</button>
+      <button id="btnRecover">失败恢复</button>
+      <button id="btnRestart">重新开始 (R)</button>
+      <button id="btnAudio" data-on="0">音频：关</button>
+      <label>种子 <input id="seedInput" type="number" value="42" /></label>
+      <button id="btnLoadReplay">载入回放</button>
+    </div>
+    <textarea id="replayBox" placeholder="回放记录（seed + 输入序列 JSON）"></textarea>
+    <div class="help">
+      玩家一（灯腔旋转）：<kbd>A</kbd>/<kbd>D</kbd>；
+      玩家二（电源输出）：<kbd>W</kbd>/<kbd>S</kbd>，<kbd>L</kbd> 开关灯。
+      光束过广会照亮礁石累积危险，过窄射程不足船会偏航；热量满格触发热保护，灯腔强制冷却。
+      三艘船全部进入港池即成功。
+    </div>
+  </div>
+  <script src="js/sim.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

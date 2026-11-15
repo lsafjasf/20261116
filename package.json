@@ -1,0 +1,10 @@
+{
+  "name": "lighthouse-coop",
+  "version": "1.0.0",
+  "description": "Two-player cooperative lighthouse night-navigation game with deterministic replay hashing.",
+  "private": true,
+  "scripts": {
+    "test": "node tests/verify.js"
+  },
+  "license": "MIT"
+}
