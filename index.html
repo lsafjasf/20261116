@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>滑翔器：三层风带五十公里</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main id="app">
+  <section id="stage">
+    <canvas id="view" width="900" height="560"></canvas>
+    <div id="stall-warning" class="hidden">⚠ 失速！按 ↓ 推杆增速改出 ⚠</div>
+    <div id="overlay" class="hidden">
+      <h2 id="overlay-title"></h2>
+      <p id="overlay-detail"></p>
+      <button id="btn-restart-overlay">重新开始（失败恢复）</button>
+    </div>
+  </section>
+  <aside id="panel">
+    <h1>滑翔器任务</h1>
+    <div class="block">
+      <h2>当前目标</h2>
+      <p id="objective">在燃料耗尽前抵达 50km 外机场，避开风暴核心。</p>
+    </div>
+    <div class="block">
+      <h2>关键资源</h2>
+      <ul id="resources">
+        <li>燃料 <b id="r-fuel"></b></li>
+        <li>电池 <b id="r-battery"></b></li>
+        <li>高度 <b id="r-alt"></b></li>
+        <li>空速 <b id="r-speed"></b></li>
+        <li>结冰 <b id="r-ice"></b></li>
+        <li>压舱 <b id="r-ballast"></b></li>
+      </ul>
+    </div>
+    <div class="block">
+      <h2>状态机</h2>
+      <p>当前状态：<b id="sm-state"></b></p>
+      <p>最近变化：<b id="sm-last"></b></p>
+    </div>
+    <div class="block">
+      <h2>操作</h2>
+      <p class="keys">←/→ 转向 · ↑/↓ 俯仰 · F 襟翼 · B 放压舱水<br>P 暂停 · R 重新开始</p>
+      <div class="btns">
+        <button id="btn-pause">暂停</button>
+        <button id="btn-restart">重新开始</button>
+        <button id="btn-replay">回放输入记录</button>
+      </div>
+      <p>Seed：<input id="seed" type="number" value="20261116"></p>
+      <p id="hash-line">状态哈希：<b id="hash"></b></p>
+    </div>
+  </aside>
+</main>
+<script type="module" src="src/game.js"></script>
+</body>
+</html>
