@@ -1,0 +1,16 @@
+{
+  "name": "city-pulse-traffic-story",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A scroll-driven, auditable city traffic data story.",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "generate:data": "node scripts/generate-data.mjs",
+    "test": "node --test tests/core.test.mjs",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1"
+  }
+}

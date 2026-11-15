@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f3efe5">
+    <meta name="description" content="临江市城市交通数据报道：滚动阅读流向、速度与公交分担，并审计每一次筛选。">
+    <title>城市脉冲 · 临江市交通数据报道</title>
+    <link rel="preload" href="assets/fonts/NotoSansSC-Regular.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/layout.css">
+    <link rel="stylesheet" href="styles/components.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#story-start">跳到报道正文</a>
+
+    <header class="masthead" aria-label="报道工具栏">
+      <a class="brand" href="#top" aria-label="城市脉冲首页">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span>
+          <strong>城市脉冲</strong>
+          <small>CITY PULSE / 临江</small>
+        </span>
+      </a>
+
+      <div class="masthead-context" aria-live="polite">
+        <span class="context-chip" id="datasetVersion">数据版本读取中</span>
+        <span class="context-chip context-chip-wide" id="currentFilter">筛选读取中</span>
+      </div>
+
+      <div class="masthead-actions">
+        <button class="text-button" id="motionToggle" type="button" aria-pressed="false" title="切换无动画模式">
+          <span class="button-icon" aria-hidden="true">◌</span>
+          <span class="button-label">动画开</span>
+        </button>
+        <button class="text-button text-button-accent" id="exportButton" type="button">
+          <span class="button-icon" aria-hidden="true">↓</span>
+          <span>导出本章 PNG</span>
+        </button>
+        <button class="text-button" id="saveProjectButton" type="button">保存工程</button>
+        <label class="text-button file-button" for="projectFile">
+          载入工程
+          <input id="projectFile" type="file" accept="application/json,.json">
+        </label>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-meta">
+          <span>数据报道 / 2026.11</span>
+          <span>8 条走廊 · 10 个时段 · 双方向</span>
+          <span>更新于 <time id="heroDate">2026-11-15</time></span>
+        </div>
+        <h1 id="hero-title">
+          城市不是一张静止的
+          <span>地图。它有脉搏。</span>
+        </h1>
+        <div class="hero-bottom">
+          <p class="hero-deck">
+            从清晨涌入中心城的人潮，到夜间仍在运行的公交底盘。滚动页面，让文字、地图与图表沿着同一份筛选口径推进。
+          </p>
+          <div class="scroll-cue" aria-hidden="true">
+            <span>SCROLL</span>
+            <i></i>
+          </div>
+        </div>
+        <div class="hero-index" aria-label="章节索引">
+          <span><b>01</b> 流向</span>
+          <span><b>02</b> 速度</span>
+          <span><b>03</b> 公共性</span>
+        </div>
+      </section>
+
+      <section class="filter-strip" aria-labelledby="filter-title">
+        <div class="filter-heading">
+          <span class="eyebrow">LIVE SLICE</span>
+          <h2 id="filter-title">当前筛选</h2>
+        </div>
+        <div class="filter-fields">
+          <label>
+            <span>数据版本</span>
+            <select id="datasetSelect">
+              <option value="base">基线 · LT-2026.11-A</option>
+              <option value="audit">审计 · LT-2026.11-B</option>
+            </select>
+          </label>
+          <label>
+            <span>片区</span>
+            <select id="districtFilter"></select>
+          </label>
+          <label>
+            <span>方向</span>
+            <select id="directionFilter"></select>
+          </label>
+          <label>
+            <span>时段</span>
+            <select id="periodFilter"></select>
+          </label>
+          <label>
+            <span>记录范围</span>
+            <select id="scopeFilter"></select>
+          </label>
+          <button class="reset-button" id="resetButton" type="button">重置筛选</button>
+        </div>
+        <p class="filter-status" id="filterStatus">
+          正在载入内置数据…
+        </p>
+      </section>
+
+      <div class="story-layout" id="story-start">
+        <nav class="chapter-rail" aria-label="章节跳转">
+          <p class="rail-label">CHAPTERS</p>
+          <div class="rail-progress" aria-hidden="true"><i id="scrollProgress"></i></div>
+          <div class="rail-items" id="chapterNav"></div>
+          <p class="rail-help">↑ ↓ 切换章节<br>Alt + 1 / 2 / 3 直达</p>
+        </nav>
+
+        <div class="story-column">
+          <article class="chapter chapter-flow is-active" id="chapter-flow" data-chapter="flow" tabindex="-1">
+            <header class="chapter-header">
+              <div class="chapter-number"><span>01</span><i></i><b>FLOW</b></div>
+              <p class="chapter-kicker">流向 / 谁在移动</p>
+              <h2>谁在穿过<br><em>城市</em></h2>
+              <p class="chapter-summary" data-narrative="summary"></p>
+            </header>
+            <div class="chapter-copy">
+              <p class="chapter-lede" data-narrative="lede"></p>
+              <p data-narrative="paragraph-0"></p>
+              <aside class="story-callout" aria-label="本章读数">
+                <span>当前切片</span>
+                <strong data-narrative="metric-1-value"></strong>
+                <small data-narrative="metric-1-unit"></small>
+              </aside>
+              <p data-narrative="paragraph-1"></p>
+              <div class="inline-rule">
+                <span>继续滚动</span><i></i>
+              </div>
+            </div>
+          </article>
+
+          <article class="chapter chapter-speed" id="chapter-speed" data-chapter="speed" tabindex="-1">
+            <header class="chapter-header">
+              <div class="chapter-number"><span>02</span><i></i><b>SPEED</b></div>
+              <p class="chapter-kicker">速度 / 拥堵如何蔓延</p>
+              <h2>慢下来，<br><em>才看见</em></h2>
+              <p class="chapter-summary" data-narrative="summary"></p>
+            </header>
+            <div class="chapter-copy">
+              <p class="chapter-lede" data-narrative="lede"></p>
+              <p data-narrative="paragraph-0"></p>
+              <aside class="story-callout story-callout-dark" aria-label="本章读数">
+                <span>慢行走廊</span>
+                <strong data-narrative="metric-1-value"></strong>
+                <small data-narrative="metric-1-unit"></small>
+              </aside>
+              <p data-narrative="paragraph-1"></p>
+              <div class="inline-rule">
+                <span>继续滚动</span><i></i>
+              </div>
+            </div>
+          </article>
+
+          <article class="chapter chapter-transit" id="chapter-transit" data-chapter="transit" tabindex="-1">
+            <header class="chapter-header">
+              <div class="chapter-number"><span>03</span><i></i><b>TRANSIT</b></div>
+              <p class="chapter-kicker">公共性 / 公交承担了什么</p>
+              <h2>城市的<br><em>公共底盘</em></h2>
+              <p class="chapter-summary" data-narrative="summary"></p>
+            </header>
+            <div class="chapter-copy">
+              <p class="chapter-lede" data-narrative="lede"></p>
+              <p data-narrative="paragraph-0"></p>
+              <aside class="story-callout" aria-label="本章读数">
+                <span>公交分担</span>
+                <strong data-narrative="metric-1-value"></strong>
+                <small data-narrative="metric-1-unit"></small>
+              </aside>
+              <p data-narrative="paragraph-1"></p>
+              <div class="inline-rule">
+                <span>报道结束</span><i></i>
+              </div>
+            </div>
+          </article>
+
+          <footer class="story-footer">
+            <p>数据为内置固定样例，用于界面与审计流程演示；城市、道路与观测值均为虚构。</p>
+            <p>导出口径会写入 PNG 文本元数据；调试面板可核对对象数、关键数值和清洗中间态。</p>
+          </footer>
+        </div>
+
+        <aside class="visual-dock" aria-label="滚动同步视觉">
+          <header class="visual-header">
+            <div>
+              <span class="eyebrow" id="visualChapterNumber">CHAPTER 01</span>
+              <h2 id="visualChapterTitle">谁在穿过城市</h2>
+            </div>
+            <span class="live-badge"><i></i> 同步中</span>
+          </header>
+
+          <section class="map-card" aria-labelledby="mapTitle">
+            <div class="card-heading">
+              <h3 id="mapTitle">临江交通脉络</h3>
+              <span id="mapModeLabel">线宽 = 当前流量</span>
+            </div>
+            <div id="cityMap" class="city-map" role="img" aria-label="临江市交通走廊示意图"></div>
+            <p class="map-caption" id="mapCaption"></p>
+          </section>
+
+          <section class="chart-card" aria-labelledby="chartTitle">
+            <div class="card-heading chart-heading">
+              <div>
+                <h3 id="chartTitle">逐小时流量</h3>
+                <p id="chartSubtitle"></p>
+              </div>
+              <button class="chart-mode-button" id="stackButton" type="button" aria-pressed="false">分组查看</button>
+            </div>
+            <p class="chart-warning" id="chartWarning" role="status" aria-live="polite" hidden></p>
+            <div id="storyChart" class="story-chart"></div>
+          </section>
+
+          <div class="visual-metrics" id="visualMetrics"></div>
+          <p class="export-scope" id="exportScope"></p>
+        </aside>
+      </div>
+    </main>
+
+    <section class="debug-panel is-open" id="debugPanel" aria-labelledby="debugTitle">
+      <header class="debug-header">
+        <div>
+          <span class="debug-dot" aria-hidden="true"></span>
+          <h2 id="debugTitle">调试面板 / 计算中间态</h2>
+          <span id="debugHash">—</span>
+        </div>
+        <button id="debugToggle" type="button" aria-expanded="true" aria-controls="debugBody">收起</button>
+      </header>
+      <div class="debug-body" id="debugBody">
+        <div class="pipeline" id="pipeline" aria-label="数据处理流水线"></div>
+        <div class="debug-grid">
+          <div>
+            <h3>当前状态快照</h3>
+            <pre id="debugState"></pre>
+          </div>
+          <div>
+            <h3>异常样本</h3>
+            <div class="anomaly-list" id="debugAnomalies"></div>
+          </div>
+          <div>
+            <h3 id="debugExportHeading">最近一次导出口径</h3>
+            <pre id="debugExport">尚未导出</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>
