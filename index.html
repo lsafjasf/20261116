@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FRAME · 本地多媒体编辑器</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23d9ff65'/%3E%3Cpath d='M9 8v16M16 8v16M23 8v16' stroke='%2312180b' stroke-width='3'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand" aria-label="FRAME 本地编辑器">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>FRAME</span>
+        <small>LOCAL</small>
+      </div>
+      <div class="project-identity">
+        <span class="eyebrow">当前项目</span>
+        <strong id="project-name">城市脉搏 / 初剪</strong>
+        <span class="unsaved-dot" id="unsaved-dot" hidden>未保存</span>
+      </div>
+      <div class="save-indicator" id="save-indicator" role="status" aria-live="polite" data-state="saved">
+        <span class="save-pulse" aria-hidden="true"></span>
+        <span id="save-label">已自动保存</span>
+        <time id="save-time">--:--:--</time>
+      </div>
+      <div class="top-actions">
+        <button class="icon-button" id="undo-button" type="button" aria-label="撤销" title="撤销 (Ctrl+Z)" disabled>
+          <span aria-hidden="true">↶</span>
+        </button>
+        <button class="icon-button" id="redo-button" type="button" aria-label="重做" title="重做 (Ctrl+Shift+Z)" disabled>
+          <span aria-hidden="true">↷</span>
+        </button>
+        <button class="ghost-button danger-ghost" id="interrupt-button" type="button" title="模拟异常关闭并重新启动 (Ctrl+Shift+X)">
+          <span aria-hidden="true">⏻</span> 强制中断
+        </button>
+        <button class="primary-button" id="export-button" type="button">
+          导出设置 <kbd>Ctrl E</kbd>
+        </button>
+      </div>
+    </header>
+
+    <main class="editor-grid">
+      <aside class="library panel" aria-labelledby="library-title">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">项目资源</span>
+            <h2 id="library-title">媒体库</h2>
+          </div>
+          <button class="mini-button" type="button" aria-label="添加媒体">＋</button>
+        </div>
+        <div class="library-tabs" role="tablist" aria-label="媒体类型">
+          <button class="tab is-active" type="button" role="tab" aria-selected="true">全部 <span>6</span></button>
+          <button class="tab" type="button" role="tab" aria-selected="false">视频</button>
+          <button class="tab" type="button" role="tab" aria-selected="false">音频</button>
+        </div>
+        <div class="media-list" aria-label="媒体素材">
+          <button class="media-item is-selected" type="button" data-clip-id="clip-skyline">
+            <span class="media-thumb skyline" aria-hidden="true"><i>4K</i></span>
+            <span><strong>城市天际线</strong><small>00:08 · 24 fps</small></span>
+            <span class="media-kind" aria-hidden="true">▰</span>
+          </button>
+          <button class="media-item" type="button" data-clip-id="clip-night">
+            <span class="media-thumb night" aria-hidden="true"><i>4K</i></span>
+            <span><strong>霓虹雨夜</strong><small>00:06 · 24 fps</small></span>
+            <span class="media-kind" aria-hidden="true">▰</span>
+          </button>
+          <button class="media-item" type="button" data-clip-id="clip-interview">
+            <span class="media-thumb interview" aria-hidden="true"><i>HD</i></span>
+            <span><strong>人物访谈</strong><small>00:12 · 24 fps</small></span>
+            <span class="media-kind" aria-hidden="true">▰</span>
+          </button>
+          <button class="media-item" type="button" data-clip-id="clip-vo">
+            <span class="media-thumb audio" aria-hidden="true"><i>WAV</i></span>
+            <span><strong>旁白_最终</strong><small>00:18 · 48 kHz</small></span>
+            <span class="media-kind" aria-hidden="true">◖</span>
+          </button>
+          <button class="media-item" type="button" data-clip-id="clip-music">
+            <span class="media-thumb music" aria-hidden="true"><i>WAV</i></span>
+            <span><strong>城市底噪</strong><small>00:30 · 48 kHz</small></span>
+            <span class="media-kind" aria-hidden="true">◖</span>
+          </button>
+        </div>
+        <div class="storage-card">
+          <span class="eyebrow">本地快照</span>
+          <strong id="storage-size">0 KB</strong>
+          <small>仅保存在此浏览器</small>
+          <div class="storage-meter" aria-hidden="true"><i id="storage-meter-fill"></i></div>
+        </div>
+      </aside>
+
+      <section class="stage" aria-labelledby="preview-title">
+        <div class="stage-heading">
+          <div>
+            <span class="eyebrow">节目监视器</span>
+            <h1 id="preview-title">城市脉搏</h1>
+          </div>
+          <div class="view-meta">
+            <span class="status-chip">1920 × 1080</span>
+            <span class="status-chip">REC.709</span>
+            <button class="mini-button" type="button" id="fullscreen-button" aria-label="全屏预览">⛶</button>
+          </div>
+        </div>
+        <div class="preview-shell">
+          <div class="preview" id="preview" role="img" aria-label="城市天际线视频预览">
+            <div class="preview-scene" id="preview-scene">
+              <div class="sky-glow"></div>
+              <div class="city-back"></div>
+              <div class="city-front"></div>
+              <div class="road-grid"></div>
+              <div class="preview-copy">
+                <span class="preview-kicker">CITY IN MOTION / 01</span>
+                <strong id="preview-clip-name">城市天际线</strong>
+                <span id="preview-caption">把城市的速度，留在这一帧。</span>
+              </div>
+            </div>
+            <span class="safe-frame" aria-hidden="true"></span>
+            <span class="preview-timecode" id="preview-timecode">00:00:08:10</span>
+            <span class="preview-badge" id="preview-badge">片段预览</span>
+          </div>
+        </div>
+        <div class="transport" aria-label="播放控制">
+          <button class="play-button" id="play-button" type="button" aria-label="播放" aria-pressed="false">
+            <span id="play-icon" aria-hidden="true">▶</span>
+          </button>
+          <span class="timecode" id="current-timecode">00:00:08:10</span>
+          <label class="scrubber-label" for="playhead-range">
+            <span class="visually-hidden">播放位置</span>
+            <input id="playhead-range" type="range" min="0" max="32" step="0.01" value="8.42" />
+          </label>
+          <output class="duration" id="duration-output" for="playhead-range">00:00:32:00</output>
+          <button class="mini-button" id="marker-button" type="button" aria-label="在当前时间添加标记" title="添加标记 (M)">◇</button>
+        </div>
+      </section>
+
+      <aside class="right-rail" aria-label="属性与同步状态">
+        <section class="inspector panel" aria-labelledby="inspector-title">
+          <div class="panel-heading inspector-heading">
+            <div>
+              <span class="eyebrow" id="selected-kind">片段 · 主画面</span>
+              <h2 id="inspector-title">属性检查器</h2>
+            </div>
+            <span class="object-id" id="selected-id-label">clip-skyline</span>
+          </div>
+          <form id="inspector-form" novalidate>
+            <label class="field field-wide">
+              <span>片段名称 <em>Enter 应用</em></span>
+              <input id="clip-name" name="name" type="text" autocomplete="off" />
+            </label>
+            <div class="field-grid">
+              <label class="field">
+                <span>入点 / s</span>
+                <input id="clip-start" name="start" type="number" min="0" max="32" step="0.1" inputmode="decimal" />
+              </label>
+              <label class="field">
+                <span>时长 / s</span>
+                <input id="clip-duration" name="duration" type="number" min="0.5" max="32" step="0.1" inputmode="decimal" />
+              </label>
+              <label class="field">
+                <span>缩放 / %</span>
+                <input id="clip-scale" name="scale" type="number" min="25" max="200" step="1" inputmode="numeric" />
+              </label>
+              <label class="field">
+                <span>不透明度 / %</span>
+                <input id="clip-opacity" name="opacity" type="number" min="0" max="100" step="1" inputmode="numeric" />
+              </label>
+            </div>
+            <div class="draft-row">
+              <span class="draft-state" id="draft-state">与已提交状态一致</span>
+              <button class="apply-button" id="apply-button" type="submit">应用 <kbd>Ctrl ↵</kbd></button>
+            </div>
+            <p class="form-error" id="form-error" role="alert" hidden></p>
+          </form>
+          <section class="audio-panel" id="audio-panel" aria-labelledby="audio-title">
+            <div class="section-title-row">
+              <div>
+                <span class="eyebrow">音轨</span>
+                <h3 id="audio-title">声音参数</h3>
+              </div>
+              <span class="level-chip" id="audio-level-chip">−4.5 dB</span>
+            </div>
+            <div class="sound-controls">
+              <label class="compact-field">
+                <span>增益</span>
+                <input id="audio-volume" type="number" min="-60" max="12" step="0.5" inputmode="decimal" />
+                <small>dB</small>
+              </label>
+              <label class="compact-field">
+                <span>声像</span>
+                <input id="audio-pan" type="number" min="-100" max="100" step="1" inputmode="numeric" />
+                <small>%</small>
+              </label>
+            </div>
+            <div class="eq-row" aria-label="三段均衡器">
+              <label><span>LOW</span><input id="eq-low" type="number" min="-12" max="12" step="0.1" aria-label="低频增益" /><small>dB</small></label>
+              <label><span>MID</span><input id="eq-mid" type="number" min="-12" max="12" step="0.1" aria-label="中频增益" /><small>dB</small></label>
+              <label><span>HIGH</span><input id="eq-high" type="number" min="-12" max="12" step="0.1" aria-label="高频增益" /><small>dB</small></label>
+            </div>
+          </section>
+          <section class="keyframe-panel" aria-labelledby="keyframe-title">
+            <div class="section-title-row">
+              <div>
+                <span class="eyebrow">动画</span>
+                <h3 id="keyframe-title">关键帧 <span id="keyframe-count">3</span></h3>
+              </div>
+              <button class="mini-button" id="add-keyframe-button" type="button" aria-label="在当前时间添加关键帧">＋</button>
+            </div>
+            <div class="keyframe-list" id="keyframe-list" role="list"></div>
+          </section>
+        </section>
+
+        <section class="sync-panel panel" aria-labelledby="sync-title">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">调试视图 · LIVE</span>
+              <h2 id="sync-title">同步核对</h2>
+            </div>
+            <span class="sync-badge" id="sync-badge">3/3</span>
+          </div>
+          <div class="sync-lanes">
+            <div class="sync-lane"><span>INPUT</span><code id="sync-input">clip-skyline · name</code></div>
+            <div class="sync-lane"><span>MEMORY</span><code id="sync-memory">rev 4 · 08.42s</code></div>
+            <div class="sync-lane"><span>STORAGE</span><code id="sync-storage">autosave.v1 · --</code></div>
+            <div class="sync-lane"><span>RENDER</span><code id="sync-render">#clip-skyline · 0px</code></div>
+          </div>
+          <div class="sync-checks" id="sync-checks" aria-live="polite">
+            <span class="check ok">输入＝草稿</span>
+            <span class="check ok">内存＝存储</span>
+            <span class="check ok">对象＝渲染</span>
+          </div>
+          <details class="snapshot-details">
+            <summary>展开关键状态 JSON</summary>
+            <pre id="sync-json" tabindex="0" aria-label="关键状态 JSON"></pre>
+          </details>
+          <div class="sync-actions">
+            <button class="text-button" id="recovery-failure-demo" type="button">恢复失败演练</button>
+            <button class="text-button" id="download-snapshot" type="button">下载快照</button>
+          </div>
+        </section>
+      </aside>
+
+      <section class="timeline panel" aria-labelledby="timeline-title">
+        <div class="timeline-heading">
+          <div>
+            <span class="eyebrow">剪辑序列</span>
+            <h2 id="timeline-title">时间线 <span class="sequence-version">V12</span></h2>
+          </div>
+          <div class="timeline-tools">
+            <span class="autosave-note" id="autosave-note">播放位置随快照自动保存</span>
+            <button class="mini-button" type="button" id="zoom-out" aria-label="缩小时间线">−</button>
+            <span class="zoom-label" id="zoom-label">34 px/s</span>
+            <button class="mini-button" type="button" id="zoom-in" aria-label="放大时间线">＋</button>
+          </div>
+        </div>
+        <div class="timeline-body">
+          <div class="track-labels" id="track-labels" aria-label="轨道列表"></div>
+          <div class="timeline-scroll" id="timeline-scroll" tabindex="0" aria-label="可滚动时间线">
+            <div class="timeline-content" id="timeline-content">
+              <div class="ruler" id="timeline-ruler" aria-hidden="true"></div>
+              <div class="track-lanes" id="track-lanes"></div>
+              <div class="playhead" id="timeline-playhead" aria-hidden="true"><span></span></div>
+            </div>
+          </div>
+        </div>
+        <div class="timeline-footer">
+          <span><i class="legend-dot video"></i> 2 条视频轨</span>
+          <span><i class="legend-dot audio"></i> 2 条音频轨</span>
+          <span class="timeline-hint">T 聚焦时间线 · Shift + 方向键 1 秒 · Ctrl + 方向键滚动</span>
+        </div>
+      </section>
+    </main>
+
+    <dialog class="modal recovery-modal" id="recovery-dialog" aria-labelledby="recovery-title" aria-describedby="recovery-desc">
+      <div class="modal-glow" aria-hidden="true"></div>
+      <div class="modal-icon" aria-hidden="true">↺</div>
+      <span class="eyebrow">启动检查 · 发现未正常关闭</span>
+      <h2 id="recovery-title">有一份未保存工作可以恢复</h2>
+      <p id="recovery-desc">上次会话在强制中断前自动保存。恢复会带回完整片段、关键帧、音轨参数和播放位置。</p>
+      <div class="recovery-summary" id="recovery-summary"></div>
+      <div class="recovery-warning">
+        <span aria-hidden="true">!</span>
+        <p>选择“暂不恢复”会保留快照归档，但不会把当前项目改回旧状态。</p>
+      </div>
+      <div class="modal-actions">
+        <button class="ghost-button" id="decline-recovery" type="button">暂不恢复</button>
+        <button class="primary-button" id="accept-recovery" type="button">恢复此快照 <kbd>Enter</kbd></button>
+      </div>
+    </dialog>
+
+    <dialog class="modal export-modal" id="export-dialog" aria-labelledby="export-title" aria-describedby="export-desc">
+      <form method="dialog" id="export-form">
+        <div class="modal-heading">
+          <div>
+            <span class="eyebrow">最近设置已自动保存</span>
+            <h2 id="export-title">导出项目</h2>
+          </div>
+          <button class="icon-button" type="submit" value="cancel" aria-label="关闭导出设置">×</button>
+        </div>
+        <p id="export-desc" class="modal-subtitle">这些选项会自动记忆，下次导出时恢复。</p>
+        <div class="export-grid">
+          <label class="field field-wide">
+            <span>文件名</span>
+            <input id="export-filename" name="filename" type="text" autocomplete="off" />
+          </label>
+          <label class="field">
+            <span>预设</span>
+            <select id="export-preset" name="preset">
+              <option value="master">母版 · 高质量</option>
+              <option value="web">网络 · 平衡</option>
+              <option value="social">社交 · 轻量</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>格式</span>
+            <select id="export-format" name="format">
+              <option value="mp4">H.264 / MP4</option>
+              <option value="mov">ProRes / MOV</option>
+              <option value="webm">VP9 / WebM</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>分辨率</span>
+            <select id="export-resolution" name="resolution">
+              <option value="1080p">1920 × 1080</option>
+              <option value="4k">3840 × 2160</option>
+              <option value="720p">1280 × 720</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>帧率</span>
+            <select id="export-fps" name="fps">
+              <option value="24">24 fps</option>
+              <option value="25">25 fps</option>
+              <option value="30">30 fps</option>
+              <option value="60">60 fps</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>目标码率 / Mbps</span>
+            <input id="export-bitrate" name="bitrate" type="number" min="1" max="200" step="1" inputmode="numeric" />
+          </label>
+          <label class="field">
+            <span>音频编码</span>
+            <select id="export-audio" name="audioCodec">
+              <option value="aac">AAC 320 kbps</option>
+              <option value="pcm">PCM 24-bit</option>
+              <option value="opus">Opus 192 kbps</option>
+            </select>
+          </label>
+          <label class="field field-wide">
+            <span>导出范围</span>
+            <select id="export-range" name="range">
+              <option value="all">整个序列 · 00:32</option>
+              <option value="inout">入点至出点 · 00:18</option>
+              <option value="selected">选中片段 · 00:08</option>
+            </select>
+          </label>
+          <label class="checkbox-field field-wide">
+            <input id="export-normalize" name="normalize" type="checkbox" />
+            <span>响度标准化至 −14 LUFS</span>
+          </label>
+        </div>
+        <div class="export-summary" id="export-summary"></div>
+        <div class="modal-actions">
+          <button class="ghost-button" type="submit" value="cancel">取消</button>
+          <button class="primary-button" id="start-export" type="button">开始导出</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal failure-modal" id="failure-dialog" aria-labelledby="failure-title" aria-describedby="failure-desc">
+      <div class="modal-icon failure" aria-hidden="true">!</div>
+      <span class="eyebrow">恢复失败 · 快照已保留</span>
+      <h2 id="failure-title">这份快照无法自动恢复</h2>
+      <p id="failure-desc">原始数据仍保存在浏览器中。可下载或复制下方快照，交由后续版本修复；当前项目不会被覆盖。</p>
+      <pre class="raw-snapshot" id="failure-raw" tabindex="0" aria-label="原始快照内容"></pre>
+      <p class="failure-reason" id="failure-reason"></p>
+      <div class="modal-actions">
+        <button class="ghost-button" id="copy-failure-raw" type="button">复制原始快照</button>
+        <button class="ghost-button" id="download-failure-raw" type="button">下载 .json</button>
+        <button class="primary-button" id="dismiss-failure" type="button">使用当前项目</button>
+      </div>
+    </dialog>
+
+    <div class="toast-region" id="toast-region" role="status" aria-live="polite" aria-atomic="true"></div>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
