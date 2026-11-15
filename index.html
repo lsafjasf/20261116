@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>织机逻辑仿真</title>
+  <style>
+    body { margin: 0; background: #0b0e13; color: #d7e0ee; font: 14px/1.5 system-ui, sans-serif; }
+    .wrap { display: grid; grid-template-columns: 1fr 320px; gap: 14px; padding: 14px; max-width: 1180px; margin: 0 auto; }
+    canvas { width: 100%; background: #10141b; border: 1px solid #232b3a; border-radius: 8px; }
+    .panel { background: #141a24; border: 1px solid #232b3a; border-radius: 8px; padding: 12px; }
+    h1 { font-size: 18px; margin: 0 0 10px; }
+    h2 { font-size: 13px; margin: 12px 0 6px; color: #9fb2cc; text-transform: uppercase; letter-spacing: .08em; }
+    .kv { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; border-bottom: 1px solid #1d2532; }
+    .kv b { font-variant-numeric: tabular-nums; }
+    button, select, input[type=range] { width: 100%; margin: 4px 0; }
+    button { background: #2456d6; color: #fff; border: 0; border-radius: 6px; padding: 8px; cursor: pointer; }
+    button.secondary { background: #2a3342; }
+    button.danger { background: #b13b3b; }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; background: #243044; font-size: 12px; }
+    .pill.stop { background: #7a2323; }
+    .pill.ok { background: #1f6b3c; }
+    #eventLog { font-family: ui-monospace, monospace; font-size: 12px; max-height: 150px; overflow: auto; }
+    .event { padding: 2px 0; color: #a9bbd4; }
+    label { font-size: 12px; color: #9fb2cc; }
+    .hash { font-family: ui-monospace, monospace; font-size: 12px; word-break: break-all; color: #8fd3a8; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div>
+      <div class="panel">
+        <h1>织机逻辑仿真 · 经纱张力保护与回放</h1>
+        <canvas id="loom" width="820" height="560"></canvas>
+      </div>
+    </div>
+    <div class="panel" id="hud">
+      <h2>当前目标</h2>
+      <div class="kv"><span>图案</span><b id="goalPattern">-</b></div>
+      <div class="kv"><span>无缺陷布面</span><b id="goalLength">-</b></div>
+      <div class="kv"><span>状态机</span><span class="pill" id="phasePill">-</span></div>
+      <div class="kv"><span>停机原因</span><b id="faultText">无</b></div>
+
+      <h2>关键资源</h2>
+      <div class="kv"><span>布长</span><b id="resCloth">0 cm</b></div>
+      <div class="kv"><span>投梭次数</span><b id="resPicks">0</b></div>
+      <div class="kv"><span>纬纱余量</span><b id="resWeft">0</b></div>
+      <div class="kv"><span>备用梭芯</span><b id="resBobbins">0</b></div>
+      <div class="kv"><span>缺陷 / 未闭合</span><b id="resDefects">0 / 0</b></div>
+      <div class="kv"><span>运行计时</span><b id="resTime">0.0 s</b></div>
+      <div class="kv"><span>梭速</span><b id="resSpeed">2.00 /s</b></div>
+
+      <h2>最近状态变化</h2>
+      <div class="kv"><span>跳转</span><b id="lastChange">-</b></div>
+      <div class="kv"><span>消息</span><b id="msgText">-</b></div>
+      <div id="eventLog"></div>
+
+      <h2>控制</h2>
+      <label>图案
+        <select id="patternSelect">
+          <option value="plain">平纹</option>
+          <option value="twill">2/2 斜纹</option>
+          <option value="satin">五枚缎纹</option>
+        </select>
+      </label>
+      <label>随机种子 <input id="seedInput" type="number" value="42" min="1" style="width:100%"></label>
+      <label>梭子速度 <span id="speedLabel">2.00 次/秒</span>
+        <input id="speedRange" type="range" min="1" max="3" step="0.05" value="2">
+      </label>
+      <div class="row">
+        <button id="btnStart">启动</button>
+        <button id="btnPause" class="secondary">暂停</button>
+      </div>
+      <div class="row">
+        <button id="btnRepair" class="danger">故障恢复</button>
+        <button id="btnReset" class="secondary">重新开始</button>
+      </div>
+      <div class="row">
+        <button id="btnMute" class="secondary">静音</button>
+        <button id="btnReplay" class="secondary">回放校验</button>
+      </div>
+      <button id="btnExport" class="secondary">导出输入记录 (JSON)</button>
+      <h2>最终状态哈希</h2>
+      <div class="hash" id="hashText">-</div>
+    </div>
+  </div>
+  <script type="module" src="web/app.js"></script>
+</body>
+</html>

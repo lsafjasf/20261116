@@ -1,0 +1,10 @@
+{
+  "name": "loom-sim",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "确定性织机模拟：状态机、张力保护、回放与哈希校验",
+  "scripts": {
+    "test": "node --test test/"
+  }
+}
