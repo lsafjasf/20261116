@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>焦点创作台 Focus Creator</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main-toolbar">跳到主工具栏</a>
+  <header class="topbar">
+    <h1>焦点创作台</h1>
+    <div id="main-toolbar" class="toolbar" role="toolbar" aria-label="主工具栏">
+      <button type="button" id="btn-add-rect" data-shape="rect">▭ 矩形 (R)</button>
+      <button type="button" id="btn-add-ellipse" data-shape="ellipse">◯ 椭圆 (O)</button>
+      <button type="button" id="btn-open-text">📝 文本弹窗 (T)</button>
+      <button type="button" id="btn-undo" disabled>↶ 撤销 Ctrl+Z</button>
+      <button type="button" id="btn-redo" disabled>↷ 重做 Ctrl+Y</button>
+      <button type="button" id="btn-sim-fail" class="danger-ghost">⚠ 模拟存储损坏</button>
+      <button type="button" id="btn-write-fail" class="danger-ghost">⚠ 模拟写入失败</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="canvas-pane" aria-label="画布区域">
+      <div class="pane-head">
+        <h2>画布</h2>
+        <span id="canvas-hint" class="hint">点击图形选中 · 方向键移动 · Delete 删除</span>
+      </div>
+      <div id="canvas-scroll" class="canvas-scroll" tabindex="0" aria-label="可滚动画布">
+        <svg id="canvas" width="1600" height="1000" viewBox="0 0 1600 1000" role="group" aria-label="图形画布"></svg>
+      </div>
+    </section>
+
+    <aside class="sidebar" aria-label="侧栏">
+      <h2>侧栏</h2>
+      <div id="sidebar-scroll" class="sidebar-scroll" tabindex="0">
+        <h3>文本块</h3>
+        <ul id="text-list" class="text-list"></ul>
+        <h3>图层</h3>
+        <ul id="layer-list" class="layer-list"></ul>
+        <h3>时间轴</h3>
+        <ol id="timeline" class="timeline"></ol>
+        <div class="sidebar-actions">
+          <button type="button" id="btn-add-key">＋ 时间轴关键帧 (K)</button>
+          <button type="button" id="btn-del-key" disabled>－ 删除选中关键帧</button>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <section id="status-panel" class="status-panel" aria-label="关键状态看板">
+    <h2>关键状态看板 <small>(输入 / 存储 / 渲染同步核对)</small></h2>
+    <div class="status-grid">
+      <div><h3>输入焦点</h3><dl id="st-focus"></dl></div>
+      <div><h3>编辑状态</h3><dl id="st-edit"></dl></div>
+      <div><h3>存储</h3><dl id="st-storage"></dl></div>
+      <div><h3>渲染</h3><dl id="st-render"></dl></div>
+      <div><h3>历史</h3><dl id="st-history"></dl></div>
+      <div><h3>弹窗 / 草稿</h3><dl id="st-modal"></dl></div>
+    </div>
+  </section>
+
+  <div id="live-region" class="sr-only" role="status" aria-live="polite"></div>
+
+  <div id="modal-backdrop" class="modal-backdrop" hidden>
+    <div id="text-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-desc">
+      <h2 id="modal-title">编辑文本块</h2>
+      <p id="modal-desc" class="hint">Tab 仅在弹窗内循环；Esc 保存草稿并关闭，焦点将回到触发按钮。</p>
+      <label class="field">
+        <span>标题</span>
+        <input type="text" id="modal-title-input" maxlength="40" autocomplete="off" />
+      </label>
+      <label class="field">
+        <span>正文</span>
+        <textarea id="modal-body-input" rows="6"></textarea>
+      </label>
+      <div id="modal-error" class="modal-error" role="alert" hidden></div>
+      <div class="modal-actions">
+        <button type="button" id="btn-modal-save" class="primary">保存并关闭 (Ctrl+Enter)</button>
+        <button type="button" id="btn-modal-cancel">取消 (Esc)</button>
+        <button type="button" id="btn-modal-discard" class="danger-ghost">丢弃草稿</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="alert" hidden></div>
+
+  <script type="module" src="app.mjs"></script>
+</body>
+</html>
