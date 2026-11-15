@@ -1,0 +1,51 @@
+{
+  "generatedAt": "2026-11-15T16:33:14.107Z",
+  "runs": [
+    {
+      "name": "success",
+      "runId": "DEMO-SUCCESS",
+      "success": true,
+      "phase": "success",
+      "duration": 506.8,
+      "stats": {
+        "spawned": 48,
+        "scanned": 48,
+        "released": 48,
+        "routed": 48,
+        "packed": 48,
+        "errors": 0,
+        "contaminatedPacks": 0,
+        "overflowHits": 0,
+        "collisions": 0,
+        "stops": 1,
+        "repairs": 2
+      },
+      "finalDigest": "f0d92cba",
+      "inputs": 196,
+      "timelineEntries": 690
+    },
+    {
+      "name": "failure",
+      "runId": "DEMO-FAILURE",
+      "success": false,
+      "phase": "failure",
+      "duration": 144.3,
+      "stats": {
+        "spawned": 14,
+        "scanned": 14,
+        "released": 14,
+        "routed": 14,
+        "packed": 0,
+        "errors": 0,
+        "contaminatedPacks": 0,
+        "overflowHits": 3,
+        "collisions": 3,
+        "stops": 0,
+        "repairs": 0
+      },
+      "finalDigest": "406331dc",
+      "inputs": 42,
+      "timelineEntries": 157
+    }
+  ]
+}

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#091117" />
+    <title>TWIN SORT / 双位分拣台</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <div class="ambient-grid" aria-hidden="true"></div>
+    <main class="shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark"><i></i><i></i></span>
+          <div>
+            <p class="eyebrow">SHIFT 07 · LIVE FLOOR</p>
+            <h1>TWIN SORT <span>/ 双位分拣台</span></h1>
+          </div>
+        </div>
+        <div class="clock-block">
+          <span class="micro-label">模拟剩余</span>
+          <strong id="clock">10:00.0</strong>
+        </div>
+        <div class="top-actions">
+          <button id="sound-btn" class="chip" type="button" aria-pressed="true">音频 开</button>
+          <button id="live-speed-btn" class="chip" type="button">班次 4×</button>
+          <button id="new-run-btn" class="chip chip-warn" type="button">新班次</button>
+        </div>
+      </header>
+
+      <section class="mission-bar" aria-label="任务进度">
+        <div class="mission-copy">
+          <span class="status-led" id="line-led"></span>
+          <div>
+            <span class="micro-label">产线状态</span>
+            <strong id="line-status">运行中</strong>
+          </div>
+        </div>
+        <div class="mission-meter">
+          <div class="meter-label"><span>装箱完成</span><b id="progress-text">0 / 48</b></div>
+          <div class="meter-track"><i id="progress-fill"></i></div>
+        </div>
+        <div class="metric">
+          <span class="micro-label">错误率</span>
+          <strong id="error-rate">0.0%</strong>
+          <small id="error-count">0 污染事件</small>
+        </div>
+        <div class="metric">
+          <span class="micro-label">缓存压力</span>
+          <strong id="cache-total">0 / 12</strong>
+          <small id="overflow-state">稳定</small>
+        </div>
+      </section>
+
+      <section class="canvas-card" aria-label="分拣台实时画面">
+        <canvas id="stage" width="1280" height="640" role="img" aria-label="包裹流、扫描位、分流口与缓存区"></canvas>
+        <div id="toast" class="toast" aria-live="polite"></div>
+        <div class="canvas-legend" aria-hidden="true">
+          <span><i class="legend-a"></i>目的地 A · 上通道</span>
+          <span><i class="legend-b"></i>目的地 B · 下通道</span>
+          <span><i class="legend-jam"></i>阻塞 / 污染</span>
+        </div>
+      </section>
+
+      <section class="control-deck">
+        <article class="player-card player-one" aria-label="左侧操作员">
+          <header>
+            <div>
+              <span class="micro-label">P1 · 左侧</span>
+              <h2>扫码与放行</h2>
+            </div>
+            <span class="role-pill">SCAN</span>
+          </header>
+          <div class="player-dashboard">
+            <div class="gauge-wrap">
+              <span>扫描仪耐久</span>
+              <b id="p1-durability">100%</b>
+              <div class="gauge"><i id="p1-gauge"></i></div>
+            </div>
+            <div class="mini-stat"><span>已扫码</span><b id="p1-scanned">0</b></div>
+          </div>
+          <div class="key-grid p1-keys">
+            <button data-press="scan" data-side="p1" type="button"><kbd>Q</kbd><span>扫码</span></button>
+            <button data-press="release" data-side="p1" type="button"><kbd>E</kbd><span>放行</span></button>
+            <button data-press="stop" data-side="p1" type="button"><kbd>S</kbd><span>停线</span></button>
+            <button data-press="resume" data-side="p1" type="button"><kbd>W</kbd><span>复线</span></button>
+            <button data-press="repair" data-side="p1" type="button"><kbd>R</kbd><span>维护</span></button>
+          </div>
+        </article>
+
+        <article class="player-card player-two" aria-label="右侧操作员">
+          <header>
+            <div>
+              <span class="micro-label">P2 · 右侧</span>
+              <h2>分流与装箱</h2>
+            </div>
+            <span class="role-pill">ROUTE</span>
+          </header>
+          <div class="player-dashboard">
+            <div class="gauge-wrap">
+              <span>装箱机耐久</span>
+              <b id="p2-durability">100%</b>
+              <div class="gauge"><i id="p2-gauge"></i></div>
+            </div>
+            <div class="mini-stat"><span>已装箱</span><b id="p2-packed">0</b></div>
+          </div>
+          <div class="key-grid p2-keys">
+            <button data-press="laneA" data-side="p2" type="button"><kbd>J</kbd><span>分流 A</span></button>
+            <button data-press="laneB" data-side="p2" type="button"><kbd>L</kbd><span>分流 B</span></button>
+            <button data-press="pack" data-side="p2" type="button"><kbd>K</kbd><span>装箱</span></button>
+            <button data-press="repair" data-side="p2" type="button"><kbd>I</kbd><span>维护</span></button>
+          </div>
+        </article>
+
+        <aside class="brief-card">
+          <span class="micro-label">班次目标</span>
+          <h2 id="objective-title">48 件内完成</h2>
+          <p id="objective-copy">错误率低于 6.0%。缓存满 6 件时，P1 必须在 3 秒内停线。</p>
+          <div class="threshold"><span>错误阈值</span><b>0–2 / 48</b></div>
+          <button id="replay-open-btn" class="wide-btn" type="button">打开回放台 <span>→</span></button>
+        </aside>
+      </section>
+
+      <section id="replay-dock" class="replay-dock" aria-label="回放台">
+        <header>
+          <div>
+            <span class="micro-label">DETERMINISTIC REPLAY</span>
+            <h2>统一事件时间线</h2>
+          </div>
+          <div class="replay-actions">
+            <span id="replay-verdict" class="verdict">等待记录</span>
+            <button id="replay-live" class="chip" type="button">返回现场</button>
+            <button id="replay-play" class="chip" type="button">播放</button>
+            <button id="replay-step" class="chip" type="button">单步 +0.1s</button>
+            <button id="replay-speed" class="chip" type="button">倍速 1×</button>
+          </div>
+        </header>
+        <div class="replay-scrub">
+          <input id="replay-seek" type="range" min="0" max="6000" step="1" value="0" aria-label="回放时间" />
+          <output id="replay-time">00:00.0 / 00:00.0</output>
+        </div>
+        <div class="timeline-shell">
+          <div class="timeline-axis">
+            <span>00:00</span><span>02:00</span><span>04:00</span><span>06:00</span><span>08:00</span><span>10:00</span>
+          </div>
+          <div id="timeline-track" class="timeline-track" aria-label="事件时间线"></div>
+        </div>
+        <div class="replay-lower">
+          <div id="event-list" class="event-list" aria-live="polite"></div>
+          <div id="conflict-card" class="conflict-card">
+            <span class="micro-label">冲突定位</span>
+            <p>尚无动作顺序冲突。</p>
+          </div>
+        </div>
+        <footer>
+          <span id="digest-readout">FINAL HASH —</span>
+          <button id="load-success" class="text-btn" type="button">载入成功局</button>
+          <button id="load-failure" class="text-btn" type="button">载入失败局</button>
+          <button id="export-run" class="text-btn" type="button">导出当前记录</button>
+        </footer>
+      </section>
+    </main>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
