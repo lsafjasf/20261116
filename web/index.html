@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>场景图检查器 · 二维图形编辑器</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>场景图检查器</h1>
+      <div class="toolbar">
+        <button id="move-btn">移动选中 +12,+8</button>
+        <button id="hide-btn">隐藏/显示</button>
+        <button id="delete-btn">删除</button>
+        <button id="undo-btn">撤销</button>
+        <label class="timeline">
+          关键帧时间 <input id="time" type="range" min="0" max="60" value="0" />
+          <span id="time-label">t=0</span>
+        </label>
+      </div>
+    </header>
+    <main>
+      <section class="panel" id="tree-panel">
+        <h2>对象树（父子层级 / 绘制顺序 #）</h2>
+        <div id="tree"></div>
+      </section>
+      <section class="panel" id="canvas-panel">
+        <h2>屏幕预览（与导出共用渲染管线）</h2>
+        <div id="canvas-host"></div>
+        <div class="resource">
+          <button id="sim-fault">模拟资源请求失败</button>
+          <button id="clear-fault">失效缓存并重试</button>
+          <span id="resource-state">资源来源: 未请求</span>
+        </div>
+        <div id="notices"></div>
+      </section>
+      <section class="panel" id="inspector-panel">
+        <h2>检查器（变换 / 裁剪 / 颜色）</h2>
+        <div id="inspector"></div>
+      </section>
+    </main>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
