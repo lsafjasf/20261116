@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f2efe8">
+    <title>InkTrace Studio · 线稿矢量化</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23191a1d'/%3E%3Cpath d='M6 25 16 7l4 11 7-5-4 12H6Z' fill='none' stroke='%23fff9f4' stroke-width='2'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="./fonts.css">
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32"><path d="M5 24.5 15.4 6.2l4 11.2 7.6-5.5-4.2 14.1H5Z" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"/><circle cx="15.4" cy="6.2" r="2.4" fill="currentColor"/></svg>
+          </span>
+          <span class="brand-copy">
+            <strong>InkTrace</strong>
+            <small>VECTOR CLEANUP STUDIO</small>
+          </span>
+        </div>
+        <div class="project-identity">
+          <span class="eyebrow">当前工程</span>
+          <button class="project-name" id="projectNameButton" type="button" title="点击重命名">
+            <span id="projectName">交叉线稿 · 清理工程</span>
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3 11 .5-2.8L10.8 1l2.2 2.2-7.3 7.3L3 11Z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+          </button>
+          <span class="save-state" id="saveState"><i></i>已保存到本机</span>
+        </div>
+        <div class="top-actions">
+          <button class="button button-quiet" id="snapshotButton" type="button">
+            <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M3 3.5h12v11H3zM6 3.5V2h6v1.5M6.5 9h5M6.5 11.5h3.2" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/></svg>
+            建立快照
+          </button>
+          <button class="button button-quiet" id="importProjectButton" type="button">
+            载入工程
+          </button>
+          <input id="projectFileInput" type="file" accept="application/json,.json" hidden>
+          <button class="button button-primary" id="exportButton" type="button">
+            <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 2v9m0 0 3.2-3.2M9 11 5.8 7.8M3 13v2h12v-2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            导出 SVG
+          </button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="sidebar sidebar-left">
+          <section class="panel-section source-section">
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">01 / 输入</span>
+                <h2>程序样例</h2>
+              </div>
+              <span class="live-pill"><i></i>确定性</span>
+            </div>
+            <div class="source-card">
+              <div class="source-thumb">
+                <canvas id="sourceCanvas" width="720" height="480" aria-label="原始灰度线稿"></canvas>
+                <span class="source-tag">B/W</span>
+              </div>
+              <div class="source-meta">
+                <strong>交叉线束 / 孤立斑点</strong>
+                <span>720 × 480 px · seed 631</span>
+              </div>
+            </div>
+            <div class="source-facts">
+              <span><b>9</b> 结构笔触</span>
+              <span><b>12</b> 孤立斑点</span>
+              <span><b>0.9 px</b> 最细线</span>
+            </div>
+            <div class="inline-actions">
+              <button class="text-button" id="uploadButton" type="button">导入图片</button>
+              <input id="imageFileInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+              <button class="text-button" id="restoreSampleButton" type="button">恢复内置样例</button>
+            </div>
+          </section>
+
+          <section class="panel-section params-section">
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">02 / 清理</span>
+                <h2>矢量化参数</h2>
+              </div>
+              <button class="icon-button" id="resetParamsButton" type="button" title="恢复默认参数" aria-label="恢复默认参数">
+                <svg viewBox="0 0 18 18"><path d="M14.2 6.2A6 6 0 1 0 15 10M14.2 2.8v3.6h-3.6" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="thresholdRange">
+                <span>阈值 <em>Threshold</em></span>
+                <output id="thresholdValue">172</output>
+              </label>
+              <input class="range" id="thresholdRange" type="range" min="8" max="235" step="1" value="172">
+              <div class="range-scale"><span>保留深色</span><span>保留灰阶</span></div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="smoothingRange">
+                <span>平滑度 <em>Smoothing</em></span>
+                <output id="smoothingValue">46</output>
+              </label>
+              <input class="range" id="smoothingRange" type="range" min="0" max="100" step="1" value="46">
+              <div class="range-scale"><span>折线</span><span>圆润</span></div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="mergeRange">
+                <span>节点合并 <em>Node merge</em></span>
+                <output id="mergeValue">3.0</output>
+              </label>
+              <input class="range" id="mergeRange" type="range" min="0" max="16" step="0.5" value="3">
+              <div class="range-scale"><span>精细</span><span>轻量</span></div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="minRegionRange">
+                <span>最小区域 <em>Min region</em></span>
+                <output id="minRegionValue">28 <small>px²</small></output>
+              </label>
+              <input class="range" id="minRegionRange" type="range" min="0" max="240" step="1" value="28">
+              <div class="range-scale"><span>保留细节</span><span>过滤噪点</span></div>
+            </div>
+            <div class="parameter-note">
+              <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 2.5 16 15H2L9 2.5Zm0 5v3.5m0 2.2v.3" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+              <span>细线守护独立于阈值，最小区域只移除紧凑斑点。</span>
+            </div>
+            <button class="button button-run" id="vectorizeButton" type="button">
+              <span>重新矢量化</span>
+              <kbd>⌘ ↵</kbd>
+            </button>
+          </section>
+
+          <section class="panel-section presets-section">
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">03 / 回归</span>
+                <h2>参数测试</h2>
+              </div>
+            </div>
+            <div class="preset-grid" role="group" aria-label="参数预设">
+              <button class="preset-button is-active" data-preset="default" type="button"><b>默认</b><small>平衡</small></button>
+              <button class="preset-button" data-preset="boundary" type="button"><b>边界</b><small>极限</small></button>
+              <button class="preset-button" data-preset="exception" type="button"><b>异常</b><small>越界恢复</small></button>
+            </div>
+            <button class="button button-outline" id="compareButton" type="button">
+              运行三组对比
+              <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M3 13.5V9m4 4.5V5m4 8.5V7.5m4 6V3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+          </section>
+        </aside>
+
+        <section class="stage-column">
+          <div class="stage-toolbar">
+            <div class="stage-title">
+              <span class="status-dot"></span>
+              <strong>矢量预览</strong>
+              <span id="previewSize">720 × 480</span>
+            </div>
+            <div class="view-controls">
+              <button class="segmented-button is-active" id="vectorViewButton" type="button">矢量</button>
+              <button class="segmented-button" id="sourceViewButton" type="button">原图</button>
+              <span class="toolbar-divider"></span>
+              <button class="icon-button" id="nodeToggleButton" type="button" title="显示路径节点" aria-label="显示路径节点">
+                <svg viewBox="0 0 18 18"><path d="M4 13 9 4l5 9H4Z" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="4" cy="13" r="1.6" fill="currentColor"/><circle cx="9" cy="4" r="1.6" fill="currentColor"/><circle cx="14" cy="13" r="1.6" fill="currentColor"/></svg>
+              </button>
+              <label class="zoom-control">
+                <span>缩放</span>
+                <select id="zoomSelect">
+                  <option value="fit" selected>适应</option>
+                  <option value="0.5">50%</option>
+                  <option value="1">100%</option>
+                  <option value="2">200%</option>
+                  <option value="4">400%</option>
+                  <option value="10">1000%</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div class="stage-viewport" id="stageViewport">
+            <div class="stage-grid" aria-hidden="true"></div>
+            <div class="canvas-wrap" id="canvasWrap">
+              <div class="preview-surface" id="svgPreview" aria-live="polite"></div>
+              <canvas class="source-preview" id="sourcePreviewCanvas" width="720" height="480" hidden></canvas>
+              <div class="node-overlay" id="nodeOverlay" hidden></div>
+            </div>
+            <div class="stage-empty" id="stageEmpty" hidden>
+              <span class="spinner"></span>
+              <strong>正在重建矢量轮廓</strong>
+              <small>若异步计算失效，将自动切换本地回退。</small>
+            </div>
+            <div class="viewport-badge" id="viewportBadge">
+              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+              <span>纯矢量 · 10× 无栅格</span>
+            </div>
+            <div class="path-inspector" id="pathInspector" hidden>
+              <span>点击路径以检查节点</span>
+              <b id="selectedPathLabel">—</b>
+            </div>
+          </div>
+
+          <div class="stage-metrics">
+            <div class="metric-cell">
+              <span>节点总数</span>
+              <strong id="metricNodes">566</strong>
+              <small id="metricNodesDelta">待计算</small>
+            </div>
+            <div class="metric-cell">
+              <span>矢量路径</span>
+              <strong id="metricPaths">24</strong>
+              <small>even-odd 填充</small>
+            </div>
+            <div class="metric-cell">
+              <span>细线覆盖</span>
+              <strong id="metricThin">97.3<sup>%</sup></strong>
+              <small>独立守护阈值</small>
+            </div>
+            <div class="metric-cell">
+              <span>噪点清除</span>
+              <strong id="metricNoise">100<sup>%</sup></strong>
+              <small id="metricFiltered">12 个连通域</small>
+            </div>
+            <div class="metric-cell metric-cell-wide">
+              <span>视觉完整度</span>
+              <strong id="metricCompleteness">97.3<sup>%</sup></strong>
+              <div class="mini-progress"><i id="completenessBar"></i></div>
+            </div>
+          </div>
+
+          <div class="timeline">
+            <div class="timeline-header">
+              <div>
+                <span class="eyebrow">关键帧</span>
+                <strong id="timelineLayerName">墨线主体</strong>
+              </div>
+              <div class="timeline-actions">
+                <span class="frame-readout" id="frameReadout">00:00.00</span>
+                <button class="button button-small" id="addKeyframeButton" type="button">＋ 当前帧</button>
+              </div>
+            </div>
+            <div class="timeline-track-wrap">
+              <div class="timeline-ruler" aria-hidden="true"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
+              <input class="timeline-range" id="timeRange" type="range" min="0" max="1000" step="1" value="0" aria-label="关键帧时间">
+              <div class="keyframe-markers" id="keyframeMarkers"></div>
+            </div>
+            <div class="frame-controls">
+              <label>X <input id="frameX" type="number" step="1" value="0"></label>
+              <label>Y <input id="frameY" type="number" step="1" value="0"></label>
+              <label>缩放 <input id="frameScale" type="number" step="0.05" min="0.05" max="20" value="1"></label>
+              <label>旋转 <input id="frameRotation" type="number" step="1" value="0"></label>
+              <label>不透明 <input id="frameOpacity" type="number" step="0.05" min="0" max="1" value="1"></label>
+            </div>
+          </div>
+        </section>
+
+        <aside class="sidebar sidebar-right">
+          <section class="panel-section layers-section">
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">工程</span>
+                <h2>图层</h2>
+              </div>
+              <button class="icon-button" id="duplicateLayerButton" type="button" title="复制当前图层" aria-label="复制当前图层">
+                <svg viewBox="0 0 18 18"><rect x="3" y="5" width="8" height="10" rx="1" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M7 3h8v10" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+              </button>
+            </div>
+            <div class="layer-list" id="layerList"></div>
+            <div class="layer-actions">
+              <button class="text-button" id="moveLayerUpButton" type="button">上移</button>
+              <button class="text-button" id="moveLayerDownButton" type="button">下移</button>
+              <span></span>
+              <button class="text-button danger-text" id="deleteLayerButton" type="button">删除</button>
+            </div>
+            <div class="layer-properties">
+              <label class="color-field">
+                <span>图层颜色</span>
+                <input id="layerColor" type="color" value="#17191c">
+                <output id="layerColorValue">#17191C</output>
+              </label>
+              <label class="opacity-field">
+                <span>图层不透明度</span>
+                <input id="layerOpacity" type="range" min="0" max="100" step="1" value="100">
+                <output id="layerOpacityValue">100%</output>
+              </label>
+            </div>
+          </section>
+
+          <section class="panel-section inspection-section">
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">质量</span>
+                <h2>导出检查</h2>
+              </div>
+              <span class="status-chip good" id="parityChip">一致</span>
+            </div>
+            <div class="inspection-list">
+              <div><span>预览 / 导出同源</span><b class="status-good">通过</b></div>
+              <div><span>10× 矢量清晰度</span><b class="status-good">通过</b></div>
+              <div><span>细线保护</span><b class="status-good" id="thinCheck">通过</b></div>
+              <div><span>紧凑噪点过滤</span><b class="status-good" id="noiseCheck">通过</b></div>
+              <div><span>关键帧可恢复</span><b class="status-good" id="keyframeCheck">通过</b></div>
+            </div>
+            <button class="button button-outline" id="verifyButton" type="button">执行往返校验</button>
+          </section>
+
+          <section class="panel-section snapshot-section">
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">保护</span>
+                <h2>工程快照</h2>
+              </div>
+              <span class="count-badge" id="snapshotCount">0</span>
+            </div>
+            <p class="muted-copy">每次导出前自动冻结当前工程；快照包含图层顺序、关键帧、坐标和颜色。</p>
+            <div class="inline-actions snapshot-tools">
+              <button class="text-button" id="downloadProjectButton" type="button">下载当前工程 JSON</button>
+            </div>
+            <div class="snapshot-list" id="snapshotList">
+              <div class="empty-list">尚未建立快照</div>
+            </div>
+          </section>
+
+          <section class="panel-section notices-section">
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">系统</span>
+                <h2>回退记录</h2>
+              </div>
+              <button class="icon-button" id="clearNoticesButton" type="button" title="清空回退记录" aria-label="清空回退记录">
+                <svg viewBox="0 0 18 18"><path d="M4 5h10M7 5V3h4v2m-6 0 1 10h6l1-10M8 8v4m2-4v4" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+            <div class="notice-list" id="noticeList">
+              <div class="notice-empty">暂无异常 · 所有服务正常</div>
+            </div>
+          </section>
+        </aside>
+      </main>
+    </div>
+
+    <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+    <div class="modal-backdrop" id="comparisonModal" hidden>
+      <section class="comparison-modal" role="dialog" aria-modal="true" aria-labelledby="comparisonTitle">
+        <header class="modal-header">
+          <div>
+            <span class="eyebrow">可重复测试 · seed 631</span>
+            <h2 id="comparisonTitle">三组结果：节点数与视觉完整度</h2>
+            <p>同一张交叉线 / 斑点样例，固定算法版本，逐组记录参数与回退状态。</p>
+          </div>
+          <button class="icon-button modal-close" id="closeComparisonButton" type="button" aria-label="关闭对比">
+            <svg viewBox="0 0 18 18"><path d="m4 4 10 10M14 4 4 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </button>
+        </header>
+        <div class="comparison-grid" id="comparisonGrid">
+          <div class="comparison-loading"><span class="spinner"></span>正在生成三组可重复结果…</div>
+        </div>
+        <footer class="modal-footer">
+          <div class="modal-note"><span class="status-dot"></span><span id="comparisonSummary">等待测试</span></div>
+          <div class="modal-actions">
+            <button class="button button-quiet" id="downloadReportButton" type="button">下载报告 JSON</button>
+            <button class="button button-primary" id="applyDefaultResultButton" type="button">应用默认结果</button>
+          </div>
+        </footer>
+      </section>
+    </div>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

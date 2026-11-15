@@ -1,0 +1,15 @@
+{
+  "name": "inktrace-studio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Deterministic black-and-white line art to editable SVG workbench",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "test": "node --test tests/*.test.js",
+    "report": "node scripts/generate-report.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
