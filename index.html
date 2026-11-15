@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="在无地图暗河中使用声呐、暗流与听力寻找正确出口。"
+    />
+    <title>盲区监听 · Abyss Listener</title>
+    <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <div>
+            <p class="eyebrow">ABYSS LISTENER / 07</p>
+            <h1>盲区监听</h1>
+          </div>
+        </div>
+        <div class="seed-control">
+          <label for="seedInput">航次 SEED</label>
+          <input id="seedInput" type="text" inputmode="numeric" spellcheck="false" />
+          <button id="newSeedBtn" class="button ghost small" type="button">换 seed</button>
+        </div>
+        <div class="top-status">
+          <span id="statusPill" class="status-pill" data-status="READY">待命</span>
+          <button id="muteBtn" class="icon-button" type="button" aria-label="切换声音">
+            <span id="muteIcon">声</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="stage-panel">
+          <div class="stage-heading">
+            <div>
+              <p class="eyebrow">PASSIVE ARRAY / 实时声场</p>
+              <h2>无地图下潜</h2>
+            </div>
+            <div class="stage-meta">
+              <span id="timer">00:00.0</span>
+              <span class="divider"></span>
+              <span id="modeLabel">待命</span>
+            </div>
+          </div>
+
+          <div class="canvas-wrap" id="canvasWrap">
+            <canvas id="gameCanvas" aria-label="声呐与监听状态画布"></canvas>
+            <div class="scanlines" aria-hidden="true"></div>
+            <div class="start-overlay" id="startOverlay">
+              <p class="eyebrow">NO MAP. NO LIGHT. ONLY SOUND.</p>
+              <h2>先听见，再下潜。</h2>
+              <p>
+                发射声呐辨认岩壁与出口，监听暗流和巡逻源。主动扫描会暴露你的位置。
+              </p>
+              <button id="startBtn" class="button primary" type="button">开始监听</button>
+              <p class="tiny">建议佩戴耳机 · 空格扫描 · WASD / 方向键移动</p>
+            </div>
+          </div>
+
+          <div class="stage-footer">
+            <div class="control-hint">
+              <kbd>WASD</kbd><span>移动</span>
+              <kbd>SPACE</kbd><span>声呐</span>
+              <kbd>E</kbd><span>提交出口</span>
+              <kbd>P</kbd><span>暂停</span>
+            </div>
+            <div class="audio-readout">
+              <span class="pulse-dot" id="audioPulse"></span>
+              <span id="audioState">AUDIO STANDBY</span>
+            </div>
+          </div>
+        </section>
+
+        <aside class="console">
+          <section class="objective-card">
+            <p class="eyebrow">CURRENT OBJECTIVE</p>
+            <h2 id="objective">寻找三个出口中的正确出口</h2>
+            <p id="objectiveDetail">先发射一次声呐，确认近处岩壁材质。</p>
+          </section>
+
+          <section class="resource-section">
+            <div class="section-title">
+              <p class="eyebrow">CRITICAL RESOURCES</p>
+              <span id="resourceTick">T+00:00</span>
+            </div>
+            <div class="resource-row">
+              <div class="resource-label">
+                <span>电量</span><strong id="batteryValue">100%</strong>
+              </div>
+              <div class="meter"><span id="batteryBar" class="meter-fill battery"></span></div>
+            </div>
+            <div class="resource-row">
+              <div class="resource-label">
+                <span>暴露</span><strong id="exposureValue">0%</strong>
+              </div>
+              <div class="meter"><span id="exposureBar" class="meter-fill exposure"></span></div>
+            </div>
+            <div class="resource-row">
+              <div class="resource-label">
+                <span>结构</span><strong id="hullValue">100%</strong>
+              </div>
+              <div class="meter"><span id="hullBar" class="meter-fill hull"></span></div>
+            </div>
+            <div class="resource-inline">
+              <span>回收次数 <strong id="recoveryValue">1</strong></span>
+              <span>声呐冷却 <strong id="cooldownValue">就绪</strong></span>
+            </div>
+          </section>
+
+          <section class="change-card" aria-live="polite">
+            <div class="section-title">
+              <p class="eyebrow">LAST STATE CHANGE</p>
+              <span id="changeTime">NOW</span>
+            </div>
+            <p id="lastChange">系统就绪：监听器等待下潜</p>
+            <div class="flow-readout">
+              <span>局部流场</span>
+              <strong id="flowValue">静水 · 0.00</strong>
+            </div>
+          </section>
+
+          <section class="actions">
+            <button id="scanBtn" class="button primary wide" type="button">
+              发射声呐 <span>−7%</span>
+            </button>
+            <div class="button-grid">
+              <button id="submitBtn" class="button amber" type="button">提交出口</button>
+              <button id="pauseBtn" class="button" type="button">暂停</button>
+              <button id="recoverBtn" class="button" type="button">紧急回收</button>
+              <button id="restartBtn" class="button" type="button">重新开始</button>
+              <button id="replayBtn" class="button" type="button">回放本局</button>
+              <button id="downloadBtn" class="button" type="button">保存记录</button>
+              <button id="loadRecordBtn" class="button" type="button">载入回放</button>
+              <input id="recordFile" type="file" accept="application/json,.json" hidden />
+            </div>
+          </section>
+
+          <section class="material-section">
+            <div class="section-title">
+              <p class="eyebrow">ECHO SIGNATURES</p>
+              <span>材质反射</span>
+            </div>
+            <div class="material-list">
+              <span><i class="material-dot basalt"></i>玄武岩</span>
+              <span><i class="material-dot granite"></i>花岗岩</span>
+              <span><i class="material-dot shale"></i>页岩</span>
+              <span><i class="material-dot crystal"></i>石英脉</span>
+            </div>
+            <p class="tiny" id="lastScanSummary">尚无声呐回波。</p>
+          </section>
+        </aside>
+      </main>
+
+      <footer class="footer">
+        <p>
+          <span class="signal-mark">◉</span>
+          声呐波前仅在接触物体后返回；距离越远、反射越弱。
+        </p>
+        <p id="hashReadout">STATE HASH —</p>
+      </footer>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
