@@ -1,0 +1,166 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #0b1018;
+  color: #d6e2f0;
+  font-size: 13px;
+}
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 18px;
+  background: #131c28;
+  border-bottom: 1px solid #243244;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.brand { font-weight: 700; font-size: 16px; }
+.meta { display: flex; gap: 8px; flex-wrap: wrap; }
+.badge {
+  background: #1c2735;
+  border: 1px solid #2c3d52;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 280px 1fr 340px;
+  gap: 12px;
+  padding: 12px;
+}
+.panel {
+  background: #131c28;
+  border: 1px solid #243244;
+  border-radius: 8px;
+  padding: 10px;
+  max-height: calc(100vh - 150px);
+  overflow-y: auto;
+}
+section h3 {
+  margin: 6px 0 8px;
+  font-size: 13px;
+  color: #8fb3dd;
+  border-bottom: 1px solid #243244;
+  padding-bottom: 4px;
+}
+section h4 { margin: 8px 0 4px; font-size: 12px; color: #faad14; }
+label { display: block; margin: 6px 0; font-size: 12px; }
+label.check { display: flex; align-items: center; gap: 6px; }
+select, input[type="number"], input[type="text"] {
+  width: 100%;
+  margin-top: 3px;
+  background: #0f1620;
+  border: 1px solid #2c3d52;
+  color: #d6e2f0;
+  border-radius: 5px;
+  padding: 5px 7px;
+}
+input[type="file"] { font-size: 11px; color: #9fb4cc; }
+.row { margin: 6px 0; }
+.btn-group { display: flex; gap: 6px; flex-wrap: wrap; }
+.btn-group.wrap { flex-direction: column; }
+button {
+  background: #1f6feb;
+  border: none;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  flex: 1;
+}
+button:hover { background: #2f7ffb; }
+button:disabled { background: #2c3d52; cursor: not-allowed; }
+button.danger { background: #c0392b; }
+button.danger:hover { background: #e04b3b; }
+.hint { color: #7d8fa5; font-size: 11px; }
+.closure-box {
+  margin-top: 10px;
+  border: 1px dashed #3a4d64;
+  border-radius: 6px;
+  padding: 6px 8px;
+  background: #0f1620;
+}
+.center { display: flex; flex-direction: column; gap: 10px; }
+.canvas-wrap {
+  background: #0f1620;
+  border: 1px solid #243244;
+  border-radius: 8px;
+  padding: 8px;
+}
+canvas { width: 100%; height: auto; border-radius: 4px; display: block; }
+.timeline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #131c28;
+  border: 1px solid #243244;
+  border-radius: 8px;
+  padding: 8px;
+}
+.timeline button { flex: 0 0 auto; padding: 6px 12px; }
+.timeline input[type="range"] { flex: 1; }
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.stat {
+  background: #131c28;
+  border: 1px solid #243244;
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+}
+.stat .num { font-size: 18px; font-weight: 700; color: #52c41a; }
+.stat .lbl { font-size: 11px; color: #8fa3ba; margin-top: 2px; }
+.log, .debug, .issues {
+  max-height: 240px;
+  overflow-y: auto;
+  font-size: 11px;
+  background: #0f1620;
+  border: 1px solid #243244;
+  border-radius: 6px;
+  padding: 6px;
+}
+.log-entry {
+  border-left: 3px solid #1f6feb;
+  padding: 4px 6px;
+  margin-bottom: 5px;
+  background: #131c28;
+  border-radius: 0 4px 4px 0;
+}
+.log-entry.reroute { border-left-color: #faad14; }
+.log-entry.closure, .log-entry.evacuate { border-left-color: #ff4d4f; }
+.log-entry.arrive { border-left-color: #52c41a; }
+.log-entry .t { color: #8fb3dd; font-weight: 700; }
+.debug-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.debug-grid div { background: #131c28; padding: 3px 5px; border-radius: 4px; }
+.issue { padding: 3px 5px; border-bottom: 1px solid #1c2735; }
+.issue.drop { color: #ff9c9e; }
+.issue.fix { color: #ffd666; }
+.verify, .verify-output {
+  font-size: 11px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.verify .ok { color: #52c41a; }
+.verify .fail { color: #ff4d4f; }
+.verify-bar {
+  margin: 0 12px 16px;
+  background: #131c28;
+  border: 1px solid #243244;
+  border-radius: 8px;
+  padding: 10px;
+}
+.verify-output {
+  margin-top: 8px;
+  max-height: 220px;
+ overflow-y: auto;
+  background: #0f1620;
+  border-radius: 6px;
+  padding: 8px;
+}

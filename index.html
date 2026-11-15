@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>车辆路径仿真与封路重规划平台</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">🚦 车辆路径仿真平台</div>
+    <div class="meta">
+      <span id="meta-sample" class="badge">样例：-</span>
+      <span id="meta-version" class="badge">数据版本：v1</span>
+      <span id="meta-filter" class="badge">筛选：全部</span>
+      <span id="meta-export" class="badge">导出口径：未导出</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="panel left">
+      <section>
+        <h3>数据集</h3>
+        <div class="row">
+          <select id="sample-select">
+            <option value="A">固定样例 A（网格·脏数据）</option>
+            <option value="B">固定样例 B（双通道·封路验证）</option>
+          </select>
+        </div>
+        <div class="row">
+          <input type="file" id="project-file" accept="application/json" />
+        </div>
+        <div class="row btn-group">
+          <button id="save-project">保存工程 JSON</button>
+          <button id="reload-project" disabled>重新载入工程</button>
+        </div>
+      </section>
+
+      <section>
+        <h3>道路编辑</h3>
+        <div id="edge-editor">
+          <p class="hint">在画布点击道路，或从下方选择。</p>
+          <label>道路
+            <select id="edge-select"></select>
+          </label>
+          <label>权重（&gt;0）
+            <input type="number" id="edge-weight" min="0.1" step="0.1" />
+          </label>
+          <div class="btn-group">
+            <button id="apply-weight">应用权重</button>
+            <button id="reset-weight">重置</button>
+          </div>
+          <div class="closure-box">
+            <h4>临时封路时间窗</h4>
+            <div class="row">
+              <label>起 <input type="number" id="close-from" min="0" /></label>
+              <label>止 <input type="number" id="close-to" min="0" /></label>
+            </div>
+            <div class="btn-group">
+              <button id="apply-closure">设置封路</button>
+              <button id="remove-closure" class="danger">解除封路</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h3>筛选与视图</h3>
+        <label>车辆状态
+          <select id="filter-state">
+            <option value="all">全部</option>
+            <option value="moving">行驶中</option>
+            <option value="waiting">等待中</option>
+            <option value="arrived">已到达</option>
+            <option value="unreachable">不可达</option>
+            <option value="pending">未释放</option>
+          </select>
+        </label>
+        <label>指定车辆
+          <select id="filter-vehicle"><option value="">（不指定）</option></select>
+        </label>
+        <label class="check"><input type="checkbox" id="heatmap-toggle" /> 显示拥堵热图</label>
+      </section>
+
+      <section>
+        <h3>导出</h3>
+        <div class="btn-group wrap">
+          <button id="export-csv">导出 3 个 CSV</button>
+          <button id="export-png">导出热图 PNG</button>
+        </div>
+        <div id="export-verify" class="verify"></div>
+      </section>
+    </aside>
+
+    <section class="center">
+      <div class="canvas-wrap">
+        <canvas id="scene" width="720" height="420"></canvas>
+      </div>
+      <div class="timeline">
+        <button id="play">▶ 播放</button>
+        <input type="range" id="tick-range" min="0" max="39" value="0" />
+        <span id="tick-label">tick 0 / 0</span>
+        <button id="step-back">−1</button>
+        <button id="step-fwd">+1</button>
+      </div>
+      <div class="stats" id="stats"></div>
+    </section>
+
+    <aside class="panel right">
+      <section>
+        <h3>车辆决策记录</h3>
+        <div class="row">
+          <select id="vehicle-select"></select>
+        </div>
+        <div id="decision-log" class="log"></div>
+      </section>
+      <section>
+        <h3>调试面板（中间计算状态）</h3>
+        <div id="debug-panel" class="debug"></div>
+      </section>
+      <section>
+        <h3>数据清洗记录</h3>
+        <div id="issues-panel" class="issues"></div>
+      </section>
+    </aside>
+  </main>
+
+  <section class="verify-bar">
+    <div class="btn-group">
+      <button id="run-verify">运行内置封路验证（49 项同构断言）</button>
+      <button id="demo-closure">一键复现封路重规划（样例 B 封 AB）</button>
+    </div>
+    <pre id="verify-output" class="verify-output">等待运行…</pre>
+  </section>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>

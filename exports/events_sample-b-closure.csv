@@ -1,0 +1,49 @@
+tick,vehicle_id,event_type,edge_id,reachable,plan_cost,dijkstra_expansions,edge_path,detail
+0,K1,plan-initial,SA,true,440,8,SA>AB>BT,初始规划 SA>AB>BT
+0,K1,enter-edge,SA,true,120,0,SA>AB>BT,进入 SA，长度 120，权重 1
+0,K6,plan-initial,BAD2,true,250,4,BAD2>SA,初始规划 BAD2>SA
+0,K6,enter-edge,BAD2,true,100,0,BAD2>SA,进入 BAD2，长度 100，权重 1
+1,K5,plan-initial,XT,true,320,6,XT,初始规划 XT
+1,K5,enter-edge,XT,true,320,0,XT,进入 XT，长度 320，权重 1
+2,K3,plan-initial,AX,true,440,8,AX>CX>CD,初始规划 AX>CX>CD
+2,K3,enter-edge,AX,true,120,0,AX>CX>CD,进入 AX，长度 120，权重 1
+5,K2,plan-initial,SC,true,520,7,SC>CD>DT,初始规划 SC>CD>DT
+5,K2,enter-edge,SC,true,160,0,SC>CD>DT,进入 SC，长度 160，权重 1
+5,K6,leave-edge,BAD2,true,,0,BAD2>SA,通过 BAD2 到达节点 A
+5,K6,enter-edge,SA,true,150,0,BAD2>SA,进入 SA，长度 120，权重 1
+6,K1,leave-edge,SA,true,,0,SA>AB>BT,通过 SA 到达节点 A
+6,K1,reroute-closure,AX,true,550,7,AX>XT,下一道路封闭，改用 AX>XT
+6,K1,enter-edge,AX,true,150,0,AX>XT,进入 AX，长度 120，权重 1
+8,K3,leave-edge,AX,true,,0,AX>CX>CD,通过 AX 到达节点 X
+8,K3,enter-edge,CX,true,120,0,AX>CX>CD,进入 CX，长度 120，权重 1
+8,K4,plan-initial,CD,true,480,8,CD>DT>BT,初始规划 CD>DT>BT
+8,K4,enter-edge,CD,true,200,0,CD>DT>BT,进入 CD，长度 200，权重 1
+11,K6,leave-edge,SA,true,,0,BAD2>SA,通过 SA 到达节点 S
+11,K6,arrive,,true,,0,BAD2>SA,第 11 tick 到达终点
+12,K1,leave-edge,AX,true,,0,AX>XT,通过 AX 到达节点 X
+12,K1,enter-edge,XT,true,400,0,AX>XT,进入 XT，长度 320，权重 1
+13,K2,leave-edge,SC,true,,0,SC>CD>DT,通过 SC 到达节点 C
+13,K2,enter-edge,CD,true,250,0,SC>CD>DT,进入 CD，长度 200，权重 1
+14,K3,leave-edge,CX,true,,0,AX>CX>CD,通过 CX 到达节点 C
+14,K3,wait-capacity,CD,true,,0,AX>CX>CD,道路 CD 满载(2)，原地等待
+15,K3,wait-capacity,CD,true,,0,AX>CX>CD,道路 CD 满载(2)，原地等待
+16,K3,wait-capacity,CD,true,,0,AX>CX>CD,道路 CD 满载(2)，原地等待
+17,K3,wait-capacity,CD,true,,0,AX>CX>CD,道路 CD 满载(2)，原地等待
+17,K5,leave-edge,XT,true,,0,XT,通过 XT 到达节点 T
+17,K5,arrive,,true,,0,XT,第 17 tick 到达终点
+18,K3,wait-capacity,CD,true,,0,AX>CX>CD,道路 CD 满载(2)，原地等待
+18,K4,leave-edge,CD,true,,0,CD>DT>BT,通过 CD 到达节点 D
+18,K4,enter-edge,DT,true,160,0,CD>DT>BT,进入 DT，长度 160，权重 1
+19,K3,enter-edge,CD,true,250,0,AX>CX>CD,进入 CD，长度 200，权重 1
+23,K2,leave-edge,CD,true,,0,SC>CD>DT,通过 CD 到达节点 D
+23,K2,enter-edge,DT,true,200,0,SC>CD>DT,进入 DT，长度 160，权重 1
+26,K4,leave-edge,DT,true,,0,CD>DT>BT,通过 DT 到达节点 T
+26,K4,enter-edge,BT,true,120,0,CD>DT>BT,进入 BT，长度 120，权重 1
+28,K1,leave-edge,XT,true,,0,AX>XT,通过 XT 到达节点 T
+28,K1,arrive,,true,,0,AX>XT,第 28 tick 到达终点
+29,K3,leave-edge,CD,true,,0,AX>CX>CD,通过 CD 到达节点 D
+29,K3,arrive,,true,,0,AX>CX>CD,第 29 tick 到达终点
+31,K2,leave-edge,DT,true,,0,SC>CD>DT,通过 DT 到达节点 T
+31,K2,arrive,,true,,0,SC>CD>DT,第 31 tick 到达终点
+32,K4,leave-edge,BT,true,,0,CD>DT>BT,通过 BT 到达节点 B
+32,K4,arrive,,true,,0,CD>DT>BT,第 32 tick 到达终点

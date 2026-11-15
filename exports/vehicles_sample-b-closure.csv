@@ -1,0 +1,7 @@
+vehicle_id,origin,destination,release_tick,deadline_tick,final_state,arrived_tick,travel_ticks,wait_ticks,distance,event_count,final_path
+K1,S,T,0,40,arrived,28,28,0,560,9,AX>XT
+K2,S,T,5,40,arrived,31,26,0,520,8,SC>CD>DT
+K3,A,D,2,30,arrived,29,22,5,440,13,AX>CX>CD
+K4,C,B,8,30,arrived,32,24,0,480,8,CD>DT>BT
+K5,X,T,1,10,arrived,17,16,0,320,4,XT
+K6,GHOST,S,0,40,arrived,11,11,0,220,6,BAD2>SA

@@ -1,0 +1,254 @@
+{
+  "schema": "traffic-sim-project/v1",
+  "savedAt": "2026-11-15T17:07:46.391Z",
+  "dataVersion": 2,
+  "sampleId": "sample-b-bypass",
+  "dataset": {
+    "id": "sample-b-bypass",
+    "version": 1,
+    "horizon": 40,
+    "nodes": [
+      {
+        "id": "S",
+        "x": 60,
+        "y": 180
+      },
+      {
+        "id": "A",
+        "x": 240,
+        "y": 80
+      },
+      {
+        "id": "B",
+        "x": 440,
+        "y": 80
+      },
+      {
+        "id": "C",
+        "x": 240,
+        "y": 300
+      },
+      {
+        "id": "D",
+        "x": 440,
+        "y": 300
+      },
+      {
+        "id": "T",
+        "x": 640,
+        "y": 180
+      },
+      {
+        "id": "X",
+        "x": 340,
+        "y": 180
+      },
+      {
+        "id": "GHOST",
+        "x": 700,
+        "y": 560
+      }
+    ],
+    "edges": [
+      {
+        "id": "SA",
+        "from": "S",
+        "to": "A",
+        "length": 120,
+        "lanes": 1,
+        "capacity": 2,
+        "weight": 1,
+        "directed": false
+      },
+      {
+        "id": "AB",
+        "from": "A",
+        "to": "B",
+        "length": 200,
+        "lanes": 1,
+        "capacity": 2,
+        "weight": 1,
+        "directed": false
+      },
+      {
+        "id": "BT",
+        "from": "B",
+        "to": "T",
+        "length": 120,
+        "lanes": 1,
+        "capacity": 2,
+        "weight": 1,
+        "directed": false
+      },
+      {
+        "id": "SC",
+        "from": "S",
+        "to": "C",
+        "length": 160,
+        "lanes": 1,
+        "capacity": 2,
+        "weight": 1,
+        "directed": false
+      },
+      {
+        "id": "CD",
+        "from": "C",
+        "to": "D",
+        "length": 200,
+        "lanes": 1,
+        "capacity": 2,
+        "weight": 1,
+        "directed": false
+      },
+      {
+        "id": "DT",
+        "from": "D",
+        "to": "T",
+        "length": 160,
+        "lanes": 1,
+        "capacity": 2,
+        "weight": 1,
+        "directed": false
+      },
+      {
+        "id": "AX",
+        "from": "A",
+        "to": "X",
+        "length": 120,
+        "lanes": 1,
+        "capacity": 2,
+        "weight": 1,
+        "directed": false
+      },
+      {
+        "id": "CX",
+        "from": "C",
+        "to": "X",
+        "length": 120,
+        "lanes": 1,
+        "capacity": 2,
+        "weight": 1,
+        "directed": false
+      },
+      {
+        "id": "XT",
+        "from": "X",
+        "to": "T",
+        "length": 320,
+        "lanes": 1,
+        "capacity": 2,
+        "weight": 1,
+        "directed": false
+      },
+      {
+        "id": "BAD2",
+        "from": "A",
+        "to": "GHOST",
+        "length": 100,
+        "lanes": 1,
+        "capacity": 2,
+        "weight": 1,
+        "directed": false
+      }
+    ],
+    "trips": [
+      {
+        "id": "K1",
+        "origin": "S",
+        "destination": "T",
+        "release": 0,
+        "deadline": 40
+      },
+      {
+        "id": "K2",
+        "origin": "S",
+        "destination": "T",
+        "release": 5,
+        "deadline": 40
+      },
+      {
+        "id": "K3",
+        "origin": "A",
+        "destination": "D",
+        "release": 2,
+        "deadline": 30
+      },
+      {
+        "id": "K4",
+        "origin": "C",
+        "destination": "B",
+        "release": 8,
+        "deadline": 30
+      },
+      {
+        "id": "K5",
+        "origin": "X",
+        "destination": "T",
+        "release": 1,
+        "deadline": 10
+      },
+      {
+        "id": "K6",
+        "origin": "GHOST",
+        "destination": "S",
+        "release": 0,
+        "deadline": 40
+      }
+    ]
+  },
+  "sanitizeIssues": [
+    {
+      "level": "drop",
+      "scope": "node",
+      "ref": "X",
+      "reason": "节点 id 重复，保留首条"
+    },
+    {
+      "level": "fix",
+      "scope": "node",
+      "ref": "GHOST",
+      "reason": "坐标为空或非数值，按索引占位"
+    },
+    {
+      "level": "drop",
+      "scope": "edge",
+      "ref": "BAD1",
+      "reason": "端点节点不存在"
+    },
+    {
+      "level": "drop",
+      "scope": "edge",
+      "ref": "SA",
+      "reason": "道路 id 重复，保留首条"
+    },
+    {
+      "level": "drop",
+      "scope": "trip",
+      "ref": "K7",
+      "reason": "起终点节点不存在"
+    },
+    {
+      "level": "drop",
+      "scope": "trip",
+      "ref": "K1",
+      "reason": "车辆 id 重复，保留首条"
+    }
+  ],
+  "overrides": {
+    "weights": {},
+    "closures": [
+      {
+        "edgeId": "AB",
+        "from": 4,
+        "to": 12
+      }
+    ]
+  },
+  "filters": {
+    "state": "all",
+    "vehicleId": ""
+  },
+  "selectedVehicleId": "K1",
+  "selectedEdgeId": "AB",
+  "heatmapEnabled": true
+}
