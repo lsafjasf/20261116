@@ -1,0 +1,78 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: #0e1116;
+  color: #d7dee8;
+}
+.layout { max-width: 1040px; margin: 0 auto; padding: 24px; }
+header h1 { margin: 0 0 4px; font-size: 22px; }
+.sub { margin: 0 0 20px; color: #8a97a8; font-size: 13px; }
+.panel {
+  background: #161b22;
+  border: 1px solid #232b36;
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 18px;
+}
+h2 { font-size: 15px; margin: 0 0 12px; color: #b9c4d2; }
+h3 { font-size: 13px; margin: 16px 0 8px; color: #8a97a8; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px 22px;
+}
+label { font-size: 12px; color: #9fb0c3; display: flex; flex-direction: column; gap: 6px; }
+input[type="range"] { width: 100%; accent-color: #4f9cff; }
+.val { color: #4f9cff; font-variant-numeric: tabular-nums; }
+.intensity-row { margin-top: 16px; display: flex; flex-direction: column; gap: 12px; }
+.buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+button {
+  background: #1f2733;
+  color: #d7dee8;
+  border: 1px solid #313c4b;
+  border-radius: 7px;
+  padding: 8px 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+button:hover:not(:disabled) { background: #283341; }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+#startBtn { background: #173a2b; border-color: #246b49; }
+#stopBtn { background: #3d1f22; border-color: #7a3036; }
+canvas {
+  width: 100%;
+  background: #0b0e13;
+  border: 1px solid #232b36;
+  border-radius: 8px;
+  display: block;
+  margin-bottom: 12px;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.stat {
+  background: #0f141b;
+  border: 1px solid #232b36;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.stat .k { font-size: 11px; color: #8a97a8; }
+.stat .v { font-size: 18px; font-variant-numeric: tabular-nums; margin-top: 2px; }
+.stat.state-calm .v { color: #58c487; }
+.stat.state-chase .v { color: #f0b455; }
+.stat.state-danger .v { color: #ff6b6b; }
+.log {
+  max-height: 180px;
+  overflow: auto;
+  font-size: 11px;
+  background: #0b0e13;
+  border: 1px solid #232b36;
+  border-radius: 8px;
+  padding: 10px;
+  margin: 0;
+  color: #8ea0b5;
+}
