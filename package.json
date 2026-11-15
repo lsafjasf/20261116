@@ -1,0 +1,11 @@
+{
+  "name": "disaster-map-collab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "双人协作灾情地图标注：共享时间线、回放、冲突检测与持久化",
+  "scripts": {
+    "test": "node test/run-tests.js && node test/web-smoke.js",
+    "serve": "node tools/serve.js"
+  }
+}

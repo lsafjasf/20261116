@@ -1,0 +1,94 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #0b1220;
+  color: #e2e8f0;
+  font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+header { padding: 14px 20px 8px; }
+h1 { margin: 0 0 8px; font-size: 20px; }
+.hud { display: flex; gap: 18px; flex-wrap: wrap; color: #94a3b8; }
+.hud b { color: #f8fafc; }
+.gauges {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding: 10px 20px;
+}
+.gauge {
+  background: #111c2e;
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.gauge span { display: block; margin: 6px 0; color: #94a3b8; }
+.bar {
+  height: 10px;
+  border-radius: 5px;
+  background: #1e293b;
+  overflow: hidden;
+  margin: 8px 0;
+}
+.bar i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #22c55e, #84cc16);
+  transition: width .25s;
+}
+.bar.alt i { background: linear-gradient(90deg, #38bdf8, #6366f1); }
+button, select {
+  background: #1d4ed8;
+  color: #fff;
+  border: 0;
+  border-radius: 7px;
+  padding: 7px 12px;
+  margin: 3px 6px 3px 0;
+  cursor: pointer;
+}
+button:hover { filter: brightness(1.15); }
+.panes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding: 0 20px;
+}
+.panes section {
+  background: #111c2e;
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+  padding: 10px;
+}
+.panes h2 { font-size: 13px; color: #93c5fd; margin: 0 0 8px; }
+canvas {
+  width: 100%;
+  height: 430px;
+  border-radius: 8px;
+  cursor: crosshair;
+  display: block;
+}
+.controls, .replay, .conflict, .feed-wrap {
+  margin: 14px 20px;
+  background: #111c2e;
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+  padding: 12px;
+}
+.conflict pre {
+  background: #0b1220;
+  padding: 10px;
+  border-radius: 8px;
+  overflow: auto;
+  color: #fcd34d;
+}
+#event-feed {
+  max-height: 260px;
+  overflow: auto;
+  font: 12px/1.6 ui-monospace, monospace;
+}
+#event-feed div { padding: 2px 0; border-bottom: 1px solid #172238; }
+#event-feed .ok { color: #86efac; }
+#event-feed .bad { color: #fca5a5; }
+@media (max-width: 980px) {
+  .gauges, .panes { grid-template-columns: 1fr; }
+}

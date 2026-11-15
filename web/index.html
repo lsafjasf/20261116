@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>灾情地图双人协同标注台</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header>
+    <h1>灾情地图双人协同标注台</h1>
+    <div class="hud">
+      <span>计时 <b id="clock">0s</b></span>
+      <span>总分 <b id="score">0</b></span>
+      <span>状态 <b id="status">running</b></span>
+      <span>危险点 <b id="progress">0/8</b></span>
+      <span>终态哈希 <b id="hash">-</b></span>
+    </div>
+  </header>
+
+  <section class="gauges">
+    <div class="gauge">
+      <strong>左侧 · 标注员</strong>
+      <div class="bar"><i id="left-durability"></i></div>
+      <span id="left-meta"></span>
+      <button id="undo-left">撤销自己最新未验证标记</button>
+    </div>
+    <div class="gauge">
+      <strong>右侧 · 验证员/连线</strong>
+      <div class="bar alt"><i id="right-durability"></i></div>
+      <span id="right-meta"></span>
+      <button id="undo-right">撤销路线草稿点</button>
+      <button id="finish-route">完成路线</button>
+    </div>
+  </section>
+
+  <main class="panes">
+    <section>
+      <h2>左侧输入：点击地图放标记（地理坐标不变）</h2>
+      <canvas id="canvas-left"></canvas>
+    </section>
+    <section>
+      <h2>右侧输入：点标记=验证；Shift+点击=路线点</h2>
+      <canvas id="canvas-right"></canvas>
+    </section>
+  </main>
+
+  <section class="controls">
+    <button id="demo-success">载入成功局并回放</button>
+    <button id="demo-failure">载入失败局并回放</button>
+    <button id="demo-conflict">演示乱序冲突</button>
+    <button id="reset">清空并重开</button>
+  </section>
+
+  <section id="replay-panel" hidden class="replay">
+    <h2>回放控制（暂停 / 单步 / 倍速均不改最终状态）</h2>
+    <button id="replay-play">播放</button>
+    <button id="replay-pause">暂停</button>
+    <button id="replay-step">单步</button>
+    <label>倍速
+      <select id="replay-speed">
+        <option value="1">1x</option>
+        <option value="2">2x</option>
+        <option value="4">4x</option>
+        <option value="8">8x</option>
+      </select>
+    </label>
+    <p id="replay-final"></p>
+  </section>
+
+  <section id="conflict-panel" hidden class="conflict"></section>
+
+  <section class="feed-wrap">
+    <h2>统一时间线事件（两侧输入 / 共享状态 / 碰撞结果）</h2>
+    <div id="event-feed"></div>
+  </section>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
