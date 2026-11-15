@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="三轴轨道对接协作游戏：方位、俯仰、推进三轴同步，两次锁定后安全撤离。"
+    />
+    <title>LATCH//3 · 三轴轨道对接</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23030908'/%3E%3Cpath d='M7 6h18v5H12v5h10v5H12v5H7z' fill='%2366efc6'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="game-shell" id="game-shell">
+      <header class="topbar">
+        <div class="brand-block">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <div>
+            <p class="eyebrow">ORBITAL SERVICE PROTOCOL</p>
+            <h1>LATCH<span>//</span>3</h1>
+          </div>
+        </div>
+        <div class="mission-identity">
+          <span class="label">任务</span>
+          <strong>双子接口 · KESTREL-7</strong>
+          <span class="seed-label">SEED <b id="seed-display">—</b></span>
+        </div>
+        <div class="phase-cluster">
+          <span class="phase-dot" id="phase-dot"></span>
+          <div>
+            <span class="label">状态机</span>
+            <strong id="phase-label">进近修正</strong>
+          </div>
+          <span class="phase-code" id="phase-code">APPROACH</span>
+        </div>
+      </header>
+
+      <section class="playfield" aria-label="轨道对接可视化">
+        <canvas id="space-canvas" aria-label="轨道、模块、误差锥与三轴仪表"></canvas>
+        <div class="scanlines" aria-hidden="true"></div>
+
+        <aside class="objective-panel glass">
+          <div class="panel-heading">
+            <span class="section-index">01</span>
+            <span>当前目标</span>
+            <span class="live-chip">LIVE</span>
+          </div>
+          <h2 id="objective-title">对准一号接口</h2>
+          <p id="objective-copy">
+            三轴同时进入青色容差窗，稳定保持 2.00 秒。任一轴过冲都会触发碰撞。
+          </p>
+          <div class="objective-progress">
+            <span>保持充电</span>
+            <div class="meter"><i id="hold-meter"></i></div>
+            <b id="hold-readout">0.00 / 2.00 s</b>
+          </div>
+        </aside>
+
+        <aside class="resource-panel glass">
+          <div class="panel-heading">
+            <span class="section-index">02</span>
+            <span>关键资源</span>
+            <span class="resource-clock" id="mission-clock">03:00</span>
+          </div>
+          <div class="resource-row">
+            <span>RCS 推进剂</span><b id="res-propellant">100%</b>
+            <div class="meter teal"><i id="bar-propellant"></i></div>
+          </div>
+          <div class="resource-row">
+            <span>主电力</span><b id="res-power">100%</b>
+            <div class="meter blue"><i id="bar-power"></i></div>
+          </div>
+          <div class="resource-row compact">
+            <span>锁扣装药</span><b id="res-latches">2 / 2</b>
+            <span>结构完整度</span><b id="res-hull">100%</b>
+          </div>
+          <div class="dock-sequence" id="dock-sequence">
+            <span class="dock-step active" data-dock="1"><i></i>接口 1</span>
+            <span class="dock-link"></span>
+            <span class="dock-step" data-dock="2"><i></i>接口 2</span>
+            <span class="dock-link"></span>
+            <span class="dock-step" data-dock="3"><i></i>撤离</span>
+          </div>
+        </aside>
+
+        <div class="target-tag" id="target-tag">
+          <span>PORT</span><b id="port-number">01</b>
+        </div>
+
+        <section class="axis-strip" aria-label="三轴遥测">
+          <article class="axis-card" data-axis="bearing">
+            <div class="axis-head"><span>P1 · 方位</span><b>BEARING</b></div>
+            <strong id="axis-bearing">0.00°</strong>
+            <div class="axis-tolerance">
+              <span>容差 ±1.35°</span><i id="axis-bearing-state">WAIT</i>
+            </div>
+          </article>
+          <article class="axis-card" data-axis="pitch">
+            <div class="axis-head"><span>P2 · 俯仰</span><b>PITCH</b></div>
+            <strong id="axis-pitch">0.00°</strong>
+            <div class="axis-tolerance">
+              <span>容差 ±1.15°</span><i id="axis-pitch-state">WAIT</i>
+            </div>
+          </article>
+          <article class="axis-card" data-axis="throttle">
+            <div class="axis-head"><span>P3 · 推进</span><b>THRUST</b></div>
+            <strong id="axis-throttle">0.00 m/s</strong>
+            <div class="axis-tolerance">
+              <span>距离 0.70–1.45 m</span><i id="axis-throttle-state">WAIT</i>
+            </div>
+          </article>
+        </section>
+
+        <aside class="event-panel glass">
+          <div class="panel-heading">
+            <span class="section-index">03</span>
+            <span>最近状态变化</span>
+            <span class="event-time" id="event-time">T+00:00.0</span>
+          </div>
+          <p class="event-latest" id="event-latest">任务开始：三轴同步进近一号接口</p>
+          <ol class="event-list" id="event-list"></ol>
+        </aside>
+
+        <div class="mode-banner" id="mode-banner">
+          <span class="mode-kicker">MODE</span>
+          <b id="mode-name">单人调试</b>
+          <span id="mode-hint">A/D 方位 · W/S 俯仰 · ↑/↓ 推进</span>
+        </div>
+
+        <div class="overlay" id="overlay" hidden>
+          <div class="overlay-card glass">
+            <span class="overlay-kicker" id="overlay-kicker">SIMULATION PAUSED</span>
+            <h2 id="overlay-title">任务暂停</h2>
+            <p id="overlay-copy">固定步长与资源消耗已冻结。</p>
+            <div class="overlay-actions">
+              <button id="overlay-primary" class="primary-button">继续任务</button>
+              <button id="overlay-secondary" class="ghost-button" hidden>重新开始</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="control-deck">
+        <div class="control-cluster">
+          <label class="select-wrap">
+            <span>协作模式</span>
+            <select id="mode-select">
+              <option value="solo">单人调试</option>
+              <option value="crew">三人协作</option>
+            </select>
+          </label>
+          <button id="audio-button" class="tool-button" aria-pressed="true">
+            <span class="button-icon">◉</span>音频开启
+          </button>
+        </div>
+        <div class="primary-controls">
+          <button id="pause-button" class="key-button"><kbd>P</kbd> 暂停</button>
+          <button id="restart-button" class="key-button"><kbd>R</kbd> 重新开始</button>
+          <button id="recover-button" class="key-button" disabled><kbd>Y</kbd> 恢复检查点</button>
+          <button id="replay-button" class="key-button"><kbd>B</kbd> 回放</button>
+        </div>
+        <div class="replay-tools">
+          <button id="export-button" class="tool-button">导出回放</button>
+          <button id="import-button" class="tool-button">导入校验</button>
+          <input id="import-file" type="file" accept="application/json" hidden />
+          <span class="hash-chip">HASH <b id="hash-display">—</b></span>
+        </div>
+      </footer>
+    </main>
+    <script type="module" src="./src/game.js"></script>
+  </body>
+</html>
