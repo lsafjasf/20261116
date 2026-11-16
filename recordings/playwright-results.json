@@ -1,0 +1,47 @@
+[
+  {
+    "name": "浏览器手动双人：固定节拍推进且无报错",
+    "ok": true,
+    "detail": "tick=32"
+  },
+  {
+    "name": "浏览器自动演示：成功救援",
+    "ok": true,
+    "detail": "ticks=691 integrity=85.51"
+  },
+  {
+    "name": "浏览器回放：暂停后单步只前进一帧",
+    "ok": true,
+    "detail": "7 -> 8"
+  },
+  {
+    "name": "浏览器回放：4x 倍速后到达同一终态",
+    "ok": true,
+    "detail": "finalChecksum=384e3fad"
+  },
+  {
+    "name": "浏览器回放：UI 显示逐帧校验通过",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "浏览器重载：仪表/耐久/进度恢复且 checksum 一致",
+    "ok": true,
+    "detail": "tick=161 checksum=7c6c8ced"
+  },
+  {
+    "name": "浏览器自动演示：冰面断裂失败",
+    "ok": true,
+    "detail": "conflicts=1"
+  },
+  {
+    "name": "浏览器冲突扫描：显示具体时刻与对象位置",
+    "ok": true,
+    "detail": "[8:44:56 AM] 顺序冲突首现 tick 43 (2.15s)：物资箱 原顺序位置 878.8,358.7；交换后 878.8,363.2"
+  },
+  {
+    "name": "浏览器全程无控制台错误",
+    "ok": true,
+    "detail": ""
+  }
+]

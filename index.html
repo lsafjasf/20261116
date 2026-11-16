@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>冰湖双人救援 · 同时间线回放验证</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 16px; background: #06121c; color: #dfe9f2;
+      font: 14px/1.5 'Microsoft YaHei', 'SimHei', "PingFang SC", system-ui, sans-serif;
+    }
+    h1 { font-size: 18px; margin: 0 0 10px; }
+    .layout { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+    canvas {
+      width: min(960px, 100%); height: auto; border: 1px solid #24445c;
+      border-radius: 8px; background: #0b1f2e;
+    }
+    .panel {
+      background: #0d2433; border: 1px solid #21425a; border-radius: 8px;
+      padding: 12px; width: 320px;
+    }
+    .panel h2 { font-size: 14px; margin: 0 0 8px; color: #9fd0ff; }
+    button {
+      background: #16394f; color: #e8f1f8; border: 1px solid #2c5a78;
+      border-radius: 6px; padding: 7px 10px; margin: 3px 4px 3px 0; cursor: pointer;
+    }
+    button:hover { background: #1d4a66; }
+    button.primary { background: #1d6b4f; border-color: #2c8f6c; }
+    button.danger { background: #7a2e2e; border-color: #a24a4a; }
+    .row { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+    .gauge { margin: 6px 0; }
+    .gauge label { display: flex; justify-content: space-between; font-size: 12px; color: #b7ccdb; }
+    .track { height: 10px; background: #132e40; border-radius: 5px; overflow: hidden; }
+    .fill { height: 100%; transition: width 0.08s linear; }
+    #log {
+      height: 180px; overflow: auto; font: 11px/1.45 ui-monospace, monospace;
+      background: #071823; border-radius: 6px; padding: 8px; border: 1px solid #1c3a4f;
+    }
+    .conflict { color: #ff9a8b; }
+    .ok { color: #7ee0a6; }
+    .bad { color: #ff7a6b; }
+    kbd {
+      background: #16394f; border: 1px solid #2c5a78; border-bottom-width: 2px;
+      border-radius: 4px; padding: 1px 5px; font-size: 11px;
+    }
+    .small { font-size: 12px; color: #9fb8c8; }
+    .badge { padding: 2px 7px; border-radius: 10px; font-size: 12px; }
+    .badge.run { background: #1d4a66; }
+    .badge.won { background: #1d6b4f; }
+    .badge.lost { background: #7a2e2e; }
+  </style>
+</head>
+<body>
+  <h1>冰湖双人救援 — 两侧输入 / 共享状态 / 碰撞结果同帧时间线</h1>
+  <div class="layout">
+    <div>
+      <canvas id="game" width="1280" height="720"></canvas>
+      <p class="small">
+        P1（卷索位）：<kbd>W</kbd>/<kbd>S</kbd> 收/放索，<kbd>A</kbd>/<kbd>D</kbd> 沿锚轨移动，<kbd>Q</kbd> 急拽；
+        P2（导向位）：<kbd>←</kbd>/<kbd>→</kbd>/<kbd>↑</kbd>/<kbd>↓</kbd> 导向，
+        <kbd>,</kbd>/<kbd>.</kbd> 沿锚轨移动，<kbd>/</kbd> 急拽。固定 20Hz 步进，回放逐帧校验 checksum。
+      </p>
+    </div>
+
+    <div class="panel">
+      <h2>任务与模式 <span id="statusBadge" class="badge run">running</span></h2>
+      <div class="row">
+        <button id="btnManual" class="primary">手动双人</button>
+        <button id="btnDemoSuccess">自动·成功</button>
+        <button id="btnDemoFailure">自动·失败</button>
+        <button id="btnReset">重置</button>
+      </div>
+
+      <h2>存档与恢复</h2>
+      <div class="row">
+        <button id="btnSave">保存进度</button>
+        <button id="btnReload">重载并校验</button>
+      </div>
+      <div id="reloadResult" class="small"></div>
+
+      <h2>仪表</h2>
+      <div class="gauge"><label><span>任务进度</span><span id="vProgress">0%</span></label>
+        <div class="track"><div id="fProgress" class="fill" style="width:0%;background:#57d28a"></div></div></div>
+      <div class="gauge"><label><span>冰面耐久</span><span id="vIntegrity">100</span></label>
+        <div class="track"><div id="fIntegrity" class="fill" style="width:100%;background:#7cc7ff"></div></div></div>
+      <div class="gauge"><label><span>绳索张力</span><span id="vTension">0</span></label>
+        <div class="track"><div id="fTension" class="fill" style="width:0%;background:#ffb85c"></div></div></div>
+      <div class="gauge"><label><span>导向载荷</span><span id="vGuide">0</span></label>
+        <div class="track"><div id="fGuide" class="fill" style="width:0%;background:#c79bff"></div></div></div>
+
+      <h2>回放（暂停 / 单步 / 倍速不改终态）</h2>
+      <div class="row">
+        <button id="btnReplay">回放最近一局</button>
+        <button id="btnPause">暂停</button>
+        <button id="btnStep">单步</button>
+      </div>
+      <div class="row">
+        <button data-speed="0.5">0.5x</button>
+        <button data-speed="1">1x</button>
+        <button data-speed="2">2x</button>
+        <button data-speed="4">4x</button>
+      </div>
+      <div class="row">
+        <button id="btnConflictScan">顺序冲突扫描</button>
+        <button id="btnMute">静音</button>
+      </div>
+      <div id="replayResult" class="small"></div>
+
+      <h2>时间线事件</h2>
+      <div id="log"></div>
+    </div>
+  </div>
+  <script type="module" src="./src/ui/main.mjs"></script>
+</body>
+</html>

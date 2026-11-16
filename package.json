@@ -1,0 +1,15 @@
+{
+  "name": "ice-rescue-duo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Two-player cooperative ice-lake rescue game with shared timeline, deterministic replay and persistence verification.",
+  "scripts": {
+    "verify": "node test/verify.mjs",
+    "serve": "node test/server.mjs",
+    "test:browser": "node test/playwright.test.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.65.1"
+  }
+}

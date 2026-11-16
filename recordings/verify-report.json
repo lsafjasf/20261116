@@ -1,0 +1,168 @@
+{
+  "startedAt": "2026-11-16T00:45:24.181Z",
+  "checks": [
+    {
+      "name": "Web Audio 在 Node 下降级为事件桩",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "success 实际结局符合预期",
+      "ok": true,
+      "detail": "success/safe ticks=691"
+    },
+    {
+      "name": "success 回放逐帧 checksum 全部一致",
+      "ok": true,
+      "detail": "692 frames"
+    },
+    {
+      "name": "success 回放终态指纹与录制终态一致",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "success 倍速/单步访问的逻辑帧 checksum 一致",
+      "ok": true,
+      "detail": "4x 访问 519 帧、单步 692 帧，终态同为 384e3fad"
+    },
+    {
+      "name": "success 重载后仪表/耐久/进度完全恢复",
+      "ok": true,
+      "detail": "tick=345 progress=66.1 integrity=90.1 tension=0.373"
+    },
+    {
+      "name": "success 存档含共享状态与两侧输入同时间线",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "failure 实际结局符合预期",
+      "ok": true,
+      "detail": "failure/ice-break ticks=43"
+    },
+    {
+      "name": "failure 回放逐帧 checksum 全部一致",
+      "ok": true,
+      "detail": "44 frames"
+    },
+    {
+      "name": "failure 回放终态指纹与录制终态一致",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "failure 倍速/单步访问的逻辑帧 checksum 一致",
+      "ok": true,
+      "detail": "4x 访问 33 帧、单步 44 帧，终态同为 694941ce"
+    },
+    {
+      "name": "failure 重载后仪表/耐久/进度完全恢复",
+      "ok": true,
+      "detail": "tick=21 progress=0.0 integrity=99.5 tension=0.128"
+    },
+    {
+      "name": "failure 存档含共享状态与两侧输入同时间线",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "失败局存在顺序敏感冲突且报告具体时刻与对象位置",
+      "ok": true,
+      "detail": "tick=43 base={\"x\":878.8,\"y\":358.7} swapped={\"x\":878.8,\"y\":363.2}"
+    },
+    {
+      "name": "失败局时间线记录了冲突对象与两侧动作顺序",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "成功局无同帧急拽，交换顺序终态一致",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Web Audio 收到张力/裂纹/急拽事件",
+      "ok": true,
+      "detail": "38 audio events"
+    }
+  ],
+  "recordings": {
+    "success": {
+      "result": "success",
+      "reason": "safe",
+      "ticks": 691,
+      "conflicts": 0,
+      "collisions": 1,
+      "fingerprint": {
+        "status": "won",
+        "tick": 691,
+        "progress": 100,
+        "integrity": 85.51,
+        "tension": 0.099,
+        "guideLoad": 0,
+        "crate": {
+          "x": 239.886833,
+          "y": 228.367229,
+          "vx": -3.791831,
+          "vy": -1.474332,
+          "angle": -0.015855
+        },
+        "endReason": "safe"
+      }
+    },
+    "failure": {
+      "result": "failure",
+      "reason": "ice-break",
+      "ticks": 43,
+      "conflicts": 1,
+      "collisions": 0,
+      "fingerprint": {
+        "status": "lost",
+        "tick": 43,
+        "progress": 0,
+        "integrity": 98.33,
+        "tension": 0.132,
+        "guideLoad": 0.6,
+        "crate": {
+          "x": 878.797865,
+          "y": 358.723371,
+          "vx": -10.631491,
+          "vy": -43.572401,
+          "angle": 0.001677
+        },
+        "endReason": "ice-break"
+      }
+    }
+  },
+  "audioEvents": 38,
+  "orderConflict": {
+    "tick": 43,
+    "time": 2.15,
+    "object": "物资箱",
+    "basePosition": {
+      "x": 878.8,
+      "y": 358.7
+    },
+    "swappedPosition": {
+      "x": 878.8,
+      "y": 363.2
+    },
+    "baseChecksum": "694941ce",
+    "swappedChecksum": "c874eb07",
+    "inputs": {
+      "winch": 0.72,
+      "leftY": 0,
+      "steerX": -0.6,
+      "steerY": 0,
+      "rightY": -0.5,
+      "leftJerk": true,
+      "rightJerk": true,
+      "order": [
+        "left",
+        "right"
+      ]
+    }
+  },
+  "allPassed": true
+}
