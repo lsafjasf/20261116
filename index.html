@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>多语言画布编辑器</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1 id="app-title" data-i18n="appTitle"></h1>
+    <div class="lang-switch">
+      <label id="language-label" for="language-select" data-i18n="languageLabel"></label>
+      <select id="language-select" data-testid="language-select"></select>
+    </div>
+  </header>
+
+  <div id="recover-banner" class="recover-banner" hidden>
+    <strong data-i18n="recoverFailTitle"></strong>
+    <p data-i18n="recoverFailBody"></p>
+    <pre id="recover-snapshot" data-testid="recover-snapshot"></pre>
+  </div>
+
+  <main class="app-main">
+    <section class="toolbar-wrap">
+      <div class="toolbar" role="toolbar" id="toolbar" data-testid="toolbar">
+        <button type="button" id="btn-add-rect" data-i18n="addRect"></button>
+        <button type="button" id="btn-add-text" data-i18n="addText"></button>
+        <button type="button" id="btn-delete" data-i18n="deleteSelected"></button>
+        <button type="button" id="btn-undo" data-i18n="undo"></button>
+        <button type="button" id="btn-submit" data-i18n="submit"></button>
+        <button type="button" id="btn-help" data-i18n="openHelp"></button>
+      </div>
+      <p id="focus-hint" class="hint" data-i18n="focusOrderHint"></p>
+      <p id="toast" class="toast" role="status" aria-live="polite" data-testid="toast"></p>
+    </section>
+
+    <section class="canvas-wrap">
+      <div id="canvas-scroll" class="canvas-scroll" data-testid="canvas-scroll">
+        <div id="canvas" class="canvas" tabindex="0" data-testid="canvas"></div>
+      </div>
+      <input
+        id="object-editor"
+        class="object-editor"
+        type="text"
+        data-testid="object-editor"
+        hidden
+      />
+    </section>
+
+    <aside class="status-panel" data-testid="status-panel">
+      <h2 data-i18n="statusPanelTitle"></h2>
+      <dl class="status-grid">
+        <dt data-i18n="statusLanguage"></dt><dd id="st-language" data-testid="st-language"></dd>
+        <dt data-i18n="statusObjectCount"></dt><dd id="st-count" data-testid="st-count"></dd>
+        <dt data-i18n="statusSelected"></dt><dd id="st-selected" data-testid="st-selected"></dd>
+        <dt data-i18n="statusScroll"></dt><dd id="st-scroll" data-testid="st-scroll"></dd>
+        <dt data-i18n="statusDirty"></dt><dd id="st-dirty" data-testid="st-dirty"></dd>
+        <dt data-i18n="statusStorage"></dt><dd id="st-storage" data-testid="st-storage"></dd>
+        <dt data-i18n="statusLastSaved"></dt><dd id="st-saved" data-testid="st-saved"></dd>
+      </dl>
+    </aside>
+  </main>
+
+  <dialog id="help-dialog" data-testid="help-dialog">
+    <h2 data-i18n="helpTitle"></h2>
+    <p id="help-body" data-i18n="helpBody"></p>
+    <form method="dialog">
+      <button type="submit" id="btn-close-dialog" data-i18n="closeDialog"></button>
+    </form>
+  </dialog>
+
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
