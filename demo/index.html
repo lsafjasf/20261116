@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>长音频 Canvas 波形概览</title>
+    <style>
+      body { margin: 0; padding: 20px; font-family: system-ui, sans-serif; background: #020617; color: #e2e8f0; }
+      canvas { width: 960px; height: 320px; border: 1px solid #1e293b; display: block; background: #0b1020; }
+      .toolbar { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+      button { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+      button.active { background: #0369a1; border-color: #38bdf8; }
+      #notices { margin-top: 10px; font-size: 13px; min-height: 20px; color: #facc15; }
+      .hint { color: #94a3b8; font-size: 12px; }
+      code { color: #38bdf8; }
+    </style>
+  </head>
+  <body>
+    <h2>十分钟音频波形 · 多分辨率瓦片渲染</h2>
+    <div class="toolbar">
+      <button data-zoom="overview" class="active">概览 2px/s</button>
+      <button data-zoom="medium">中倍 25px/s</button>
+      <button data-zoom="detail">细节 200px/s</button>
+      <button id="fail-toggle">模拟瓦片请求失效</button>
+      <button id="invalidate">使缓存失效</button>
+      <span class="hint">滚轮缩放（光标锚点）· Shift+滚轮 / 拖拽滚动</span>
+    </div>
+    <canvas id="wave" width="960" height="320"></canvas>
+    <div id="notices"></div>
+    <p class="hint">
+      级别 <code id="level">-</code> · 像素列 <code id="buckets">-</code> ·
+      时间窗口 <code id="window">-</code> · 播放头 <code id="head">-</code>
+    </p>
+    <script type="module" src="./demo.js"></script>
+  </body>
+</html>

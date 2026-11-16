@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "name": "ten-minute-waveform",
+  "canvas": {
+    "width": 960,
+    "height": 320
+  },
+  "audio": {
+    "sampleRate": 44100,
+    "durationSec": 600,
+    "seed": "uid634-ten-minutes",
+    "pyramidChecksum": "763878588757251acc13f05106a031d1a2e30ffeaabee77d6bd873d1fb493f0d"
+  },
+  "viewport": {
+    "zoomId": "medium",
+    "scrollSec": 120
+  },
+  "layers": [
+    {
+      "id": "grid",
+      "name": "Time grid",
+      "visible": true
+    },
+    {
+      "id": "waveform",
+      "name": "Waveform",
+      "visible": true
+    },
+    {
+      "id": "selection",
+      "name": "Selection",
+      "visible": true
+    },
+    {
+      "id": "playhead",
+      "name": "Playhead",
+      "visible": true
+    }
+  ],
+  "keyframes": [
+    {
+      "id": "kf-1",
+      "timeSec": 126,
+      "layerId": "playhead",
+      "x": 150,
+      "y": 60,
+      "color": "#f472b6"
+    },
+    {
+      "id": "kf-2",
+      "timeSec": 152,
+      "layerId": "waveform",
+      "x": 800,
+      "y": 260,
+      "color": "#38bdf8"
+    }
+  ],
+  "theme": {
+    "background": "#0b1020",
+    "waveform": "#38bdf8",
+    "centerLine": "#1e293b",
+    "grid": "#1e293b",
+    "gridLabel": "#94a3b8",
+    "playhead": "#f472b6",
+    "selection": "#facc15",
+    "selectionFill": "#facc15"
+  },
+  "overlay": {
+    "playheadSec": 145,
+    "selection": {
+      "startSec": 130,
+      "endSec": 138
+    }
+  },
+  "contentHash": "ecaa36f0"
+}

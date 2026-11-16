@@ -1,0 +1,25 @@
+{
+  "snapshotId": "pre-export-2026-11-16T00-19-41-883Z",
+  "createdAt": "2026-11-16T00:19:41.890Z",
+  "gitCommit": "ababc9c81d3cd63ca8da720ce98285302a57d45c",
+  "pyramidChecksum": "763878588757251acc13f05106a031d1a2e30ffeaabee77d6bd873d1fb493f0d",
+  "pyramidLevels": 10,
+  "previewHash": "f0699007",
+  "previewHashesByZoom": {
+    "overview": "d0f34252",
+    "medium": "f8276a58",
+    "detail": "479d2d44"
+  },
+  "viewport": {
+    "zoomId": "medium",
+    "scrollSec": 120
+  },
+  "layerOrder": [
+    "grid",
+    "waveform",
+    "selection",
+    "playhead"
+  ],
+  "keyframeCount": 2,
+  "projectFile": "project.json"
+}

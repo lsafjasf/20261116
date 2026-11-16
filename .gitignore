@@ -1,0 +1,4 @@
+node_modules/
+artifacts/audio/
+artifacts/exports/
+artifacts/perf-report.json

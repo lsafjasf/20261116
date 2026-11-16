@@ -1,0 +1,16 @@
+{
+  "name": "long-audio-waveform-canvas",
+  "version": "1.0.0",
+  "description": "Long-audio Canvas waveform overview with multi-resolution peak pyramid, tiled progressive rendering, aligned playhead/selection, deterministic export and failure fallback.",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "generate": "node scripts/generate-audio.js",
+    "test": "node scripts/run-all.js",
+    "perf": "node scripts/perf.js",
+    "snapshot": "node scripts/snapshot.js",
+    "export": "node scripts/export.js"
+  },
+  "engines": { "node": ">=20" },
+  "license": "MIT"
+}
