@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WebGL2 上下文丢失/恢复演示</title>
+    <link rel="stylesheet" href="src/styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <div id="hud">
+        <div class="hud-row">
+          <span id="status-badge" class="badge">INIT</span>
+          <span id="status-text">初始化中…</span>
+        </div>
+        <div class="hud-grid">
+          <div><b>帧时间 Frame</b><span id="m-frame-ms">–</span></div>
+          <div><b>FPS</b><span id="m-fps">–</span></div>
+          <div><b>候选数 Candidates</b><span id="m-candidates">–</span></div>
+          <div><b>可见数 Visible</b><span id="m-visible">–</span></div>
+          <div><b>节点数 Nodes</b><span id="m-nodes">–</span></div>
+          <div><b>缓存命中率 Cache</b><span id="m-cache">–</span></div>
+          <div><b>绘制调用 Draws</b><span id="m-draws">–</span></div>
+          <div><b>GPU 占用 GPU Mem</b><span id="m-gpu">–</span></div>
+          <div><b>GL 错误 GL Err</b><span id="m-errors">–</span></div>
+          <div><b>拦截调用 Blocked</b><span id="m-blocked">–</span></div>
+        </div>
+        <div class="hud-row small">
+          <span>渲染路径 Path：<b id="m-mode">–</b></span>
+          <span>丢失次数 Losses：<b id="m-loss-count">0</b></span>
+          <span>拾取 Pick：<b id="m-pick">无 none</b></span>
+        </div>
+      </div>
+      <canvas id="gl-canvas" width="960" height="720"></canvas>
+      <div id="lost-overlay" class="hidden">
+        <div class="overlay-card">
+          <h2>渲染上下文已丢失 / Context Lost</h2>
+          <p id="overlay-detail">已暂停渲染，等待系统恢复 GPU… / Rendering paused, waiting for GPU recovery…</p>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>

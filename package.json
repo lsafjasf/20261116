@@ -1,0 +1,17 @@
+{
+  "name": "webgl2-context-loss-restore",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node test/harness.js",
+    "report": "node test/harness.js",
+    "ui": "node test/ui-check.js",
+    "serve": "node -e \"import('./test/server.js').then(async m=>{const s=await m.startServer();console.log(s.url);})\""
+  },
+  "dependencies": {
+    "pixelmatch": "^6.0.0",
+    "playwright": "^1.49.0",
+    "pngjs": "^7.0.0"
+  }
+}
